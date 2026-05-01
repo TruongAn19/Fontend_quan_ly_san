@@ -1,0 +1,105 @@
+<div class="admin-rackets animate-fade-in">
+  <div class="header-row">
+    <h1 class="page-title">Quản lý Vợt</h1>
+    <button class="btn-create" (click)="openCreateModal()">+ Thêm mới</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải danh sách...
+    </div>
+  } @else {
+
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên Vợt</th>
+            <th>Hãng</th>
+            <th>Giá trị</th>
+            <th>Giá thuê</th>
+            <th>Tình trạng</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of rackets()">
+            <td>{{ item.id }}</td>
+            <td><strong>{{ item.name }}</strong></td>
+            <td>{{ item.brand }}</td>
+            <td>{{ item.price | number }} VNĐ</td>
+            <td>{{ item.rentalPrice | number }} VNĐ</td>
+            <td>{{ item.conditionStatus }}</td>
+            <td class="actions-cell">
+              <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper">
+      <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
+      <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() + 1 > totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+    </div>
+
+  }
+
+  @if (showModal()) {
+    <div class="modal-overlay animate-fade-in">
+      <div class="modal-content glass-card">
+        <h3>{{ isEdit() ? 'Sửa thông tin vợt' : 'Thêm vợt mới' }}</h3>
+        
+        <form [formGroup]="racketForm" (ngSubmit)="onSubmit()" class="premium-form">
+          <div class="form-group">
+            <label for="name">Tên vợt</label>
+            <input type="text" id="name" formControlName="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="brand">Hãng</label>
+            <input type="text" id="brand" formControlName="brand" />
+          </div>
+
+          <div class="form-group">
+            <label for="price">Giá trị gốc (VNĐ)</label>
+            <input type="number" id="price" formControlName="price" />
+          </div>
+
+          <div class="form-group">
+            <label for="rentalPrice">Giá cho thuê (VNĐ)</label>
+            <input type="number" id="rentalPrice" formControlName="rentalPrice" />
+          </div>
+
+          <div class="form-group">
+            <label for="conditionStatus">Tình trạng</label>
+            <select id="conditionStatus" formControlName="conditionStatus">
+              <option value="Tốt">Tốt</option>
+              <option value="Cũ">Cũ</option>
+              <option value="Bảo trì">Bảo trì</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="racketImg">Hình ảnh</label>
+            <input type="file" id="racketImg" (change)="onFileSelected($event)" accept="image/*" />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn-primary" [disabled]="racketForm.invalid">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+</div>

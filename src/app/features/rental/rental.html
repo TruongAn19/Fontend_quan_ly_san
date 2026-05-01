@@ -1,0 +1,85 @@
+<div class="rental-container animate-fade-in">
+  
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <div class="glass-card form-card">
+    <h1 class="section-title">Thuê dụng cụ</h1>
+    
+    <form [formGroup]="rentalForm" (ngSubmit)="onSubmitRental()" class="premium-form">
+      
+      <div class="form-group">
+        <label for="fullName">Họ và Tên</label>
+        <input type="text" id="fullName" formControlName="fullName" [class.invalid]="rentalForm.get('fullName')?.invalid && rentalForm.get('fullName')?.touched" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" formControlName="email" [class.invalid]="rentalForm.get('email')?.invalid && rentalForm.get('email')?.touched" />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Số điện thoại</label>
+        <input type="text" id="phone" formControlName="phone" [class.invalid]="rentalForm.get('phone')?.invalid && rentalForm.get('phone')?.touched" />
+      </div>
+
+      <div class="form-group">
+        <label for="type">Hình thức thuê</label>
+        <select id="type" formControlName="type">
+          <option value="DAILY">Thuê theo ngày (DAILY)</option>
+          <option value="ON_SITE">Thuê tại sân (ON_SITE)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">Số lượng vợt</label>
+        <input type="number" id="quantity" formControlName="quantity" min="1" />
+      </div>
+
+      @if (rentalForm.get('type')?.value === 'DAILY') {
+        <div class="form-group animate-fade-in">
+          <label for="rentalDate">Ngày bắt đầu thuê</label>
+          <input type="date" id="rentalDate" formControlName="rentalDate" />
+        </div>
+
+        <div class="form-group animate-fade-in">
+          <label for="quantityDay">Số ngày thuê</label>
+          <input type="number" id="quantityDay" formControlName="quantityDay" min="1" />
+        </div>
+      }
+
+      @if (rentalForm.get('type')?.value === 'ON_SITE') {
+        <div class="form-group animate-fade-in">
+          <label for="bookingCode">Mã đặt sân (Booking Code)</label>
+          <input type="text" id="bookingCode" formControlName="bookingCode" placeholder="VD: BK123456" [class.invalid]="rentalForm.get('bookingCode')?.invalid && rentalForm.get('bookingCode')?.touched" />
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="paymentMethod">Phương thức thanh toán</label>
+        <select id="paymentMethod" formControlName="paymentMethod">
+          <option value="VNPAY">Thanh toán qua VNPay</option>
+          <option value="CASH">Thanh toán tiền mặt</option>
+        </select>
+      </div>
+
+      <div class="deposit-notice animate-fade-in">
+        <i class="fas fa-info-circle"></i>
+        <p>Lưu ý: Hệ thống sẽ thu phí đặt cọc bằng giá trị gốc của vợt để đảm bảo an toàn thiết bị. Số tiền này sẽ được đối soát khi trả vợt.</p>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="isCreating() || isPaying()">
+        @if (isCreating() || isPaying()) {
+          <span class="spinner"></span> Đang xử lý...
+        } @else {
+          Thuê & Thanh toán
+        }
+      </button>
+
+    </form>
+  </div>
+
+</div>

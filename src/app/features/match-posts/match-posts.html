@@ -1,0 +1,82 @@
+<div class="match-container animate-fade-in">
+  
+  <div class="header-row">
+    <h1 class="page-title">Tìm người chơi</h1>
+    <a routerLink="/match-posts/create" class="btn-create">+ Tạo bài đăng mới</a>
+  </div>
+
+  <div class="glass-card filter-card">
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filter-form">
+      <div class="filter-row">
+        
+        <div class="form-group">
+          <label for="area">Khu vực</label>
+          <input type="text" id="area" formControlName="area" placeholder="VD: Thu Duc, Binh Thanh..." />
+        </div>
+
+        <div class="form-group">
+          <label for="playDate">Ngày chơi</label>
+          <input type="date" id="playDate" formControlName="playDate" />
+        </div>
+
+        <div class="form-group">
+          <label for="skillLevel">Trình độ</label>
+          <select id="skillLevel" formControlName="skillLevel">
+            <option value="">Tất cả</option>
+            <option value="Beginner">Mới chơi (Beginner)</option>
+            <option value="Intermediate">Trung bình (Intermediate)</option>
+            <option value="Advanced">Khá tốt (Advanced)</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary filter-btn">Tìm kiếm</button>
+    </form>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="skeleton-grid">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+    </div>
+  } @else {
+
+    @if (posts().length === 0) {
+      <div class="empty-state animate-fade-in">
+        <h3 class="empty-title">Chưa có bài đăng nào</h3>
+        <p class="empty-text">Hãy trở thành người đầu tiên tạo bài đăng ghép sân nhé!</p>
+      </div>
+    } @else {
+      
+      <div class="match-grid">
+        <div class="match-card glass-card animate-fade-in" *ngFor="let post of posts()">
+          <div class="card-header">
+            <h3 class="card-title">{{ post.skillLevel }} - {{ post.area }}</h3>
+            <span class="slot-badge">{{ post.participants?.length || 0 }} / {{ post.maxParticipants }}</span>
+          </div>
+          <div class="card-body">
+            <p class="info-row">📅 Ngày: <strong>{{ post.playDate }}</strong></p>
+            <p class="info-row">⏰ Giờ: <strong>{{ post.timeSlot }}</strong></p>
+            <p class="desc-text">{{ post.description || 'Không có mô tả.' }}</p>
+            
+            <div class="card-footer">
+              <a [routerLink]="['/match-posts/detail', post.id]" class="btn-detail">Xem chi tiết</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination-wrapper">
+        <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
+        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+      </div>
+    }
+  }
+
+</div>

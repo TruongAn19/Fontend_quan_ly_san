@@ -1,0 +1,61 @@
+<div class="history-container animate-fade-in">
+  <h1 class="page-title">Lịch sử Đặt sân</h1>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải lịch sử...
+    </div>
+  } @else {
+
+    @if (bookings().length === 0) {
+      <div class="empty-state">
+        <p>Bạn chưa có lịch sử đặt sân nào.</p>
+      </div>
+    } @else {
+      
+      <div class="table-responsive glass-card">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>Mã đặt</th>
+              <th>Tên sân</th>
+              <th>Ngày đặt</th>
+              <th>Khung giờ</th>
+              <th>Trạng thái</th>
+              <th>Tổng tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of bookings()">
+              <td><strong>{{ item.bookingCode }}</strong></td>
+              <td>{{ item.courtName || 'Sân cầu lông' }}</td>
+              <td>{{ item.bookingDate }}</td>
+              <td>{{ item.time }}</td>
+              <td>
+                <span class="status-badge" [class]="item.status?.toLowerCase()">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td class="total-price">{{ item.totalPrice | number }} VNĐ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-wrapper">
+        <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
+        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+      </div>
+
+    }
+
+  }
+</div>

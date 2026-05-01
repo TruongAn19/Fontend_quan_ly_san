@@ -1,0 +1,75 @@
+<div class="admin-bookings animate-fade-in">
+  <h1 class="page-title">Quản lý Đặt sân (Staff)</h1>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="filterForm" (ngSubmit)="onFilterSubmit()" class="filters-bar glass-card">
+    <div class="filter-group">
+      <label for="date">Lọc theo ngày</label>
+      <input type="date" id="date" formControlName="date" />
+    </div>
+    <div class="filter-group">
+      <label for="search">Tìm người đặt (Họ tên/SĐT)</label>
+      <input type="text" id="search" formControlName="search" placeholder="Tìm kiếm..." />
+    </div>
+    <button type="submit" class="btn-filter">Áp dụng</button>
+  </form>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải danh sách...
+    </div>
+  } @else {
+
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Khách hàng</th>
+            <th>Ngày</th>
+            <th>Giờ</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of bookings()">
+            <td>{{ item.id }}</td>
+            <td><strong>{{ item.fullName }}</strong><br><small>{{ item.phone }}</small></td>
+            <td>{{ item.bookingDate }}</td>
+            <td>{{ item.timeSlot }}</td>
+            <td>{{ item.totalPrice | number }} VNĐ</td>
+            <td>
+              <span class="status-badge" [attr.data-status]="item.status">
+                {{ item.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-dropdown">
+                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
+                  <option value="">-- Đổi trạng thái --</option>
+                  <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
+                    {{ st }}
+                  </option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper">
+      <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
+      <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+    </div>
+
+  }
+</div>

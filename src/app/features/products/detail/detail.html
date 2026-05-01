@@ -1,0 +1,86 @@
+<div class="detail-container animate-fade-in">
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải chi tiết...
+    </div>
+  } @else {
+    
+    @if (productDetail()) {
+      <div class="grid-layout">
+        
+        <!-- Image Section -->
+        <div class="image-section">
+          <img 
+            [src]="productDetail().product?.imageUrl || 'assets/img/default-court.png'" 
+            alt="{{ productDetail().product?.name }}" 
+            class="detail-img"
+          />
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section glass-card">
+          <h1 class="product-name">{{ productDetail().product?.name }}</h1>
+          <p class="product-address">{{ productDetail().product?.address }}</p>
+
+          <div class="price-box">
+            @if (productDetail().discountPrice && productDetail().discountPrice < productDetail().product?.pricePerHour) {
+              <span class="original-price">{{ productDetail().product?.pricePerHour | number }} VNĐ</span>
+              <span class="discount-price">{{ productDetail().discountPrice | number }} VNĐ / Giờ</span>
+            } @else {
+              <span class="discount-price">{{ productDetail().product?.pricePerHour | number }} VNĐ / Giờ</span>
+            }
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">Mô tả sản phẩm</h3>
+            <p class="block-desc">{{ productDetail().product?.description || 'Chưa có mô tả cho sản phẩm này.' }}</p>
+          </div>
+
+          <div class="detail-block">
+            <h3 class="block-title">Khung giờ trống</h3>
+            
+            @if (productDetail().availableTime?.length) {
+              <div class="time-grid">
+                <span class="time-badge" *ngFor="let time of productDetail().availableTime">
+                  {{ time.time }}
+                </span>
+              </div>
+            } @else {
+              <p class="empty-time">Hôm nay đã hết khung giờ trống.</p>
+            }
+          </div>
+
+          <!-- Rackets section -->
+          @if (productDetail().rackets?.length) {
+            <div class="detail-block">
+              <h3 class="block-title">Vợt cho thuê tại sân</h3>
+              <div class="racket-list">
+                <div class="racket-item" *ngFor="let racket of productDetail().rackets">
+                  <div class="racket-info">
+                    <span class="racket-name">{{ racket.name }}</span>
+                    <span class="racket-factory">{{ racket.factory }}</span>
+                  </div>
+                  <div class="racket-action">
+                    <span class="racket-price">{{ (racket.rentalPricePerPlay || racket.price) | number }}đ / Buổi</span>
+                    <a [routerLink]="['/rackets/detail', racket.id]" class="btn-view-racket">Chi tiết</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <a [routerLink]="['/booking', productId()]" class="btn-book-now">Đặt sân ngay</a>
+        </div>
+
+      </div>
+    }
+  }
+
+</div>

@@ -1,0 +1,71 @@
+<div class="admin-rentals animate-fade-in">
+  <h1 class="page-title">Quản lý Thuê Dụng cụ (Daily)</h1>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="filters-bar glass-card">
+    <div class="filter-group">
+      <label for="search">Tìm kiếm (Tên người thuê/Mã đơn)</label>
+      <input type="text" id="search" formControlName="search" placeholder="Nhập từ khóa..." />
+    </div>
+    <button type="submit" class="btn-filter">Tìm kiếm</button>
+  </form>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải danh sách...
+    </div>
+  } @else {
+
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>ID đơn</th>
+            <th>Người thuê</th>
+            <th>Dụng cụ</th>
+            <th>Ngày thuê</th>
+            <th>Tổng chi phí</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of rentals()">
+            <td>{{ item.id }}</td>
+            <td><strong>{{ item.customerName || 'Khách vãng lai' }}</strong></td>
+            <td>{{ item.racketName || 'Vợt' }}</td>
+            <td>{{ item.rentalDate }}</td>
+            <td>{{ item.totalFee | number }} VNĐ</td>
+            <td>
+              <span class="status-badge" [attr.data-status]="item.status">
+                {{ item.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-dropdown">
+                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
+                  <option value="">-- Đổi trạng thái --</option>
+                  <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
+                    {{ st }}
+                  </option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper">
+      <button class="page-btn" [disabled]="currentPage() === 0" (click)="changePage(currentPage() - 1)">Trang trước</button>
+      <span class="page-indicator">Trang {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() + 1 >= totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+    </div>
+
+  }
+</div>

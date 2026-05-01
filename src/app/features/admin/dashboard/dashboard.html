@@ -1,0 +1,51 @@
+<div class="admin-dashboard animate-fade-in">
+  <h1 class="page-title">Admin Dashboard</h1>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tổng hợp dữ liệu...
+    </div>
+  } @else {
+    
+    @if (stats()) {
+      <div class="stats-grid">
+        <div class="stat-card glass-card">
+          <h3 class="stat-label">Người dùng</h3>
+          <p class="stat-value">{{ stats().countUser || 0 }}</p>
+        </div>
+        <div class="stat-card glass-card">
+          <h3 class="stat-label">Sản phẩm / Sân</h3>
+          <p class="stat-value">{{ stats().countProduct || 0 }}</p>
+        </div>
+      </div>
+    }
+
+    @if (racketStats()) {
+      <div class="racket-stats-section">
+        <h2 class="section-title">Thống kê thuê dụng cụ</h2>
+        
+        <div class="stats-grid secondary">
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Tổng số vợt</h4>
+            <p class="stat-value">{{ racketStats().totalRackets || 0 }}</p>
+          </div>
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Đang cho thuê</h4>
+            <p class="stat-value">{{ racketStats().currentlyRented || 0 }}</p>
+          </div>
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Doanh thu tháng này</h4>
+            <p class="stat-value">{{ (racketStats().monthlyRevenue || 0) | number }} VNĐ</p>
+          </div>
+        </div>
+      </div>
+    }
+
+  }
+</div>

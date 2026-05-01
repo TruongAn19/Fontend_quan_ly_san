@@ -1,0 +1,106 @@
+<div class="register-container">
+  <div class="glass-card animate-fade-in">
+    <h1 class="premium-title">Tạo tài khoản</h1>
+    <p class="premium-subtitle">Tham gia cùng chúng tôi ngay hôm nay</p>
+
+    @if (errorMessage()) {
+      <div class="error-alert">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="premium-form">
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">Họ</label>
+          <input 
+            type="text" 
+            id="firstName" 
+            formControlName="firstName" 
+            placeholder="Nguyễn"
+            [class.invalid]="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
+          />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Tên</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            formControlName="lastName" 
+            placeholder="Văn A"
+            [class.invalid]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="name@example.com"
+          [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+        />
+        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+          <span class="validation-error">Vui lòng nhập email hợp lệ</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Số điện thoại</label>
+        <input 
+          type="text" 
+          id="phone" 
+          formControlName="phone" 
+          placeholder="0901234567"
+          [class.invalid]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
+        />
+        @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+          <span class="validation-error">Số điện thoại không đúng định dạng VN</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          placeholder="••••••••"
+          [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+        />
+        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+          <span class="validation-error">Mật khẩu tối thiểu 6 ký tự</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Xác nhận mật khẩu</label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          formControlName="confirmPassword" 
+          placeholder="••••••••"
+          [class.invalid]="(registerForm.get('confirmPassword')?.invalid || registerForm.hasError('mismatch')) && registerForm.get('confirmPassword')?.touched"
+        />
+        @if (registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched) {
+          <span class="validation-error">Mật khẩu xác nhận không khớp</span>
+        }
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span class="spinner"></span> Đang xử lý...
+        } @else {
+          <span>Đăng ký</span>
+        }
+      </button>
+    </form>
+
+    <div class="form-footer">
+      <p>Đã có tài khoản? <a routerLink="/login">Đăng nhập ngay</a></p>
+    </div>
+  </div>
+</div>

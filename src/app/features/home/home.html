@@ -1,0 +1,72 @@
+<div class="home-container animate-fade-in">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Sân Cầu Lông <span class="highlight">Premium</span></h1>
+      <p class="hero-subtitle">Đặt sân trực tuyến nhanh chóng, tiện lợi. Trải nghiệm tốt nhất cho người đam mê cầu lông.</p>
+      <div class="hero-actions">
+        <a routerLink="/products" class="btn-primary">Đặt Sân Ngay</a>
+        <a routerLink="/rackets" class="btn-secondary">Thuê Vợt</a>
+      </div>
+    </div>
+  </section>
+
+  @if (errorMessage()) {
+    <div class="error-state">
+      <p>{{ errorMessage() }}</p>
+      <button class="btn-retry" (click)="loadHomeData()">Thử lại</button>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="skeleton-grid">
+        <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+      </div>
+    </div>
+  } @else {
+    
+    <!-- Top Products Section -->
+    <section class="section-grid-container" *ngIf="homeData()?.topProducts?.length">
+      <h2 class="section-title">Sân Cầu Lông Nổi Bật</h2>
+      <div class="product-grid">
+        <div class="product-card" *ngFor="let item of homeData()?.topProducts">
+          <img [src]="item.imageUrl || 'assets/img/default-court.png'" alt="{{item.name}}" class="card-img">
+          <div class="card-body">
+            <h3 class="card-name">{{item.name}}</h3>
+            <p class="card-address">{{item.address}}</p>
+            <div class="card-price">
+              <span>{{item.pricePerHour | number}} VNĐ / Giờ</span>
+            </div>
+            <a [routerLink]="['/products/detail', item.id]" class="btn-book">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Rackets Section -->
+    <section class="section-grid-container" *ngIf="homeData()?.topRackets?.length">
+      <h2 class="section-title">Vợt Cho Thuê Hot</h2>
+      <div class="product-grid">
+        <div class="product-card" *ngFor="let item of homeData()?.topRackets">
+          <img [src]="item.imageUrl || 'assets/img/default-racket.png'" alt="{{item.name}}" class="card-img">
+          <div class="card-body">
+            <h3 class="card-name">{{item.name}}</h3>
+            <p class="card-address">Hãng: {{item.factory}}</p>
+            <div class="card-price">
+              <span>{{item.rentalPrice | number}} VNĐ / Buổi</span>
+            </div>
+            <a [routerLink]="['/rackets/detail', item.id]" class="btn-book">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!homeData()?.topProducts?.length && !homeData()?.topRackets?.length">
+      <p>Chưa có sản phẩm nào nổi bật hôm nay.</p>
+    </div>
+  }
+
+</div>

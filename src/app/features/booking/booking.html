@@ -1,0 +1,124 @@
+<div class="booking-container animate-fade-in">
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- Hold Slot Timer -->
+  @if (isHeld()) {
+    <div class="hold-timer-alert animate-pulse">
+      <span class="timer-text">Khung giờ đã được giữ! Vui lòng hoàn tất thanh toán trong: <strong>{{ holdTimeLeft() }} giây</strong></span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải thông tin...
+    </div>
+  } @else {
+
+    <div class="grid-layout">
+      
+      <!-- Left: Slot Selection -->
+      <div class="glass-card selection-card">
+        <h2 class="section-title">Chọn sân & khung giờ</h2>
+        
+        <div class="control-group">
+          <label for="bookingDate">Chọn ngày:</label>
+          <input type="date" id="bookingDate" [value]="selectedDate()" (change)="onDateChange($event)" [disabled]="isHeld()" />
+        </div>
+
+        <div class="control-group">
+          <label for="bookingCourt">Chọn sân:</label>
+          <select id="bookingCourt" [value]="selectedCourtId()" (change)="onCourtChange($event)" [disabled]="isHeld()">
+            <option *ngFor="let court of bookingInfo()?.courts" [value]="court.id">{{ court.name }}</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Khung giờ khả dụng:</label>
+          @if (availableTimes().length === 0) {
+            <p class="empty-times">Không có khung giờ khả dụng trong ngày này.</p>
+          } @else {
+            <form [formGroup]="bookingForm">
+              <div class="time-radio-group">
+                <label *ngFor="let time of availableTimes()" class="time-radio-label" [class.selected]="bookingForm.get('availableTimeId')?.value == time.id">
+                  <input type="radio" formControlName="availableTimeId" [value]="time.id" style="display: none;" />
+                  {{ time.time }}
+                </label>
+              </div>
+            </form>
+          }
+        </div>
+
+        @if (!isHeld()) {
+          <button class="btn-hold" [disabled]="isHolding() || availableTimes().length === 0" (click)="onHoldSlot()">
+            @if (isHolding()) {
+              <span class="spinner"></span> Đang giữ chỗ...
+            } @else {
+              Giữ chỗ ngay
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Right: Booking Form -->
+      <div class="glass-card form-card" [class.disabled-overlay]="!isHeld()">
+        <h2 class="section-title">Thông tin người đặt</h2>
+        
+        <form [formGroup]="bookingForm" (ngSubmit)="onPlaceBooking()" class="premium-form">
+          <div class="form-group">
+            <label for="receiverName">Họ và Tên</label>
+            <input type="text" id="receiverName" formControlName="receiverName" [class.invalid]="bookingForm.get('receiverName')?.invalid && bookingForm.get('receiverName')?.touched" />
+            @if (bookingForm.get('receiverName')?.invalid && bookingForm.get('receiverName')?.touched) {
+              <span class="field-error">Vui lòng nhập họ và tên.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="receiverPhone">Số điện thoại</label>
+            <input type="text" id="receiverPhone" formControlName="receiverPhone" [class.invalid]="bookingForm.get('receiverPhone')?.invalid && bookingForm.get('receiverPhone')?.touched" />
+            @if (bookingForm.get('receiverPhone')?.invalid && bookingForm.get('receiverPhone')?.touched) {
+              <span class="field-error">Số điện thoại không hợp lệ (VD: 0912345678).</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="receiverAddress">Địa chỉ</label>
+            <input type="text" id="receiverAddress" formControlName="receiverAddress" [class.invalid]="bookingForm.get('receiverAddress')?.invalid && bookingForm.get('receiverAddress')?.touched" />
+            @if (bookingForm.get('receiverAddress')?.invalid && bookingForm.get('receiverAddress')?.touched) {
+              <span class="field-error">Vui lòng nhập địa chỉ.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="bookingType">Hình thức đặt</label>
+            <select id="bookingType" formControlName="bookingType">
+              <option value="ONE_TIME">Đặt 1 lần</option>
+              <option value="WEEKLY_RECURRING">Đặt định kỳ hàng tuần</option>
+            </select>
+          </div>
+
+          @if (bookingForm.get('bookingType')?.value === 'WEEKLY_RECURRING') {
+            <div class="form-group animate-fade-in">
+              <label for="recurringEndDate">Ngày kết thúc định kỳ</label>
+              <input type="date" id="recurringEndDate" formControlName="recurringEndDate" />
+            </div>
+          }
+
+          <button type="submit" class="btn-place-booking" [disabled]="isPlacing() || !isHeld()">
+            @if (isPlacing()) {
+              <span class="spinner"></span> Đang xử lý...
+            } @else {
+              Tiến hành Thanh toán
+            }
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+  }
+</div>

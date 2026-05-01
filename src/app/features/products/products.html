@@ -1,0 +1,94 @@
+<div class="catalog-container animate-fade-in">
+  
+  <!-- Filter Section -->
+  <div class="glass-card filter-card">
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filter-form">
+      <div class="filter-row">
+        <div class="form-group search-group">
+          <label for="search">Tìm kiếm</label>
+          <input type="text" id="search" formControlName="search" placeholder="Tên sân..." />
+        </div>
+
+        <div class="form-group">
+          <label for="address">Địa chỉ</label>
+          <input type="text" id="address" formControlName="address" placeholder="Quận/Huyện..." />
+        </div>
+
+        <div class="form-group">
+          <label for="price">Giá tối đa</label>
+          <input type="number" id="price" formControlName="price" placeholder="VNĐ/Giờ" />
+        </div>
+
+        <div class="form-group">
+          <label for="sort">Sắp xếp</label>
+          <select id="sort" formControlName="sort">
+            <option value="">Mặc định</option>
+            <option value="pricePerHour,asc">Giá tăng dần</option>
+            <option value="pricePerHour,desc">Giá giảm dần</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary filter-btn">Tìm kiếm</button>
+    </form>
+  </div>
+
+  <!-- Error State -->
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="skeleton-grid">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+  } @else {
+
+    <!-- Empty State -->
+    @if (products().length === 0) {
+      <div class="empty-state animate-fade-in">
+        <h3 class="empty-title">Không tìm thấy sản phẩm</h3>
+        <p class="empty-text">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm xem sao nhé!</p>
+      </div>
+    } @else {
+      
+      <!-- Product Grid -->
+      <div class="product-grid">
+        <div class="product-card animate-fade-in" *ngFor="let product of products()">
+          <img [src]="product.imageUrl || 'assets/img/default-court.png'" alt="{{product.name}}" class="card-img"/>
+          <div class="card-body">
+            <h3 class="card-name">{{ product.name }}</h3>
+            <p class="card-address">{{ product.address }}</p>
+            <div class="card-price">
+              <span>{{ product.pricePerHour | number }} VNĐ / Giờ</span>
+            </div>
+            <a [routerLink]="['/products/detail', product.id]" class="btn-detail">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-wrapper">
+        <button 
+          class="page-btn" 
+          [disabled]="currentPage() === 1" 
+          (click)="changePage(currentPage() - 1)">
+          Trang trước
+        </button>
+        
+        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+        
+        <button 
+          class="page-btn" 
+          [disabled]="currentPage() === totalPages()" 
+          (click)="changePage(currentPage() + 1)">
+          Trang sau
+        </button>
+      </div>
+    }
+  }
+
+</div>

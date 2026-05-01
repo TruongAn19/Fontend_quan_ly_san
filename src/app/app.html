@@ -1,0 +1,53 @@
+<div class="app-wrapper">
+  
+  <!-- Premium Navbar -->
+  <nav class="premium-navbar animate-fade-in">
+    <div class="nav-container">
+      
+      <a routerLink="/" class="nav-logo">
+        <span class="logo-text">Badminton<span class="accent">Hub</span></span>
+      </a>
+
+      <div class="nav-links">
+        @if (isAdmin()) {
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
+          <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">Users</a>
+          <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">Sản phẩm</a>
+          <a routerLink="/admin/rackets" routerLinkActive="active" class="nav-item">Vợt</a>
+          <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Booking</a>
+          <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Thuê đồ</a>
+          <a routerLink="/admin/ntfy" routerLinkActive="active" class="nav-item">Thông báo</a>
+        } @else {
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">Trang chủ</a>
+          <a routerLink="/products" routerLinkActive="active" class="nav-item">Sân Cầu Lông</a>
+          <a routerLink="/rackets" routerLinkActive="active" class="nav-item">Thuê Vợt</a>
+          @if (authService.isLoggedIn()) {
+            <a routerLink="/booking-history" routerLinkActive="active" class="nav-item">Lịch sử đặt sân</a>
+            <a routerLink="/rental-history" routerLinkActive="active" class="nav-item">Lịch sử thuê vợt</a>
+          }
+        }
+      </div>
+
+      <div class="nav-actions">
+        @if (authService.isLoggedIn()) {
+          @if (!isAdmin()) {
+            <a routerLink="/profile" class="btn-profile">
+              Cá nhân
+            </a>
+          }
+          <button class="btn-logout" (click)="onLogout()">Đăng xuất</button>
+        } @else {
+          <a routerLink="/login" class="btn-login">Đăng nhập</a>
+          <a routerLink="/register" class="btn-primary">Đăng ký</a>
+        }
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Router Outlet Content -->
+  <main class="app-main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

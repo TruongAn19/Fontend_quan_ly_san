@@ -1,0 +1,112 @@
+<div class="admin-products animate-fade-in">
+  <div class="header-row">
+    <h1 class="page-title">Quản lý Sản phẩm / Sân</h1>
+    <button class="btn-create" (click)="openCreateModal()">+ Thêm mới</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span> Đang tải danh sách...
+    </div>
+  } @else {
+
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Giảm giá</th>
+            <th>Địa chỉ</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of products()">
+            <td>{{ item.id }}</td>
+            <td><strong>{{ item.name }}</strong></td>
+            <td>{{ item.price | number }} VNĐ</td>
+            <td>{{ item.sale || 0 }}%</td>
+            <td>{{ item.address }}</td>
+            <td class="actions-cell">
+              <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
+              <button class="btn-delete" (click)="deleteProduct(item.id)">Xóa</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper">
+      <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
+      <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+    </div>
+
+  }
+
+  @if (showModal()) {
+    <div class="modal-overlay animate-fade-in">
+      <div class="modal-content glass-card">
+        <h3>{{ isEdit() ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h3>
+        
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="premium-form">
+          <div class="form-group">
+            <label for="name">Tên sản phẩm/Sân</label>
+            <input type="text" id="name" formControlName="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="price">Giá (VNĐ)</label>
+            <input type="number" id="price" formControlName="price" />
+          </div>
+
+          <div class="form-group">
+            <label for="sale">Khuyến mãi (%)</label>
+            <input type="number" id="sale" formControlName="sale" />
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Số lượng sân (Hệ thống tự sinh tên "Sân 1", "Sân 2"...)</label>
+            <input type="number" id="quantity" formControlName="quantity" />
+          </div>
+
+          <div class="form-group">
+            <label for="subCourtNames">Hoặc nhập tên các sân con (cách nhau dấu phẩy, vd: Sân A, Sân B)</label>
+            <input type="text" id="subCourtNames" formControlName="subCourtNames" placeholder="Sân A, Sân B, Sân C..." />
+          </div>
+
+          <div class="form-group">
+            <label for="address">Địa chỉ</label>
+            <input type="text" id="address" formControlName="address" />
+          </div>
+
+          <div class="form-group">
+            <label for="detailDesc">Mô tả</label>
+            <textarea id="detailDesc" formControlName="detailDesc" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="image">Hình ảnh (Nhập link URL hoặc tải file ảnh lên)</label>
+            <input type="text" id="image" formControlName="image" placeholder="https://example.com/image.jpg" />
+            <span style="font-size: 0.8rem; color: #94a3b8; margin: 4px 0;">Hoặc tải lên từ máy tính:</span>
+            <input type="file" id="productImg" (change)="onFileSelected($event)" accept="image/*" />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn-primary" [disabled]="productForm.invalid">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+</div>

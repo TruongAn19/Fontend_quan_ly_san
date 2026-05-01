@@ -1,0 +1,30 @@
+<div class="success-container animate-fade-in">
+  <div class="glass-card">
+
+    <div class="icon-circle success">
+      <span class="icon">✔</span>
+    </div>
+
+    <h2>Thuê vợt thành công!</h2>
+    <p>{{ message() }}</p>
+
+    <div class="rental-info">
+      <div class="info-row">
+        <span class="label">Mã thuê vợt</span>
+        <span class="value code">{{ rentalCode() }}</span>
+      </div>
+      @if (rentalId()) {
+        <div class="info-row">
+          <span class="label">ID đơn thuê</span>
+          <span class="value">#{{ rentalId() }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="action-group">
+      <a routerLink="/" class="btn-primary">Quay về Trang chủ</a>
+      <a routerLink="/rental-history" class="btn-secondary">Xem Lịch sử Thuê dụng cụ</a>
+    </div>
+
+  </div>
+</div>

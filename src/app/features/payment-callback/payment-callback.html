@@ -1,0 +1,44 @@
+<div class="callback-container animate-fade-in">
+
+  <div class="glass-card result-card">
+
+    @if (isLoading()) {
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <h2>Đang xử lý giao dịch...</h2>
+        <p>Vui lòng không đóng trình duyệt hoặc tải lại trang này.</p>
+      </div>
+    } @else {
+
+      @if (paymentStatus() === 'SUCCESS') {
+        <div class="success-state animate-fade-in">
+          <div class="icon-circle success">
+            <span class="icon">✔</span>
+          </div>
+          <h2>Thanh toán thành công!</h2>
+          <p>Đơn đặt của bạn đã được xác nhận hệ thống.</p>
+          
+          <div class="action-group">
+            <a routerLink="/booking-history" class="btn-primary">Xem Lịch sử Đặt sân</a>
+            <a routerLink="/rental-history" class="btn-secondary">Xem Lịch sử Thuê dụng cụ</a>
+          </div>
+        </div>
+      } @else {
+        <div class="failed-state animate-fade-in">
+          <div class="icon-circle failed">
+            <span class="icon">✖</span>
+          </div>
+          <h2>Thanh toán thất bại</h2>
+          <p class="error-text">{{ errorMessage() }}</p>
+          
+          <div class="action-group">
+            <a routerLink="/" class="btn-primary">Quay lại Trang chủ</a>
+          </div>
+        </div>
+      }
+
+    }
+
+  </div>
+
+</div>
