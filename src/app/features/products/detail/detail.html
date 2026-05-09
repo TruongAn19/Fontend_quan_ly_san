@@ -22,12 +22,20 @@
             alt="{{ productDetail().product?.name }}" 
             class="detail-img"
           />
+          <!-- Hiển thị mô tả chi tiết dưới ảnh -->
+          <div class="image-detail-desc glass-card" *ngIf="productDetail().product?.detailDesc">
+            <h3 class="block-title">Chi tiết sân</h3>
+            <p class="block-desc">{{ productDetail().product?.detailDesc }}</p>
+          </div>
         </div>
 
         <!-- Info Section -->
         <div class="info-section glass-card">
           <h1 class="product-name">{{ productDetail().product?.name }}</h1>
-          <p class="product-address">{{ productDetail().product?.address }}</p>
+          <div class="location-box">
+            <p class="product-region"><strong>Khu vực:</strong> {{ productDetail().product?.address }}</p>
+            <p class="product-address"><strong>Địa chỉ:</strong> {{ productDetail().product?.addressDetail || 'Chưa cập nhật địa chỉ chi tiết' }}</p>
+          </div>
 
           <div class="price-box">
             @if (productDetail().discountPrice && productDetail().discountPrice < productDetail().product?.pricePerHour) {
@@ -39,8 +47,8 @@
           </div>
 
           <div class="detail-block">
-            <h3 class="block-title">Mô tả sản phẩm</h3>
-            <p class="block-desc">{{ productDetail().product?.description || 'Chưa có mô tả cho sản phẩm này.' }}</p>
+            <h3 class="block-title">Mô tả ngắn</h3>
+            <p class="block-desc">{{ productDetail().product?.shortDesc || 'Chưa có mô tả cho sản phẩm này.' }}</p>
           </div>
 
           <div class="detail-block">

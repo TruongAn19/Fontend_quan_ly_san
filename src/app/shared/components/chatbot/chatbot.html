@@ -1,0 +1,66 @@
+<div class="chatbot-wrapper">
+    <!-- Floating Action Button -->
+    <button class="chat-fab" (click)="toggleChat()">
+        <i class="fas" [class.fa-comment-dots]="!isOpen()" [class.fa-times]="isOpen()"></i>
+    </button>
+
+    <!-- Chat Container -->
+    @if (isOpen()) {
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-info">
+                    <h3>Antigravity AI</h3>
+                    <div class="status">
+                        <span class="status-dot"></span>
+                        Sẵn sàng hỗ trợ
+                    </div>
+                </div>
+                <button (click)="toggleChat()" style="background:none; border:none; color:white; cursor:pointer; font-size: 1.2rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="chat-messages" #scrollContainer>
+                @for (msg of messages(); track $index) {
+                    <div class="message" [ngClass]="msg.role">
+                        <div class="message-content" [innerHTML]="msg.content"></div>
+                    </div>
+                }
+                
+                @if (isProcessing()) {
+                    <div class="typing-indicator">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                }
+            </div>
+
+            <!-- Suggestions -->
+            <div class="suggestions">
+                @for (suggest of suggestions(); track suggest) {
+                    <div class="suggestion-chip" (click)="sendPreset(suggest)">
+                        {{ suggest }}
+                    </div>
+                }
+            </div>
+
+            <!-- Input Area -->
+            <form (submit)="sendMessage($event)" class="chat-input-area">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        [(ngModel)]="userInput" 
+                        name="userInput"
+                        placeholder="Bạn cần hỗ trợ gì?" 
+                        autocomplete="off"
+                        [disabled]="isProcessing()">
+                </div>
+                <button type="submit" class="send-button" [disabled]="!userInput.trim() || isProcessing()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    }
+</div>

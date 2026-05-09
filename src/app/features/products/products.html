@@ -10,8 +10,8 @@
         </div>
 
         <div class="form-group">
-          <label for="address">Địa chỉ</label>
-          <input type="text" id="address" formControlName="address" placeholder="Quận/Huyện..." />
+          <label for="address">Khu vực</label>
+          <input type="text" id="address" formControlName="address" placeholder="Hà Nội, HCM..." />
         </div>
 
         <div class="form-group">
@@ -61,7 +61,9 @@
           <img [src]="product.imageUrl || 'assets/img/default-court.png'" alt="{{product.name}}" class="card-img"/>
           <div class="card-body">
             <h3 class="card-name">{{ product.name }}</h3>
-            <p class="card-address">{{ product.address }}</p>
+            <p class="card-address">
+              <i class="location-icon"></i> {{ product.address }}
+            </p>
             <div class="card-price">
               <span>{{ product.pricePerHour | number }} VNĐ / Giờ</span>
             </div>

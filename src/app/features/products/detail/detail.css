@@ -29,6 +29,14 @@
   border-radius: 32px;
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.image-detail-desc {
+  margin-top: 0;
+  padding: 24px;
 }
 
 .detail-img {
@@ -55,10 +63,20 @@
   letter-spacing: -0.025em;
 }
 
-.product-address {
-  font-size: 1.125rem;
-  color: #94a3b8;
+.location-box {
   margin-bottom: 32px;
+}
+
+.product-region {
+  font-size: 1.1rem;
+  color: #60a5fa;
+  margin-bottom: 4px;
+}
+
+.product-address {
+  font-size: 1rem;
+  color: #94a3b8;
+  line-height: 1.4;
 }
 
 .price-box {

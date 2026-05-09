@@ -24,7 +24,8 @@
             <th>Tên</th>
             <th>Giá</th>
             <th>Giảm giá</th>
-            <th>Địa chỉ</th>
+            <th>Khu vực</th>
+            <th>Địa chỉ chi tiết</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -34,7 +35,8 @@
             <td><strong>{{ item.name }}</strong></td>
             <td>{{ item.price | number }} VNĐ</td>
             <td>{{ item.sale || 0 }}%</td>
-            <td>{{ item.address }}</td>
+             <td>{{ item.address }}</td>
+             <td>{{ item.addressDetail }}</td>
             <td class="actions-cell">
               <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
               <button class="btn-delete" (click)="deleteProduct(item.id)">Xóa</button>
@@ -84,13 +86,23 @@
           </div>
 
           <div class="form-group">
-            <label for="address">Địa chỉ</label>
+            <label for="address">Khu vực (Hà Nội, TP.HCM...)</label>
             <input type="text" id="address" formControlName="address" />
           </div>
 
           <div class="form-group">
-            <label for="detailDesc">Mô tả</label>
+            <label for="addressDetail">Địa chỉ chi tiết</label>
+            <input type="text" id="addressDetail" formControlName="addressDetail" />
+          </div>
+
+          <div class="form-group">
+            <label for="detailDesc">Mô tả chi tiết (Hiển thị dưới ảnh)</label>
             <textarea id="detailDesc" formControlName="detailDesc" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="shortDesc">Mô tả ngắn (Hiển thị phần thông tin bên phải)</label>
+            <textarea id="shortDesc" formControlName="shortDesc" rows="2"></textarea>
           </div>
 
           <div class="form-group">
