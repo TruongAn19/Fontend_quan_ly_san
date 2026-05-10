@@ -25,16 +25,16 @@ export class ChatbotComponent {
   isProcessing = signal(false);
   userInput = '';
   chatId = 'session-' + Math.random().toString(36).substr(2, 9);
-  
+
   messages = signal<Message[]>([
-    { role: 'assistant', content: 'Chào mừng bạn đến với hệ thống đặt sân cầu lông! Tôi là trợ lý AI Antigravity, tôi có thể giúp gì cho bạn?' }
+    { role: 'assistant', content: 'Chào mừng bạn đến với hệ thống đặt sân bóng đá! Tôi là trợ lý AI SoccerHub, tôi có thể giúp gì cho bạn?' }
   ]);
 
   suggestions = signal<string[]>([
-    'Kiểm tra sân trống chiều nay',
-    'Địa chỉ sân ở đâu?',
-    'Cách cầm vợt đúng',
-    'Báo cáo doanh thu tuần này'
+    'Cách đặt sân cỏ nhân tạo',
+    'Giá thuê sân 7 người',
+    'Tìm đối thủ ghép sân',
+    'Dịch vụ cho thuê giày bóng đá'
   ]);
 
   constructor() {

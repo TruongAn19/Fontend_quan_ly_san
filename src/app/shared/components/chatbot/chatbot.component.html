@@ -7,7 +7,7 @@
     <!-- Chat Window -->
     <div class="chat-window" [style.transform]="isOpen ? 'scale(1)' : 'scale(0)'" [style.opacity]="isOpen ? '1' : '0'">
         <div class="chat-header">
-            <h3>Trợ lý cầu lông AI</h3>
+            <h3>Trợ lý SoccerHub AI</h3>
             <button (click)="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;">
                 <i class="fas fa-chevron-down"></i>
             </button>
@@ -21,7 +21,8 @@
         </div>
 
         <div class="chat-input">
-            <input type="text" [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Hỏi tôi về đặt sân, kỹ thuật..." [disabled]="isTyping">
+            <input type="text" [(ngModel)]="userInput" (keyup.enter)="sendMessage()"
+                placeholder="Hỏi tôi về đặt sân, kỹ thuật..." [disabled]="isTyping">
             <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isTyping">
                 <i class="fas fa-paper-plane"></i>
             </button>

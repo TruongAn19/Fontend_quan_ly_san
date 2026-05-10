@@ -24,7 +24,7 @@
           <thead>
             <tr>
               <th>Mã đơn</th>
-              <th>Vợt thuê</th>
+              <th>Đồ bóng đá</th>
               <th>Hình thức</th>
               <th>Số lượng</th>
               <th>Thời gian thuê</th>
@@ -34,7 +34,7 @@
           <tbody>
             <tr *ngFor="let item of rentals()">
               <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
-              <td>{{ item.racketName || 'Vợt cầu lông' }}</td>
+              <td>{{ item.racketName || 'Dụng cụ bóng đá' }}</td>
               <td>
                 <span class="type-badge" [class.daily]="item.type === 'DAILY'">
                   {{ item.type }}
