@@ -1,13 +1,17 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BookingService } from '../../core/services/booking.service';
+import { ProfileService } from '../../core/services/profile.service';
+import { SlotEventsService, SlotHeldEvent } from '../../core/services/slot-events.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './booking.html',
   styleUrls: ['./booking.css']
 })
@@ -16,9 +20,12 @@ export class BookingComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private bookingService = inject(BookingService);
+  private profileService = inject(ProfileService);
+  private slotEvents = inject(SlotEventsService);
+  private authService = inject(AuthService);
 
   productId = signal<number | null>(null);
-  bookingInfo = signal<any>(null);
+  productDetail = signal<any>(null);
   availableTimes = signal<any[]>([]);
 
   bookingForm!: FormGroup;
@@ -33,18 +40,45 @@ export class BookingComponent implements OnInit, OnDestroy {
   isHeld = signal<boolean>(false);
 
   selectedDate = signal<string>('');
-  selectedCourtId = signal<number | null>(null);
+  selectedPitchId = signal<number | null>(null);
+
+  // Popup xác nhận
+  showConfirmPopup = signal<boolean>(false);
+  isEstimating = signal<boolean>(false);
+  priceEstimate = signal<any>(null);
+  pendingPayload: any = null;
+
+  // Realtime slot conflict
+  conflictToast = signal<{ timeName: string; visible: boolean } | null>(null);
+  blockedTimeIds = signal<Set<number>>(new Set());
+  private slotEventsSub?: Subscription;
+  private conflictToastTimer: any;
+
+  today = new Date();
 
   private showError(msg: string): void {
     this.errorMessage.set(msg);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  private toLocalDateString(date: Date): string {
+  toLocalDateString(date: Date): string {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
+  }
+
+  getSelectedTimeName(): string {
+    const id = this.bookingForm?.get('availableTimeId')?.value;
+    if (!id) return 'Chưa chọn';
+    const t = this.availableTimes().find((x: any) => x.id === +id);
+    return t ? t.time : 'Chưa chọn';
+  }
+
+  isCurrentSlotBlocked(): boolean {
+    const id = +this.bookingForm?.get('availableTimeId')?.value;
+    if (!id) return false;
+    return this.blockedTimeIds().has(id);
   }
 
   ngOnInit(): void {
@@ -54,6 +88,8 @@ export class BookingComponent implements OnInit, OnDestroy {
       this.productId.set(+id);
       this.initForm();
       this.loadBookingInfo();
+      this.loadUserProfile();
+      this.subscribeSlotEvents();
     } else {
       this.showError('Mã sản phẩm không hợp lệ.');
     }
@@ -61,6 +97,62 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearHoldTimer();
+    this.slotEventsSub?.unsubscribe();
+    this.slotEvents.disconnect();
+    if (this.conflictToastTimer) clearTimeout(this.conflictToastTimer);
+  }
+
+  private subscribeSlotEvents(): void {
+    this.slotEventsSub = this.slotEvents.stream.subscribe((evt: SlotHeldEvent) => {
+      if (evt.action !== 'HELD') return;
+
+      const myEmail = this.authService.currentUser();
+      if (myEmail && evt.holderEmail && evt.holderEmail === myEmail) return;
+
+      const sameContext =
+        evt.subPitchId === this.selectedPitchId() &&
+        evt.bookingDate === this.selectedDate();
+      if (!sameContext) return;
+
+      const selectedTimeId = +this.bookingForm?.get('availableTimeId')?.value;
+      const isMySelectedSlot = evt.availableTimeId === selectedTimeId;
+
+      const heldTime = this.availableTimes().find((t: any) => t.id === evt.availableTimeId);
+      const heldTimeName = heldTime?.time || 'khung giờ này';
+
+      this.blockedTimeIds.update(set => {
+        const next = new Set(set);
+        next.add(evt.availableTimeId);
+        return next;
+      });
+
+      if (isMySelectedSlot && !this.isHeld()) {
+        this.showConflictToast(heldTimeName);
+        this.bookingForm.patchValue({ availableTimeId: '' });
+        this.loadAvailableTimes({ autoSelectFirst: false });
+      } else {
+        this.loadAvailableTimes({ autoSelectFirst: false });
+      }
+    });
+  }
+
+  private reconnectSlotEvents(): void {
+    const pitchId = this.selectedPitchId();
+    const date = this.selectedDate();
+    if (pitchId && date) {
+      this.slotEvents.subscribe(pitchId, date);
+    }
+  }
+
+  private showConflictToast(timeName: string): void {
+    this.conflictToast.set({ timeName, visible: true });
+    if (this.conflictToastTimer) clearTimeout(this.conflictToastTimer);
+    this.conflictToastTimer = setTimeout(() => this.conflictToast.set(null), 6000);
+  }
+
+  dismissConflictToast(): void {
+    this.conflictToast.set(null);
+    if (this.conflictToastTimer) clearTimeout(this.conflictToastTimer);
   }
 
   initForm(): void {
@@ -68,9 +160,23 @@ export class BookingComponent implements OnInit, OnDestroy {
       receiverName: ['', [Validators.required]],
       receiverAddress: ['', [Validators.required]],
       receiverPhone: ['', [Validators.required, Validators.pattern(/^0[35789][0-9]{8}$/)]],
-      bookingType: ['ONE_TIME', [Validators.required]],
-      recurringEndDate: [null],
       availableTimeId: ['', [Validators.required]]
+    });
+  }
+
+  loadUserProfile(): void {
+    this.profileService.getProfile().subscribe({
+      next: (res) => {
+        const user = res?.data;
+        if (user) {
+          this.bookingForm.patchValue({
+            receiverName: user.fullName || '',
+            receiverPhone: user.phone || '',
+            receiverAddress: user.address || ''
+          });
+        }
+      },
+      error: (err) => console.error('Failed to load profile', err)
     });
   }
 
@@ -80,10 +186,11 @@ export class BookingComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.isLoading.set(false);
         const data = res?.data || res;
-        this.bookingInfo.set(data);
+        this.productDetail.set(data);
         if (data && data.courts && data.courts.length > 0) {
-          this.selectedCourtId.set(data.courts[0].id);
+          this.selectedPitchId.set(data.courts[0].id);
           this.loadAvailableTimes();
+          this.reconnectSlotEvents();
         }
       },
       error: (err) => {
@@ -93,32 +200,52 @@ export class BookingComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadAvailableTimes(): void {
-    if (!this.selectedCourtId() || !this.selectedDate()) return;
+  loadAvailableTimes(opts: { autoSelectFirst?: boolean } = { autoSelectFirst: true }): void {
+    if (!this.selectedPitchId() || !this.selectedDate()) return;
 
-    this.bookingService.getAvailableTimes(this.selectedDate(), this.selectedCourtId()!).subscribe({
+    this.bookingService.getAvailableTimes(this.selectedDate(), this.selectedPitchId()!).subscribe({
       next: (res) => {
         if (res && res.data) {
           this.availableTimes.set(res.data);
+          if (res.data.length > 0) {
+            const currentId = this.bookingForm.get('availableTimeId')?.value;
+            const exists = res.data.some((t: any) => t.id === +currentId);
+            if (!exists) {
+              const next = opts.autoSelectFirst ? res.data[0].id : '';
+              this.bookingForm.patchValue({ availableTimeId: next });
+            }
+          } else {
+            this.bookingForm.patchValue({ availableTimeId: '' });
+          }
         }
-      }
+      },
+      error: (err) => console.error('Failed to load available times', err)
     });
   }
 
   onDateChange(event: any): void {
     this.selectedDate.set(event.target.value);
+    this.blockedTimeIds.set(new Set());
     this.loadAvailableTimes();
+    this.reconnectSlotEvents();
   }
 
-  onCourtChange(event: any): void {
-    this.selectedCourtId.set(+event.target.value);
+  onPitchChange(event: any): void {
+    this.selectedPitchId.set(+event.target.value);
+    this.blockedTimeIds.set(new Set());
     this.loadAvailableTimes();
+    this.reconnectSlotEvents();
   }
 
   onHoldSlot(): void {
     const timeId = this.bookingForm.get('availableTimeId')?.value;
-    if (!timeId || !this.selectedCourtId()) {
+    if (!timeId || !this.selectedPitchId()) {
       this.showError('Vui lòng chọn sân và khung giờ.');
+      return;
+    }
+
+    if (this.blockedTimeIds().has(+timeId)) {
+      this.showError('Khung giờ này vừa bị người khác giữ. Vui lòng chọn khung giờ khác.');
       return;
     }
 
@@ -126,22 +253,29 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.errorMessage.set(null);
 
     const payload = {
-      subCourtId: this.selectedCourtId()!,
+      subPitchId: this.selectedPitchId()!,
       availableTimeId: +timeId,
       bookingDate: this.selectedDate()
     };
 
     this.bookingService.holdSlot(payload).subscribe({
-      next: () => {
+      next: (res) => {
         this.isHolding.set(false);
         this.isHeld.set(true);
-        this.startHoldTimer(180);
+        const remaining = (res?.data as any)?.remainingTime || 180;
+        this.startHoldTimer(remaining);
       },
       error: (err) => {
         this.isHolding.set(false);
         this.showError(err.error?.message || 'Không thể giữ chỗ khung giờ này.');
       }
     });
+  }
+
+  formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   }
 
   startHoldTimer(seconds: number): void {
@@ -167,22 +301,61 @@ export class BookingComponent implements OnInit, OnDestroy {
   onPlaceBooking(): void {
     if (this.bookingForm.invalid) {
       this.bookingForm.markAllAsTouched();
-      this.showError('Vui lòng điền đầy đủ và đúng thông tin người đặt.');
+      this.showError('Vui lòng điền đầy đủ và đúng định dạng thông tin người đặt.');
       return;
     }
 
-    this.isPlacing.set(true);
+    if (!this.isHeld()) {
+      this.showError('Vui lòng giữ chỗ trước khi thanh toán.');
+      return;
+    }
+
     this.errorMessage.set(null);
+    this.isEstimating.set(true);
 
     const payload = {
       ...this.bookingForm.value,
+      bookingType: 'ONE_TIME',
       productId: this.productId(),
-      courtId: this.selectedCourtId(),
+      courtId: this.selectedPitchId(),
       bookingDate: this.selectedDate(),
-      availableTimeId: +this.bookingForm.get('availableTimeId')?.value
+      availableTimeId: +this.bookingForm.get('availableTimeId')?.value,
+      recurringEndDate: null
     };
 
-    this.bookingService.placeBooking(payload).subscribe({
+    this.pendingPayload = payload;
+
+    this.bookingService.estimatePrice({
+      productId: payload.productId,
+      availableTimeId: payload.availableTimeId,
+      bookingDate: payload.bookingDate,
+      bookingType: 'ONE_TIME'
+    }).subscribe({
+      next: (res) => {
+        this.isEstimating.set(false);
+        this.priceEstimate.set(res.data);
+        this.showConfirmPopup.set(true);
+      },
+      error: () => {
+        this.isEstimating.set(false);
+        // Nếu estimate thất bại, vẫn cho tiếp tục
+        this.priceEstimate.set(null);
+        this.showConfirmPopup.set(true);
+      }
+    });
+  }
+
+  cancelPopup(): void {
+    this.showConfirmPopup.set(false);
+    this.priceEstimate.set(null);
+    this.pendingPayload = null;
+  }
+
+  confirmBooking(): void {
+    this.showConfirmPopup.set(false);
+    this.isPlacing.set(true);
+
+    this.bookingService.placeBooking(this.pendingPayload).subscribe({
       next: (res) => {
         this.isPlacing.set(false);
         this.clearHoldTimer();
@@ -200,7 +373,7 @@ export class BookingComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isPlacing.set(false);
-        this.showError(err.error?.message || 'Đặt sân thất bại.');
+        this.showError(err.error?.message || 'Đặt sân thất bại. Vui lòng kiểm tra lại thông tin.');
       }
     });
   }

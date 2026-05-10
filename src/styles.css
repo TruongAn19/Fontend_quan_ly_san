@@ -1,1 +1,43 @@
 /* You can add global styles to this file, and also import other style files */
+
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 40px auto 20px;
+  width: 100%;
+}
+
+.page-indicator {
+  color: #E5E7EB;
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 120px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.page-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #10B981;
+  border-color: #10B981;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}

@@ -14,14 +14,14 @@ export class RentalSuccessComponent implements OnInit {
 
   rentalCode = signal<string | null>(null);
   rentalId = signal<number | null>(null);
-  message = signal<string>('Thuê vợt thành công!');
+  message = signal<string>('Thuê thiết bị thành công!');
 
   ngOnInit(): void {
     const state = history.state as { rentalCode?: string; rentalId?: number; message?: string };
     if (state?.rentalCode) {
       this.rentalCode.set(state.rentalCode);
       this.rentalId.set(state.rentalId ?? null);
-      this.message.set(state.message || 'Thuê vợt thành công!');
+      this.message.set(state.message || 'Thuê thiết bị thành công!');
     } else {
       this.router.navigate(['/']);
     }

@@ -18,13 +18,25 @@ export class ProductsComponent implements OnInit {
   filterForm: FormGroup = this.fb.group({
     search: [''],
     address: [''],
-    price: [''],
+    price: [2000000],
     sort: ['']
   });
+
+  selectedAddresses: string[] = [];
+
+  onAddressChange(addr: string, event: any): void {
+    if (event.target.checked) {
+      this.selectedAddresses.push(addr);
+    } else {
+      this.selectedAddresses = this.selectedAddresses.filter(a => a !== addr);
+    }
+    this.filterForm.patchValue({ address: this.selectedAddresses.join(', ') });
+  }
 
   products = signal<any[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
+  totalElements = signal<number>(0);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
@@ -53,18 +65,25 @@ export class ProductsComponent implements OnInit {
         
         const mappedData = rawData.map((item: any) => ({
           ...item,
-          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/product/${item.image}`) : 'assets/img/default-court.png',
+          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/product/${item.image}`) : 'assets/img/default-pitch.png',
           pricePerHour: item.pricePerHour || item.price
         }));
 
         this.products.set(mappedData);
         this.totalPages.set(pages);
+        this.totalElements.set(res?.data?.totalElements || res?.totalElements || 0);
       },
       error: (err) => {
         this.isLoading.set(false);
         this.errorMessage.set('Không thể tải danh sách sản phẩm.');
       }
     });
+  }
+
+  onSearch(event: any): void {
+    const value = event.target.value;
+    this.filterForm.patchValue({ search: value });
+    this.applyFilters();
   }
 
   applyFilters(): void {

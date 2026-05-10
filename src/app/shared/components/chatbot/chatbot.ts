@@ -33,7 +33,6 @@ export class ChatbotComponent {
   suggestions = signal<string[]>([
     'Cách đặt sân cỏ nhân tạo',
     'Giá thuê sân 7 người',
-    'Tìm đối thủ ghép sân',
     'Dịch vụ cho thuê giày bóng đá'
   ]);
 

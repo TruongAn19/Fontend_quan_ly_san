@@ -1,5 +1,5 @@
 <div class="detail-container animate-fade-in">
-
+  
   @if (errorMessage()) {
     <div class="error-alert">
       <span>{{ errorMessage() }}</span>
@@ -13,78 +13,143 @@
   } @else {
     
     @if (productDetail()) {
-      <div class="grid-layout">
-        
-        <!-- Image Section -->
-        <div class="image-section">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a routerLink="/">Trang chủ</a>
+        <span class="separator">›</span>
+        <a routerLink="/products">Sân bóng</a>
+        <span class="separator">›</span>
+        <span class="active">{{ productDetail().product?.name }}</span>
+      </nav>
+
+      <!-- Gallery Row -->
+      <div class="gallery-row">
+        <div class="main-image-wrapper">
           <img 
-            [src]="productDetail().product?.imageUrl || 'assets/img/default-court.png'" 
+            [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" 
             alt="{{ productDetail().product?.name }}" 
-            class="detail-img"
+            class="main-image"
           />
-          <!-- Hiển thị mô tả chi tiết dưới ảnh -->
-          <div class="image-detail-desc glass-card" *ngIf="productDetail().product?.detailDesc">
-            <h3 class="block-title">Chi tiết sân</h3>
-            <p class="block-desc">{{ productDetail().product?.detailDesc }}</p>
-          </div>
         </div>
+      </div>
 
-        <!-- Info Section -->
-        <div class="info-section glass-card">
-          <h1 class="product-name">{{ productDetail().product?.name }}</h1>
-          <div class="location-box">
-            <p class="product-region"><strong>Khu vực:</strong> {{ productDetail().product?.address }}</p>
-            <p class="product-address"><strong>Địa chỉ:</strong> {{ productDetail().product?.addressDetail || 'Chưa cập nhật địa chỉ chi tiết' }}</p>
+      <!-- Main Layout -->
+      <div class="main-layout">
+        
+        <!-- Left Content -->
+        <div class="left-content">
+          
+          <div class="header-info">
+            <div class="status-row">
+              <span class="badge-hot">🔥 Phổ biến</span>
+            </div>
+            <h1 class="product-name">{{ productDetail().product?.name }}</h1>
+            <div class="address-row">
+              <i class="location-icon">📍</i>
+              <span>{{ productDetail().product?.addressDetail || productDetail().product?.address }}</span>
+            </div>
           </div>
 
-          <div class="price-box">
-            @if (productDetail().discountPrice && productDetail().discountPrice < productDetail().product?.pricePerHour) {
-              <span class="original-price">{{ productDetail().product?.pricePerHour | number }} VNĐ</span>
-              <span class="discount-price">{{ productDetail().discountPrice | number }} VNĐ / Giờ</span>
-            } @else {
-              <span class="discount-price">{{ productDetail().product?.pricePerHour | number }} VNĐ / Giờ</span>
-            }
+          <!-- Amenities -->
+          <div class="content-block">
+            <h3 class="block-title">Tiện ích sân</h3>
+            <div class="amenities-grid">
+              <div class="amenity-item"><i>🅿️</i> Bãi đỗ xe</div>
+              <div class="amenity-item"><i>🚿</i> Phòng tắm</div>
+              <div class="amenity-item"><i>💡</i> Đèn chiếu sáng</div>
+              <div class="amenity-item"><i>📶</i> Wifi miễn phí</div>
+              <div class="amenity-item"><i>📷</i> Camera an ninh</div>
+              <div class="amenity-item"><i>🚰</i> Quầy nước</div>
+            </div>
           </div>
 
-          <div class="detail-block">
-            <h3 class="block-title">Mô tả ngắn</h3>
-            <p class="block-desc">{{ productDetail().product?.shortDesc || 'Chưa có mô tả cho sản phẩm này.' }}</p>
+          <!-- Description -->
+          <div class="content-block">
+            <h3 class="block-title">Mô tả</h3>
+            <p class="description-text">
+              {{ productDetail().product?.detailDesc || productDetail().product?.shortDesc || 'Sân bóng chất lượng cao, mặt cỏ nhân tạo đạt chuẩn FIFA, hệ thống chiếu sáng hiện đại phục vụ nhu cầu tập luyện và thi đấu.' }}
+            </p>
           </div>
 
-          <div class="detail-block">
-            <h3 class="block-title">Khung giờ trống</h3>
+          <!-- Time Slots -->
+          <div class="content-block">
+            <div class="slots-header">
+              <h3 class="block-title">Khung giờ trống</h3>
+              <a href="#" class="btn-check-all">Thử ngay</a>
+            </div>
             
             @if (productDetail().availableTime?.length) {
-              <div class="time-grid">
-                <span class="time-badge" *ngFor="let time of productDetail().availableTime">
-                  {{ time.time }}
-                </span>
+              <div class="slots-grid">
+                @for (time of productDetail().availableTime; track time.time) {
+                  <div class="slot-item available">
+                    <span class="slot-time">{{ time.time }}</span>
+                    <span class="slot-status">Trống</span>
+                  </div>
+                }
               </div>
             } @else {
               <p class="empty-time">Hôm nay đã hết khung giờ trống.</p>
             }
           </div>
 
-          <!-- Rackets section -->
-          @if (productDetail().rackets?.length) {
-            <div class="detail-block">
-              <h3 class="block-title">Vợt cho thuê tại sân</h3>
-              <div class="racket-list">
-                <div class="racket-item" *ngFor="let racket of productDetail().rackets">
-                  <div class="racket-info">
-                    <span class="racket-name">{{ racket.name }}</span>
-                    <span class="racket-factory">{{ racket.factory }}</span>
+          <!-- Equipment Section -->
+          @if (productDetail().equipments?.length) {
+            <div class="content-block">
+              <h3 class="block-title">Thiết bị cho thuê tại sân</h3>
+              <div class="equipment-list">
+                @for (equipment of productDetail().equipments; track equipment.id) {
+                  <div class="equipment-item">
+                    <div class="equipment-info">
+                      <span class="equipment-name">{{ equipment.name }}</span>
+                      <span class="equipment-factory">{{ equipment.factory }}</span>
+                    </div>
+                    <div class="equipment-action">
+                      <span class="equipment-price">{{ (equipment.rentalPricePerPlay || equipment.price) | number }}đ</span>
+                      <a [routerLink]="['/equipments/detail', equipment.id]" class="btn-view-equipment">Chi tiết</a>
+                    </div>
                   </div>
-                  <div class="racket-action">
-                    <span class="racket-price">{{ (racket.rentalPricePerPlay || racket.price) | number }}đ / Buổi</span>
-                    <a [routerLink]="['/rackets/detail', racket.id]" class="btn-view-racket">Chi tiết</a>
-                  </div>
-                </div>
+                }
               </div>
             </div>
           }
 
-          <a [routerLink]="['/booking', productId()]" class="btn-book-now">Đặt sân ngay</a>
+        </div>
+
+        <!-- Right Sidebar (Booking) -->
+        <div class="right-sidebar">
+          <div class="sidebar-card">
+            <div class="price-display">
+              <span class="price-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
+              <span class="price-unit">/ giờ</span>
+            </div>
+            
+            <div class="divider"></div>
+
+            <div class="summary-details">
+              <div class="summary-row">
+                <span class="summary-label">Khung giờ</span>
+                <span class="summary-value">06:00 - 07:30</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Loại sân</span>
+                <span class="summary-value">7 người</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Thời lượng</span>
+                <span class="summary-value">1.5 giờ</span>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="total-row">
+              <span class="total-label">Tổng tiền</span>
+              <span class="total-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
+            </div>
+
+            <a [routerLink]="['/booking', productId()]" class="btn-primary">Đặt sân ngay</a>
+            <button class="btn-secondary">Đặt định kỳ hàng tuần</button>
+          </div>
         </div>
 
       </div>

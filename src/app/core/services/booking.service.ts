@@ -25,8 +25,12 @@ export class BookingService {
     return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/available-times`, { params });
   }
 
-  holdSlot(payload: { subCourtId: number; availableTimeId: number; bookingDate: string }): Observable<ApiResponse<{ remainingTime: number }>> {
+  holdSlot(payload: { subPitchId: number; availableTimeId: number; bookingDate: string }): Observable<ApiResponse<{ remainingTime: number }>> {
     return this.http.post<ApiResponse<{ remainingTime: number }>>(`${this.API_URL}/hold`, payload);
+  }
+
+  estimatePrice(payload: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/estimate`, payload);
   }
 
   placeBooking(payload: any): Observable<ApiResponse<{ bookingId: number; bookingCode: string; paymentUrl: string }>> {

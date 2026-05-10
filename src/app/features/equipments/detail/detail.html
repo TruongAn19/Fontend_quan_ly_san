@@ -12,37 +12,37 @@
     </div>
   } @else {
     
-    @if (racketDetail()) {
+    @if (equipmentDetail()) {
       <div class="grid-layout">
         
         <!-- Image Section -->
         <div class="image-section">
           <img 
-            [src]="racketDetail().imageUrl || 'assets/img/default-racket.png'" 
-            alt="{{ racketDetail().name }}" 
+            [src]="equipmentDetail().imageUrl || 'assets/img/default-racket.png'" 
+            alt="{{ equipmentDetail().name }}" 
             class="detail-img"
           />
         </div>
 
         <!-- Info Section -->
         <div class="info-section glass-card">
-          <h1 class="product-name">{{ racketDetail().name }}</h1>
-          <p class="product-address">Hãng sản xuất: {{ racketDetail().factory }}</p>
+          <h1 class="product-name">{{ equipmentDetail().name }}</h1>
+          <p class="product-address">Hãng sản xuất: {{ equipmentDetail().factory }}</p>
 
           <div class="price-box-group">
             <div class="price-item">
               <span class="label">Giá mua:</span>
-              <span class="value">{{ racketDetail().price | number }} VNĐ</span>
+              <span class="value">{{ equipmentDetail().price | number }} VNĐ</span>
             </div>
             <div class="price-item rental">
               <span class="label">Giá thuê:</span>
-              <span class="value main">{{ racketDetail().rentalPrice | number }} VNĐ / Buổi</span>
+              <span class="value main">{{ equipmentDetail().rentalPrice | number }} VNĐ / Buổi</span>
             </div>
           </div>
 
           <div class="detail-block">
             <h3 class="block-title">Mô tả sản phẩm</h3>
-            <p class="block-desc">{{ racketDetail().description || 'Chưa có mô tả cho sản phẩm này.' }}</p>
+            <p class="block-desc">{{ equipmentDetail().description || 'Chưa có mô tả cho sản phẩm này.' }}</p>
           </div>
 
           <!-- Stock Checker -->
@@ -81,10 +81,10 @@
               [disabled]="stockCount() === 0 || stockCount() === null"
               (click)="goToRental()"
             >
-              🏸 Thuê vợt ngay
+              ⚽ Thuê đồ ngay
             </button>
             @if (stockCount() === 0) {
-              <p class="rent-note">Vợt đã hết trong ngày này, vui lòng chọn ngày khác.</p>
+              <p class="rent-note">Thiết bị đã hết trong ngày này, vui lòng chọn ngày khác.</p>
             }
           </div>
 

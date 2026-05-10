@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
@@ -17,6 +17,12 @@ export class HomeComponent implements OnInit {
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
 
+  // Computed signal to match the 'featuredProducts()' call in the template
+  featuredProducts = computed(() => {
+    const data = this.homeData();
+    return data?.topProducts || [];
+  });
+
   ngOnInit(): void {
     this.loadHomeData();
   }
@@ -32,28 +38,28 @@ export class HomeComponent implements OnInit {
           if (data.products) {
             data.products = data.products.map((p: any) => ({
               ...p,
-              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:8080/resources/images/product/${p.image}`) : 'assets/img/default-court.png',
+              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:8080/resources/images/product/${p.image}`) : 'assets/img/default-pitch.png',
               pricePerHour: p.pricePerHour || p.price
             }));
           }
-          if (data.rackets) {
-            data.rackets = data.rackets.map((r: any) => ({
+          if (data.equipments) {
+            data.equipments = data.equipments.map((r: any) => ({
               ...r,
-              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `http://localhost:8080/resources/images/racket/${r.image}`) : 'assets/img/default-racket.png',
+              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `http://localhost:8080/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
               rentalPrice: r.rentalPricePerDay || r.rentalPricePerPlay || r.price
             }));
           }
           if (data.topProducts) {
             data.topProducts = data.topProducts.map((p: any) => ({
               ...p,
-              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:8080/resources/images/product/${p.image}`) : 'assets/img/default-court.png',
+              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:8080/resources/images/product/${p.image}`) : 'assets/img/default-pitch.png',
               pricePerHour: p.pricePerHour || p.price
             }));
           }
-          if (data.topRackets) {
-            data.topRackets = data.topRackets.map((r: any) => ({
+          if (data.topEquipments) {
+            data.topEquipments = data.topEquipments.map((r: any) => ({
               ...r,
-              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `http://localhost:8080/resources/images/racket/${r.image}`) : 'assets/img/default-racket.png',
+              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `http://localhost:8080/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
               rentalPrice: r.rentalPricePerDay || r.rentalPricePerPlay || r.price
             }));
           }

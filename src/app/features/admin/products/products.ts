@@ -36,12 +36,13 @@ export class AdminProductsComponent implements OnInit {
       name: ['', [Validators.required]],
       detailDesc: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
+      depositPrice: [0, [Validators.required, Validators.min(0)]],
       address: ['', [Validators.required]],
       addressDetail: ['', [Validators.required]],
       shortDesc: ['', [Validators.required]],
       sale: [0, [Validators.min(0), Validators.max(100)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
-      subCourtNames: [''],
+      subPitchNames: [''],
       image: ['']
     });
   }
@@ -74,7 +75,7 @@ export class AdminProductsComponent implements OnInit {
     this.isEdit.set(false);
     this.selectedProductId.set(null);
     this.selectedFile = null;
-    this.productForm.reset({ price: 0, sale: 0, quantity: 1, subCourtNames: '', image: '' });
+    this.productForm.reset({ price: 0, depositPrice: 0, sale: 0, quantity: 1, subPitchNames: '', image: '' });
     this.showModal.set(true);
   }
 
@@ -86,12 +87,13 @@ export class AdminProductsComponent implements OnInit {
       name: product.name,
       detailDesc: product.detailDesc,
       price: product.price,
+      depositPrice: product.depositPrice || 0,
       address: product.address,
       addressDetail: product.addressDetail || '',
       shortDesc: product.shortDesc || '',
       sale: product.sale || 0,
       quantity: product.quantity || 1,
-      subCourtNames: product.subCourtNames || '',
+      subPitchNames: product.subPitchNames || '',
       image: product.image || ''
     });
     this.showModal.set(true);

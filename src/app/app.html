@@ -1,26 +1,25 @@
 <div class="app-wrapper">
 
-  <!-- Premium Navbar -->
+  <!-- GoalField Navbar -->
   <nav class="premium-navbar animate-fade-in">
     <div class="nav-container">
 
       <a routerLink="/" class="nav-logo">
-        <span class="logo-text">Soccer<span class="accent">Hub</span></span>
+        <div class="logo-icon">🛡️</div>
+        <span class="logo-text">GoalField</span>
       </a>
 
       <div class="nav-links">
         @if (isAdmin()) {
           <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
-          <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">Users</a>
-          <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">Sân bóng</a>
-          <a routerLink="/admin/rackets" routerLinkActive="active" class="nav-item">Dịch vụ</a>
-          <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Đặt sân</a>
-          <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Thuê đồ</a>
-          <a routerLink="/admin/ntfy" routerLinkActive="active" class="nav-item">Thông báo</a>
+          <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">Quản lý Sân</a>
+          <a routerLink="/admin/equipments" routerLinkActive="active" class="nav-item">Thiết bị</a>
+          <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Đơn đặt</a>
+          <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Đơn thuê</a>
         } @else {
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">Trang chủ</a>
-          <a routerLink="/products" routerLinkActive="active" class="nav-item">Sân Bóng Đá</a>
-          <a routerLink="/rackets" routerLinkActive="active" class="nav-item">Thuê Đồ</a>
+          <a routerLink="/products" routerLinkActive="active" class="nav-item">Sân bóng</a>
+          <a routerLink="/equipments" routerLinkActive="active" class="nav-item">Thiết bị</a>
           @if (authService.isLoggedIn()) {
             <a routerLink="/booking-history" routerLinkActive="active" class="nav-item">Lịch sử đặt sân</a>
             <a routerLink="/rental-history" routerLinkActive="active" class="nav-item">Lịch sử thuê đồ</a>
@@ -30,11 +29,9 @@
 
       <div class="nav-actions">
         @if (authService.isLoggedIn()) {
-          @if (!isAdmin()) {
-            <a routerLink="/profile" class="btn-profile">
-              Cá nhân
-            </a>
-          }
+          <a routerLink="/profile" class="btn-profile">
+            👤
+          </a>
           <button class="btn-logout" (click)="onLogout()">Đăng xuất</button>
         } @else {
           <a routerLink="/login" class="btn-login">Đăng nhập</a>
@@ -49,6 +46,53 @@
   <main class="app-main-content">
     <router-outlet></router-outlet>
   </main>
+
+  <!-- Global Footer -->
+  <footer class="global-footer">
+    <div class="footer-container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="icon">🛡️</span>
+            <span class="text">GoalField</span>
+          </div>
+          <p class="brand-desc">
+            Nền tảng đặt sân bóng đá hàng đầu Việt Nam. Kết nối đam mê, nâng tầm trải nghiệm thể thao của bạn.
+          </p>
+          <div class="social-links">
+            <span class="social-item">FB</span>
+            <span class="social-item">IG</span>
+            <span class="social-item">YT</span>
+          </div>
+        </div>
+
+        <div class="footer-links-group">
+          <h4 class="links-title">Dịch vụ</h4>
+          <a routerLink="/products">Tìm sân bóng</a>
+          <a routerLink="/equipments">Thuê thiết bị</a>
+          <a href="#">Giải đấu</a>
+        </div>
+
+        <div class="footer-links-group">
+          <h4 class="links-title">Hỗ trợ</h4>
+          <a href="#">Hướng dẫn đặt sân</a>
+          <a href="#">Chính sách bảo mật</a>
+          <a href="#">Điều khoản sử dụng</a>
+        </div>
+
+        <div class="footer-contact">
+          <h4 class="links-title">Liên hệ</h4>
+          <p>📍 123 Đường ABC, Quận 1, TP.HCM</p>
+          <p>📞 1900 1234 (8h - 22h)</p>
+          <p>✉️ support@goalfield.vn</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 GoalField. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
   <app-chatbot></app-chatbot>
 </div>

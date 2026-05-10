@@ -17,7 +17,7 @@ export class RentalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private rentalService = inject(RentalService);
 
-  racketId = signal<number | null>(null);
+  equipmentId = signal<number | null>(null);
   rentalForm!: FormGroup;
 
   isLoading = signal<boolean>(false);
@@ -29,10 +29,10 @@ export class RentalComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.racketId.set(+id);
+      this.equipmentId.set(+id);
       this.initForm();
     } else {
-      this.errorMessage.set('Mã vợt không hợp lệ.');
+      this.errorMessage.set('Mã thiết bị không hợp lệ.');
     }
   }
 
@@ -80,7 +80,7 @@ export class RentalComponent implements OnInit {
       email: formValue.email,
       phone: formValue.phone,
       type: formValue.type,
-      racketId: this.racketId(),
+      equipmentId: this.equipmentId(),
       quantity: formValue.quantity
     };
 

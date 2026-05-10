@@ -5,7 +5,7 @@ export interface AvailableTimeDTO {
 }
 
 export interface HoldBookingRequest {
-  subCourtId: number;
+  subPitchId: number;
   availableTimeId: number;
   bookingDate: string;
 }
@@ -16,7 +16,7 @@ export interface PlaceBookingRequest {
   receiverPhone: string;
   productId: number;
   availableTimeId: number;
-  courtId: number;
+  subPitchId: number;
   bookingDate: string;
   bookingType: 'ONE_TIME' | 'WEEKLY_RECURRING';
   recurringEndDate?: string | null;

@@ -4,19 +4,19 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 
 @Component({
-  selector: 'app-racket-detail',
+  selector: 'app-equipment-detail',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './detail.html',
   styleUrls: ['./detail.css']
 })
-export class RacketDetailComponent implements OnInit {
+export class EquipmentDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
   private router = inject(Router);
 
-  racketId = signal<number | null>(null);
-  racketDetail = signal<any>(null);
+  equipmentId = signal<number | null>(null);
+  equipmentDetail = signal<any>(null);
   stockCount = signal<number | null>(null);
 
   isLoading = signal<boolean>(false);
@@ -29,7 +29,7 @@ export class RacketDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.racketId.set(+id);
+      this.equipmentId.set(+id);
       this.loadDetail();
       this.checkStock();
     } else {
@@ -39,19 +39,19 @@ export class RacketDetailComponent implements OnInit {
 
   loadDetail(): void {
     this.isLoading.set(true);
-    this.productService.getRacketDetail(this.racketId()!).subscribe({
+    this.productService.getEquipmentDetail(this.equipmentId()!).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         const data = res?.data || res;
         if (data) {
-          data.imageUrl = data.image ? (data.image.startsWith('http') ? data.image : `http://localhost:8080/resources/images/racket/${data.image}`) : 'assets/img/default-racket.png';
+          data.imageUrl = data.image ? (data.image.startsWith('http') ? data.image : `http://localhost:8080/resources/images/equipment/${data.image}`) : 'assets/img/default-racket.png';
           data.rentalPrice = data.rentalPricePerDay || data.rentalPricePerPlay || data.price;
         }
-        this.racketDetail.set(data);
+        this.equipmentDetail.set(data);
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Không thể tải chi tiết vợt.');
+        this.errorMessage.set('Không thể tải chi tiết thiết bị.');
       }
     });
   }
@@ -62,13 +62,13 @@ export class RacketDetailComponent implements OnInit {
   }
 
   checkStock(): void {
-    if (!this.racketId()) return;
+    if (!this.equipmentId()) return;
 
     this.isCheckingStock.set(true);
     this.stockMessage.set(null);
 
-    this.productService.checkRacketStock({
-      racketId: this.racketId()!,
+    this.productService.checkEquipmentStock({
+      equipmentId: this.equipmentId()!,
       date: this.selectedDate()
     }).subscribe({
       next: (res) => {
@@ -84,8 +84,8 @@ export class RacketDetailComponent implements OnInit {
   }
 
   goToRental(): void {
-    if (this.racketId()) {
-      this.router.navigate(['/rentals', this.racketId()]);
+    if (this.equipmentId()) {
+      this.router.navigate(['/rentals', this.equipmentId()]);
     }
   }
 }

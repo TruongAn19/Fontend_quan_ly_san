@@ -37,10 +37,10 @@
         <tbody>
           <tr *ngFor="let item of rentals()">
             <td>{{ item.id }}</td>
-            <td><strong>{{ item.customerName || 'Khách vãng lai' }}</strong></td>
-            <td>{{ item.racketName || 'Vợt' }}</td>
+            <td><strong>{{ item.fullName || 'Khách vãng lai' }}</strong></td>
+            <td>{{ item.equipmentName || 'Thiết bị' }}</td>
             <td>{{ item.rentalDate }}</td>
-            <td>{{ item.totalFee | number }} VNĐ</td>
+            <td>{{ item.rentalPrice | number }} VNĐ</td>
             <td>
               <span class="status-badge" [attr.data-status]="item.status">
                 {{ item.status }}

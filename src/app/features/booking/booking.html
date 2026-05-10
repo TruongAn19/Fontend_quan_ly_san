@@ -1,124 +1,260 @@
 <div class="booking-container animate-fade-in">
 
+  @if (conflictToast(); as toast) {
+    <div class="conflict-toast" role="alert">
+      <span class="conflict-toast-icon">🔒</span>
+      <div class="conflict-toast-body">
+        <strong>Khung giờ {{ toast.timeName }} vừa bị người khác giữ</strong>
+        <p>Vui lòng chọn khung giờ khác hoặc thử lại sau 3 phút.</p>
+      </div>
+      <button class="conflict-toast-close" (click)="dismissConflictToast()" aria-label="Đóng">×</button>
+    </div>
+  }
+
   @if (errorMessage()) {
     <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
+      <span>⚠️ {{ errorMessage() }}</span>
     </div>
   }
 
-  <!-- Hold Slot Timer -->
-  @if (isHeld()) {
-    <div class="hold-timer-alert animate-pulse">
-      <span class="timer-text">Khung giờ đã được giữ! Vui lòng hoàn tất thanh toán trong: <strong>{{ holdTimeLeft() }} giây</strong></span>
+  <a [routerLink]="['/products/detail', productId()]" class="back-link">‹ Quay lại</a>
+
+  <div class="page-header">
+    <h1 class="page-title">Xác nhận đặt sân</h1>
+    <p class="page-subtitle">Điền thông tin và chọn lịch phù hợp</p>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper-row">
+    <div class="step-item completed">
+      <span class="step-num">✓</span>
+      <span>Chọn sân</span>
     </div>
-  }
-
-  @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tải thông tin...
+    <div class="step-line filled"></div>
+    <div class="step-item active">
+      <span class="step-num">2</span>
+      <span>Thông tin</span>
     </div>
-  } @else {
+    <div class="step-line"></div>
+    <div class="step-item">
+      <span class="step-num">3</span>
+      <span>Thanh toán</span>
+    </div>
+  </div>
 
-    <div class="grid-layout">
-      
-      <!-- Left: Slot Selection -->
-      <div class="glass-card selection-card">
-        <h2 class="section-title">Chọn sân & khung giờ</h2>
-        
-        <div class="control-group">
-          <label for="bookingDate">Chọn ngày:</label>
-          <input type="date" id="bookingDate" [value]="selectedDate()" (change)="onDateChange($event)" [disabled]="isHeld()" />
+  <div class="booking-content" *ngIf="productDetail()" [formGroup]="bookingForm">
+
+    <!-- ===== LEFT COLUMN ===== -->
+    <div class="form-section">
+
+      <!-- Block 1: Thông tin người đặt -->
+      <div class="form-block">
+        <h3 class="block-title">
+          <span class="block-icon">👤</span>
+          Thông tin người đặt
+        </h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Họ và tên *</label>
+            <input type="text" class="form-input" placeholder="Nguyễn Văn A" formControlName="receiverName">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại *</label>
+            <input type="text" class="form-input" placeholder="0901 000 000" formControlName="receiverPhone">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Địa chỉ *</label>
+            <input type="text" class="form-input" placeholder="Số nhà, đường, quận, thành phố" formControlName="receiverAddress">
+          </div>
         </div>
-
-        <div class="control-group">
-          <label for="bookingCourt">Chọn sân:</label>
-          <select id="bookingCourt" [value]="selectedCourtId()" (change)="onCourtChange($event)" [disabled]="isHeld()">
-            <option *ngFor="let court of bookingInfo()?.courts" [value]="court.id">{{ court.name }}</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label>Khung giờ khả dụng:</label>
-          @if (availableTimes().length === 0) {
-            <p class="empty-times">Không có khung giờ khả dụng trong ngày này.</p>
-          } @else {
-            <form [formGroup]="bookingForm">
-              <div class="time-radio-group">
-                <label *ngFor="let time of availableTimes()" class="time-radio-label" [class.selected]="bookingForm.get('availableTimeId')?.value == time.id">
-                  <input type="radio" formControlName="availableTimeId" [value]="time.id" style="display: none;" />
-                  {{ time.time }}
-                </label>
-              </div>
-            </form>
-          }
-        </div>
-
-        @if (!isHeld()) {
-          <button class="btn-hold" [disabled]="isHolding() || availableTimes().length === 0" (click)="onHoldSlot()">
-            @if (isHolding()) {
-              <span class="spinner"></span> Đang giữ chỗ...
-            } @else {
-              Giữ chỗ ngay
-            }
-          </button>
-        }
       </div>
 
-      <!-- Right: Booking Form -->
-      <div class="glass-card form-card" [class.disabled-overlay]="!isHeld()">
-        <h2 class="section-title">Thông tin người đặt</h2>
-        
-        <form [formGroup]="bookingForm" (ngSubmit)="onPlaceBooking()" class="premium-form">
+      <!-- Block 2: Chọn lịch -->
+      <div class="form-block">
+        <h3 class="block-title">
+          <span class="block-icon">🗓️</span>
+          Chọn lịch đặt sân
+        </h3>
+        <div class="form-grid">
           <div class="form-group">
-            <label for="receiverName">Họ và Tên</label>
-            <input type="text" id="receiverName" formControlName="receiverName" [class.invalid]="bookingForm.get('receiverName')?.invalid && bookingForm.get('receiverName')?.touched" />
-            @if (bookingForm.get('receiverName')?.invalid && bookingForm.get('receiverName')?.touched) {
-              <span class="field-error">Vui lòng nhập họ và tên.</span>
-            }
+            <label class="form-label">Ngày đặt</label>
+            <input type="date" class="form-input" [value]="selectedDate()" (change)="onDateChange($event)">
           </div>
-
           <div class="form-group">
-            <label for="receiverPhone">Số điện thoại</label>
-            <input type="text" id="receiverPhone" formControlName="receiverPhone" [class.invalid]="bookingForm.get('receiverPhone')?.invalid && bookingForm.get('receiverPhone')?.touched" />
-            @if (bookingForm.get('receiverPhone')?.invalid && bookingForm.get('receiverPhone')?.touched) {
-              <span class="field-error">Số điện thoại không hợp lệ (VD: 0912345678).</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="receiverAddress">Địa chỉ</label>
-            <input type="text" id="receiverAddress" formControlName="receiverAddress" [class.invalid]="bookingForm.get('receiverAddress')?.invalid && bookingForm.get('receiverAddress')?.touched" />
-            @if (bookingForm.get('receiverAddress')?.invalid && bookingForm.get('receiverAddress')?.touched) {
-              <span class="field-error">Vui lòng nhập địa chỉ.</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="bookingType">Hình thức đặt</label>
-            <select id="bookingType" formControlName="bookingType">
-              <option value="ONE_TIME">Đặt 1 lần</option>
-              <option value="WEEKLY_RECURRING">Đặt định kỳ hàng tuần</option>
+            <label class="form-label">Sân thi đấu</label>
+            <select class="form-input" (change)="onPitchChange($event)">
+              @for (pitch of productDetail().courts; track pitch.id) {
+                <option [value]="pitch.id">{{ pitch.name }}</option>
+              }
             </select>
           </div>
-
-          @if (bookingForm.get('bookingType')?.value === 'WEEKLY_RECURRING') {
-            <div class="form-group animate-fade-in">
-              <label for="recurringEndDate">Ngày kết thúc định kỳ</label>
-              <input type="date" id="recurringEndDate" formControlName="recurringEndDate" />
-            </div>
-          }
-
-          <button type="submit" class="btn-place-booking" [disabled]="isPlacing() || !isHeld()">
-            @if (isPlacing()) {
-              <span class="spinner"></span> Đang xử lý...
-            } @else {
-              Tiến hành Thanh toán
+          <div class="form-group full">
+            <label class="form-label">Khung giờ *</label>
+            <select class="form-input" formControlName="availableTimeId">
+              <option value="">-- Chọn khung giờ trống --</option>
+              @for (time of availableTimes(); track time.id) {
+                <option [value]="time.id">{{ time.time }}</option>
+              }
+            </select>
+            @if (availableTimes().length === 0) {
+              <span class="hint-text">⚠️ Không có khung giờ trống — vui lòng chọn ngày khác</span>
             }
-          </button>
-        </form>
+          </div>
+        </div>
       </div>
+
+      <!-- Hold alert -->
+      @if (isHeld()) {
+        <div class="alert-hold">
+          <span class="alert-icon">⏱️</span>
+          <div>
+            <strong>Khung giờ đang được giữ cho bạn!</strong>
+            <p>Hoàn tất thanh toán trong <strong class="countdown">{{ formatTime(holdTimeLeft()) }}</strong> để không mất chỗ.</p>
+          </div>
+        </div>
+      }
 
     </div>
 
-  }
+    <!-- ===== RIGHT COLUMN: Sidebar ===== -->
+    <aside class="summary-sidebar">
+
+      <!-- Ảnh sân -->
+      <div class="field-thumb">
+        <img [src]="productDetail().product?.image || 'assets/img/default-pitch.png'"
+             [alt]="productDetail().product?.name">
+      </div>
+
+      <div class="field-info">
+        <h4 class="field-name">{{ productDetail().product?.name }}</h4>
+        <p class="field-addr">📍 {{ productDetail().product?.address }}</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Tóm tắt lịch -->
+      <div class="summary-details">
+        <div class="summary-row">
+          <span class="row-label">📅 Ngày</span>
+          <span class="row-value">{{ selectedDate() | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Giá -->
+      <div class="price-block">
+        <div class="price-row">
+          <span class="price-label">Giá thuê sân</span>
+          <span class="price-val">{{ (productDetail().product?.price || 0) | number:'1.0-0' }}đ</span>
+        </div>
+        <div class="price-note">
+          ⚡ Phụ phí +30% áp dụng cho giờ cao điểm (17h–22h) và cuối tuần. Giá chính xác hiện khi xác nhận.
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Nút giữ chỗ -->
+      <button class="btn-hold" (click)="onHoldSlot()"
+              [disabled]="isHolding() || isHeld() || isCurrentSlotBlocked() || !bookingForm.get('availableTimeId')?.value"
+              *ngIf="!isHeld()">
+        @if (isCurrentSlotBlocked()) {
+          🔒 Khung giờ đã bị giữ — chọn khung khác
+        } @else if (!bookingForm.get('availableTimeId')?.value) {
+          ⏳ Vui lòng chọn khung giờ
+        } @else if (isHolding()) {
+          Đang giữ chỗ...
+        } @else {
+          🔒 Giữ chỗ ngay (3 phút)
+        }
+      </button>
+
+      @if (isHeld()) {
+        <div class="held-badge">✅ Đã giữ chỗ · Còn {{ formatTime(holdTimeLeft()) }}</div>
+      }
+
+      <!-- Nút thanh toán -->
+      <button class="btn-pay" (click)="onPlaceBooking()"
+              [disabled]="isPlacing() || isEstimating()">
+        {{ isEstimating() ? '⏳ Đang tính giá...' : isPlacing() ? 'Đang xử lý...' : '💳 Đặt sân & Thanh toán cọc' }}
+      </button>
+
+      @if (bookingForm.invalid && bookingForm.touched) {
+        <p class="form-error-hint">Vui lòng điền đầy đủ thông tin và chọn khung giờ</p>
+      }
+
+      <p class="ssl-note">🔒 Thanh toán an toàn qua VNPay · Mã hóa SSL</p>
+
+    </aside>
+
+  </div>
+
 </div>
+
+<!-- ===== POPUP XÁC NHẬN ===== -->
+@if (showConfirmPopup()) {
+  <div class="popup-overlay" (click)="cancelPopup()">
+    <div class="popup-card" (click)="$event.stopPropagation()">
+
+      <div class="popup-header">
+        <span class="popup-icon">📋</span>
+        <h2 class="popup-title">Xác nhận đặt sân</h2>
+        <p class="popup-subtitle">Kiểm tra chi tiết giá trước khi thanh toán</p>
+      </div>
+
+      @if (priceEstimate()) {
+        <div class="popup-body">
+          <div class="price-breakdown">
+            <div class="breakdown-row">
+              <span class="breakdown-label">Giá sân cơ bản</span>
+              <span class="breakdown-value">{{ priceEstimate().basePrice | number:'1.0-0' }}đ</span>
+            </div>
+
+            @if (priceEstimate().hasSurcharge) {
+              <div class="breakdown-row surcharge">
+                <span class="breakdown-label">⚡ Phụ phí {{ priceEstimate().surchargeReason }}</span>
+                <span class="breakdown-value surcharge-val">+{{ (priceEstimate().surchargeRate * 100) | number:'1.0-0' }}%</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="breakdown-label">Giá sau phụ phí</span>
+                <span class="breakdown-value">{{ priceEstimate().pricePerSession | number:'1.0-0' }}đ</span>
+              </div>
+            }
+          </div>
+
+          <div class="price-divider"></div>
+
+          <div class="price-total-row">
+            <span>Tổng giá trị đặt sân</span>
+            <span class="total-amount">{{ priceEstimate().totalPrice | number:'1.0-0' }}đ</span>
+          </div>
+
+          <div class="deposit-info">
+            <div class="deposit-header">💳 Bạn chỉ cần thanh toán cọc ngay bây giờ</div>
+            <div class="deposit-row">
+              <span>Tiền cọc (qua VNPay)</span>
+              <span class="deposit-amount">{{ priceEstimate().depositPrice | number:'1.0-0' }}đ</span>
+            </div>
+            <div class="deposit-row remaining">
+              <span>Còn lại thanh toán tại sân</span>
+              <span>{{ priceEstimate().remainingPrice | number:'1.0-0' }}đ</span>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="popup-body">
+          <p style="text-align:center; color:#9CA3AF;">Xác nhận thanh toán tiền cọc để giữ lịch đặt sân?</p>
+        </div>
+      }
+
+      <div class="popup-actions">
+        <button class="btn-cancel-popup" (click)="cancelPopup()">Hủy bỏ</button>
+        <button class="btn-confirm-popup" (click)="confirmBooking()" [disabled]="isPlacing()">
+          {{ isPlacing() ? 'Đang xử lý...' : '✓ Xác nhận & Thanh toán cọc' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -5,13 +5,13 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
 
 @Component({
-  selector: 'app-rackets',
+  selector: 'app-equipments',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './rackets.html',
-  styleUrls: ['./rackets.css']
+  templateUrl: './equipments.html',
+  styleUrls: ['./equipments.css']
 })
-export class RacketsComponent implements OnInit {
+export class EquipmentsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
 
@@ -21,17 +21,17 @@ export class RacketsComponent implements OnInit {
     sort: ['']
   });
 
-  rackets = signal<any[]>([]);
+  equipments = signal<any[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadRackets();
+    this.loadEquipments();
   }
 
-  loadRackets(): void {
+  loadEquipments(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
@@ -40,37 +40,37 @@ export class RacketsComponent implements OnInit {
       ...this.filterForm.value
     };
 
-    this.productService.getRackets(filters).subscribe({
+    this.productService.getEquipments(filters).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const rawData = res?.data?.rackets || res?.rackets || [];
+        const rawData = res?.data?.equipments || res?.equipments || [];
         const pages = res?.data?.totalPages || res?.totalPages || 1;
 
         const mappedData = rawData.map((item: any) => ({
           ...item,
-          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/racket/${item.image}`) : 'assets/img/default-racket.png',
+          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/equipment/${item.image}`) : 'assets/img/default-racket.png',
           rentalPrice: item.rentalPricePerDay || item.rentalPricePerPlay || item.price
         }));
 
-        this.rackets.set(mappedData);
+        this.equipments.set(mappedData);
         this.totalPages.set(pages);
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Không thể tải danh sách vợt.');
+        this.errorMessage.set('Không thể tải danh sách thiết bị.');
       }
     });
   }
 
   applyFilters(): void {
     this.currentPage.set(1);
-    this.loadRackets();
+    this.loadEquipments();
   }
 
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.loadRackets();
+      this.loadEquipments();
     }
   }
 }

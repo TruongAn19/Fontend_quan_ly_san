@@ -43,10 +43,51 @@ export class RentalHistoryComponent implements OnInit {
     });
   }
 
+  onRetryPayment(rentalId: number): void {
+    this.isLoading.set(true);
+    this.rentalService.payRental(rentalId, { paymentMethod: 'VNPAY' }).subscribe({
+      next: (res) => {
+        this.isLoading.set(false);
+        if (res && res.data && res.data.paymentUrl) {
+          window.location.href = res.data.paymentUrl;
+        } else {
+          this.loadHistory();
+        }
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        alert(err.error?.message || 'Không thể tiến hành thanh toán lại.');
+      }
+    });
+  }
+
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
       this.loadHistory();
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    if (!status) return 'Không xác định';
+    const s = status.toUpperCase();
+    switch (s) {
+      case 'PAID': return 'Đã thanh toán';
+      case 'COMPLETED': return 'Đã trả';
+      case 'PENDING': return 'Chờ thanh toán';
+      case 'CANCELLED': return 'Đã hủy';
+      case 'RETURNED': return 'Đã trả';
+      default: return status;
+    }
+  }
+
+  getTypeLabel(type: string): string {
+    if (!type) return 'Không xác định';
+    const t = type.toUpperCase();
+    switch (t) {
+      case 'DAILY': return 'Thuê theo ngày';
+      case 'ON_SITE': return 'Thuê tại sân';
+      default: return type;
     }
   }
 }

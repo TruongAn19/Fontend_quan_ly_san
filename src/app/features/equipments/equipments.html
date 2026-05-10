@@ -55,31 +55,31 @@
   } @else {
 
     <!-- Empty State -->
-    @if (rackets().length === 0) {
+    @if (equipments().length === 0) {
       <div class="empty-state animate-fade-in">
         <h3 class="empty-title">Không tìm thấy sản phẩm</h3>
         <p class="empty-text">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm xem sao nhé!</p>
       </div>
     } @else {
       
-      <!-- Racket Grid -->
+      <!-- Equipment Grid -->
       <div class="product-grid">
-        <div class="product-card animate-fade-in" *ngFor="let racket of rackets()">
-          <img [src]="racket.imageUrl || 'assets/img/default-racket.png'" alt="{{racket.name}}" class="card-img"/>
+        <div class="product-card animate-fade-in" *ngFor="let equipment of equipments()">
+          <img [src]="equipment.imageUrl || 'assets/img/default-racket.png'" alt="{{equipment.name}}" class="card-img"/>
           <div class="card-body">
-            <h3 class="card-name">{{ racket.name }}</h3>
-            <p class="card-address">Hãng: {{ racket.factory }}</p>
+            <h3 class="card-name">{{ equipment.name }}</h3>
+            <p class="card-address">Hãng: {{ equipment.factory }}</p>
             <div class="card-price-group">
               <div class="price-row">
                 <span class="price-label">Giá mua:</span>
-                <span class="price-value">{{ racket.price | number }} VNĐ</span>
+                <span class="price-value">{{ equipment.price | number }} VNĐ</span>
               </div>
               <div class="price-row rental">
                 <span class="price-label">Giá thuê:</span>
-                <span class="price-value">{{ racket.rentalPrice | number }} VNĐ / Buổi</span>
+                <span class="price-value">{{ equipment.rentalPrice | number }} VNĐ / Buổi</span>
               </div>
             </div>
-            <a [routerLink]="['/rackets/detail', racket.id]" class="btn-detail">Xem chi tiết</a>
+            <a [routerLink]="['/equipments/detail', equipment.id]" class="btn-detail">Xem chi tiết</a>
           </div>
         </div>
       </div>

@@ -49,4 +49,22 @@ export class BookingHistoryComponent implements OnInit {
       this.loadHistory();
     }
   }
+
+  getStatusLabel(status: string): string {
+    if (!status) return 'Không xác định';
+    const s = status.toUpperCase();
+    switch (s) {
+      case 'DA_DAT': return 'Đã cọc';
+      case 'DA_THANH_TOAN':
+      case 'PAID':
+        return 'Đã thanh toán';
+      case 'PENDING':
+      case 'CHO_THANH_TOAN':
+        return 'Chờ thanh toán';
+      case 'CANCELLED':
+      case 'DA_HUY':
+        return 'Đã hủy';
+      default: return status;
+    }
+  }
 }

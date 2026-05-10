@@ -34,7 +34,7 @@ export class ProductService {
     return this.http.get<any>(`${this.API_URL}/products/${productId}`);
   }
 
-  getRackets(filters: { page: number; factory?: string; price?: string; sort?: string }): Observable<any> {
+  getEquipments(filters: { page: number; factory?: string; price?: string; sort?: string }): Observable<any> {
     const apiPage = PaginationAdapter.toApiPage(filters.page, '0-based');
     let params = new HttpParams().set('page', apiPage.toString());
 
@@ -42,14 +42,14 @@ export class ProductService {
     if (filters.price) params = params.set('price', filters.price);
     if (filters.sort) params = params.set('sort', filters.sort);
 
-    return this.http.get<any>(`${this.API_URL}/rackets`, { params });
+    return this.http.get<any>(`${this.API_URL}/equipments`, { params });
   }
 
-  getRacketDetail(racketId: number): Observable<any> {
-    return this.http.get<any>(`${this.API_URL}/rackets/${racketId}`);
+  getEquipmentDetail(equipmentId: number): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/equipments/${equipmentId}`);
   }
 
-  checkRacketStock(payload: { racketId: number; date: string }): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/racket-stock`, payload);
+  checkEquipmentStock(payload: { equipmentId: number; date: string }): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/equipment-stock`, payload);
   }
 }

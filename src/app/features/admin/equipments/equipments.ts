@@ -4,17 +4,17 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
-  selector: 'app-admin-rackets',
+  selector: 'app-admin-equipments',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './rackets.html',
-  styleUrls: ['./rackets.css']
+  templateUrl: './equipments.html',
+  styleUrls: ['./equipments.css']
 })
-export class AdminRacketsComponent implements OnInit {
+export class AdminEquipmentsComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
-  rackets = signal<any[]>([]);
+  equipments = signal<any[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -22,39 +22,39 @@ export class AdminRacketsComponent implements OnInit {
 
   showModal = signal<boolean>(false);
   isEdit = signal<boolean>(false);
-  selectedRacketId = signal<number | null>(null);
-  racketForm!: FormGroup;
+  selectedEquipmentId = signal<number | null>(null);
+  equipmentForm!: FormGroup;
   selectedFile: File | null = null;
 
   ngOnInit(): void {
-    this.loadRackets();
+    this.loadEquipments();
     this.initForm();
   }
 
   initForm(): void {
-    this.racketForm = this.fb.group({
+    this.equipmentForm = this.fb.group({
       name: ['', [Validators.required]],
-      brand: ['', [Validators.required]],
+      factory: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
-      conditionStatus: ['Tốt', [Validators.required]],
-      rentalPrice: [0, [Validators.required, Validators.min(0)]]
+      status: ['ACTIVE', [Validators.required]],
+      rentalPricePerPlay: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
-  loadRackets(): void {
+  loadEquipments(): void {
     this.isLoading.set(true);
-    this.adminService.getRackets(this.currentPage()).subscribe({
+    this.adminService.getEquipments(this.currentPage()).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.rackets.set(res.rackets || res.data?.rackets || []);
+          this.equipments.set(res.equipments || res.data?.equipments || []);
           this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
         }
       },
       error: (err) => {
         this.isLoading.set(false);
-        console.error('Error loading rackets:', err);
-        this.errorMessage.set(err?.error?.message || err?.message || 'Không thể tải danh sách vợt.');
+        console.error('Error loading equipments:', err);
+        this.errorMessage.set(err?.error?.message || err?.message || 'Không thể tải danh sách thiết bị.');
       }
     });
   }
@@ -67,22 +67,22 @@ export class AdminRacketsComponent implements OnInit {
 
   openCreateModal(): void {
     this.isEdit.set(false);
-    this.selectedRacketId.set(null);
+    this.selectedEquipmentId.set(null);
     this.selectedFile = null;
-    this.racketForm.reset({ price: 0, conditionStatus: 'Tốt', rentalPrice: 0 });
+    this.equipmentForm.reset({ price: 0, status: 'ACTIVE', rentalPricePerPlay: 0 });
     this.showModal.set(true);
   }
 
-  openEditModal(racket: any): void {
+  openEditModal(equipment: any): void {
     this.isEdit.set(true);
-    this.selectedRacketId.set(racket.id);
+    this.selectedEquipmentId.set(equipment.id);
     this.selectedFile = null;
-    this.racketForm.patchValue({
-      name: racket.name,
-      brand: racket.brand,
-      price: racket.price,
-      conditionStatus: racket.conditionStatus || 'Tốt',
-      rentalPrice: racket.rentalPrice || 0
+    this.equipmentForm.patchValue({
+      name: equipment.name,
+      factory: equipment.factory,
+      price: equipment.price,
+      status: equipment.status || 'ACTIVE',
+      rentalPricePerPlay: equipment.rentalPricePerPlay || 0
     });
     this.showModal.set(true);
   }
@@ -92,31 +92,31 @@ export class AdminRacketsComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.racketForm.invalid) return;
+    if (this.equipmentForm.invalid) return;
 
-    const formValue = this.racketForm.value;
+    const formValue = this.equipmentForm.value;
     const formData = new FormData();
 
     formData.append(
-      'racket',
+      'equipment',
       new Blob([JSON.stringify(formValue)], { type: 'application/json' })
     );
 
     if (this.selectedFile) {
-      formData.append('racketImg', this.selectedFile);
+      formData.append('equipmentImg', this.selectedFile);
     }
 
     const request = this.isEdit()
-      ? this.adminService.updateRacket(this.selectedRacketId()!, formData)
-      : this.adminService.createRacket(formData);
+      ? this.adminService.updateEquipment(this.selectedEquipmentId()!, formData)
+      : this.adminService.createEquipment(formData);
 
     request.subscribe({
       next: () => {
         this.closeModal();
-        this.loadRackets();
+        this.loadEquipments();
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Thao tác vợt thất bại.');
+        this.errorMessage.set(err.error?.message || 'Thao tác thiết bị thất bại.');
       }
     });
   }
@@ -124,7 +124,7 @@ export class AdminRacketsComponent implements OnInit {
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.loadRackets();
+      this.loadEquipments();
     }
   }
 }

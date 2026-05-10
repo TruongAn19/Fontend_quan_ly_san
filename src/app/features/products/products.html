@@ -1,96 +1,122 @@
-<div class="catalog-container animate-fade-in">
-  
-  <!-- Filter Section -->
-  <div class="glass-card filter-card">
-    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filter-form">
-      <div class="filter-row">
-        <div class="form-group search-group">
-          <label for="search">Tìm kiếm</label>
-          <input type="text" id="search" formControlName="search" placeholder="Tên sân..." />
-        </div>
+<div class="products-container animate-fade-in">
 
-        <div class="form-group">
-          <label for="address">Khu vực</label>
-          <input type="text" id="address" formControlName="address" placeholder="Hà Nội, HCM..." />
-        </div>
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1 class="page-title">Tất cả sân bóng</h1>
+    <p class="page-desc">Hiện có {{ totalElements() }} sân bóng đang cập nhật mới nhất</p>
+  </header>
 
-        <div class="form-group">
-          <label for="price">Giá tối đa</label>
-          <input type="number" id="price" formControlName="price" placeholder="VNĐ/Giờ" />
-        </div>
-
-        <div class="form-group">
-          <label for="sort">Sắp xếp</label>
-          <select id="sort" formControlName="sort">
-            <option value="">Mặc định</option>
-            <option value="pricePerHour,asc">Giá tăng dần</option>
-            <option value="pricePerHour,desc">Giá giảm dần</option>
-          </select>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-primary filter-btn">Tìm kiếm</button>
-    </form>
-  </div>
-
-  <!-- Error State -->
-  @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
-  }
-
-  <!-- Loading State -->
-  @if (isLoading()) {
-    <div class="skeleton-grid">
-      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
-    </div>
-  } @else {
-
-    <!-- Empty State -->
-    @if (products().length === 0) {
-      <div class="empty-state animate-fade-in">
-        <h3 class="empty-title">Không tìm thấy sản phẩm</h3>
-        <p class="empty-text">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm xem sao nhé!</p>
-      </div>
-    } @else {
+  <!-- Products Content -->
+  <div class="products-content">
+    
+    <!-- Sidebar Filters -->
+    <aside class="filters-sidebar" [formGroup]="filterForm">
       
-      <!-- Product Grid -->
-      <div class="product-grid">
-        <div class="product-card animate-fade-in" *ngFor="let product of products()">
-          <img [src]="product.imageUrl || 'assets/img/default-court.png'" alt="{{product.name}}" class="card-img"/>
-          <div class="card-body">
-            <h3 class="card-name">{{ product.name }}</h3>
-            <p class="card-address">
-              <i class="location-icon"></i> {{ product.address }}
-            </p>
-            <div class="card-price">
-              <span>{{ product.pricePerHour | number }} VNĐ / Giờ</span>
-            </div>
-            <a [routerLink]="['/products/detail', product.id]" class="btn-detail">Xem chi tiết</a>
+      <div class="filter-group">
+        <h4 class="filter-title">Tìm kiếm</h4>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Tên sân..." 
+                 formControlName="search"
+                 (input)="onSearch($event)">
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4 class="filter-title">Khu vực</h4>
+        <div class="checkbox-list">
+          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Quận 1', $event)"> Quận 1</label>
+          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Quận 7', $event)"> Quận 7</label>
+          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Thủ Đức', $event)"> Thủ Đức</label>
+          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Tân Bình', $event)"> Tân Bình</label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4 class="filter-title">Khoảng giá tối đa</h4>
+        <div class="price-range">
+          <input type="range" 
+                 class="range-slider" 
+                 min="100000" 
+                 max="2000000" 
+                 step="50000"
+                 formControlName="price">
+          <div class="range-labels">
+            <span>{{ filterForm.get('price')?.value | number }}đ</span>
+            <span>2.000.000đ</span>
           </div>
         </div>
       </div>
 
-      <!-- Pagination -->
-      <div class="pagination-wrapper">
-        <button 
-          class="page-btn" 
-          [disabled]="currentPage() === 1" 
-          (click)="changePage(currentPage() - 1)">
-          Trang trước
-        </button>
-        
-        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
-        
-        <button 
-          class="page-btn" 
-          [disabled]="currentPage() === totalPages()" 
-          (click)="changePage(currentPage() + 1)">
-          Trang sau
-        </button>
+      <div class="filter-group">
+        <h4 class="filter-title">Loại sân</h4>
+        <div class="type-tags">
+          <span class="type-tag active">5 người</span>
+          <span class="type-tag">7 người</span>
+          <span class="type-tag">11 người</span>
+        </div>
       </div>
-    }
-  }
+
+      <button class="btn-apply-filters" (click)="applyFilters()">Áp dụng bộ lọc</button>
+
+    </aside>
+
+    <!-- Main Grid Area -->
+    <main class="main-grid-area">
+      
+      <div class="grid-header">
+        <span class="results-count">Hiển thị {{ products().length }} trong {{ totalElements() }} sân</span>
+        <div class="sort-box">
+          <span style="font-size: 13px; color: #6B7280; margin-right: 8px;">Sắp xếp:</span>
+          <select class="sort-dropdown">
+            <option>Phổ biến nhất</option>
+            <option>Giá thấp đến cao</option>
+            <option>Giá cao đến thấp</option>
+          </select>
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <span class="spinner"></span> Đang tải sân bóng...
+        </div>
+      } @else {
+        <div class="products-grid">
+          @for (item of products(); track item.id) {
+            <a [routerLink]="['/products/detail', item.id]" class="product-card">
+              <div class="product-image">
+                <img [src]="item.imageUrl || 'assets/img/default-pitch.png'" [alt]="item.name">
+              </div>
+              <div class="product-info">
+                <h4 class="product-name">{{ item.name }}</h4>
+                <p class="product-addr">📍 {{ item.address }}</p>
+                <div class="product-footer">
+                  <span class="product-price">{{ item.pricePerHour | number }}đ/h</span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages() > 1">
+          <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">‹</button>
+          
+          <button *ngFor="let page of [].constructor(totalPages()); let i = index" 
+                  class="page-btn" 
+                  [class.active]="currentPage() === (i + 1)"
+                  (click)="changePage(i + 1)">
+            {{ i + 1 }}
+          </button>
+
+          <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">›</button>
+        </div>
+      }
+
+    </main>
+
+  </div>
 
 </div>

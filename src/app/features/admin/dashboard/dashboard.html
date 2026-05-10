@@ -26,22 +26,22 @@
       </div>
     }
 
-    @if (racketStats()) {
-      <div class="racket-stats-section">
+    @if (equipmentStats()) {
+      <div class="equipment-stats-section">
         <h2 class="section-title">Thống kê thuê dụng cụ</h2>
         
         <div class="stats-grid secondary">
           <div class="stat-card glass-card">
-            <h4 class="stat-label">Tổng số vợt</h4>
-            <p class="stat-value">{{ racketStats().totalRackets || 0 }}</p>
+            <h4 class="stat-label">Tổng số thiết bị</h4>
+            <p class="stat-value">{{ equipmentStats().totalEquipments || 0 }}</p>
           </div>
           <div class="stat-card glass-card">
             <h4 class="stat-label">Đang cho thuê</h4>
-            <p class="stat-value">{{ racketStats().currentlyRented || 0 }}</p>
+            <p class="stat-value">{{ equipmentStats().currentlyRented || 0 }}</p>
           </div>
           <div class="stat-card glass-card">
             <h4 class="stat-label">Doanh thu tháng này</h4>
-            <p class="stat-value">{{ (racketStats().monthlyRevenue || 0) | number }} VNĐ</p>
+            <p class="stat-value">{{ (equipmentStats().monthlyRevenue || 0) | number }} VNĐ</p>
           </div>
         </div>
       </div>

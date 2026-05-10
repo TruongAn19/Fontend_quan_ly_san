@@ -41,20 +41,24 @@
         <tbody>
           <tr *ngFor="let item of bookings()">
             <td>{{ item.id }}</td>
-            <td><strong>{{ item.fullName }}</strong><br><small>{{ item.phone }}</small></td>
+            <td>
+              <strong>{{ item.user?.fullName || item.receiverName }}</strong>
+              <br>
+              <small>{{ item.user?.phone || item.receiverPhone }}</small>
+            </td>
             <td>{{ item.bookingDate }}</td>
-            <td>{{ item.timeSlot }}</td>
+            <td>{{ item.time }}</td>
             <td>{{ item.totalPrice | number }} VNĐ</td>
             <td>
               <span class="status-badge" [attr.data-status]="item.status">
-                {{ item.status }}
+                {{ getStatusLabel(item.status) }}
               </span>
             </td>
             <td>
               <div class="action-dropdown">
                 <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
                   <option value="">-- Đổi trạng thái --</option>
-                  <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
+                  <option *ngFor="let st of statusList" [value]="st" [selected]="getStatusLabel(item.status) === st">
                     {{ st }}
                   </option>
                 </select>

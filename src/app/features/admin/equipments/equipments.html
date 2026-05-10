@@ -1,6 +1,6 @@
 <div class="admin-rackets animate-fade-in">
   <div class="header-row">
-    <h1 class="page-title">Quản lý Vợt</h1>
+    <h1 class="page-title">Quản lý Thiết bị</h1>
     <button class="btn-create" (click)="openCreateModal()">+ Thêm mới</button>
   </div>
 
@@ -21,7 +21,7 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Tên Vợt</th>
+            <th>Tên Thiết bị</th>
             <th>Hãng</th>
             <th>Giá trị</th>
             <th>Giá thuê</th>
@@ -30,13 +30,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of rackets()">
+          <tr *ngFor="let item of equipments()">
             <td>{{ item.id }}</td>
             <td><strong>{{ item.name }}</strong></td>
-            <td>{{ item.brand }}</td>
+            <td>{{ item.factory }}</td>
             <td>{{ item.price | number }} VNĐ</td>
-            <td>{{ item.rentalPrice | number }} VNĐ</td>
-            <td>{{ item.conditionStatus }}</td>
+            <td>{{ item.rentalPricePerPlay | number }} VNĐ</td>
+            <td>{{ item.status }}</td>
             <td class="actions-cell">
               <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
             </td>
@@ -56,46 +56,46 @@
   @if (showModal()) {
     <div class="modal-overlay animate-fade-in">
       <div class="modal-content glass-card">
-        <h3>{{ isEdit() ? 'Sửa thông tin vợt' : 'Thêm vợt mới' }}</h3>
+        <h3>{{ isEdit() ? 'Sửa thông tin thiết bị' : 'Thêm thiết bị mới' }}</h3>
         
-        <form [formGroup]="racketForm" (ngSubmit)="onSubmit()" class="premium-form">
+        <form [formGroup]="equipmentForm" (ngSubmit)="onSubmit()" class="premium-form">
           <div class="form-group">
-            <label for="name">Tên vợt</label>
+            <label for="name">Tên thiết bị</label>
             <input type="text" id="name" formControlName="name" />
           </div>
 
           <div class="form-group">
-            <label for="brand">Hãng</label>
-            <input type="text" id="brand" formControlName="brand" />
+            <label for="factory">Hãng sản xuất</label>
+            <input type="text" id="factory" formControlName="factory" placeholder="Ví dụ: Adidas, Nike..." />
           </div>
 
           <div class="form-group">
-            <label for="price">Giá trị gốc (VNĐ)</label>
+            <label for="price">Giá trị thiết bị (VNĐ)</label>
             <input type="number" id="price" formControlName="price" />
           </div>
 
           <div class="form-group">
-            <label for="rentalPrice">Giá cho thuê (VNĐ)</label>
-            <input type="number" id="rentalPrice" formControlName="rentalPrice" />
+            <label for="rentalPricePerPlay">Giá cho thuê mỗi lượt (VNĐ)</label>
+            <input type="number" id="rentalPricePerPlay" formControlName="rentalPricePerPlay" />
           </div>
 
           <div class="form-group">
-            <label for="conditionStatus">Tình trạng</label>
-            <select id="conditionStatus" formControlName="conditionStatus">
-              <option value="Tốt">Tốt</option>
-              <option value="Cũ">Cũ</option>
-              <option value="Bảo trì">Bảo trì</option>
+            <label for="status">Trạng thái thiết bị</label>
+            <select id="status" formControlName="status">
+              <option value="ACTIVE">Sẵn sàng cho thuê</option>
+              <option value="MAINTENANCE">Đang bảo trì</option>
+              <option value="INACTIVE">Hỏng/Ngừng sử dụng</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="racketImg">Hình ảnh</label>
-            <input type="file" id="racketImg" (change)="onFileSelected($event)" accept="image/*" />
+            <label for="equipmentImg">Hình ảnh</label>
+            <input type="file" id="equipmentImg" (change)="onFileSelected($event)" accept="image/*" />
           </div>
 
           <div class="modal-actions">
             <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
-            <button type="submit" class="btn-primary" [disabled]="racketForm.invalid">Lưu</button>
+            <button type="submit" class="btn-primary" [disabled]="equipmentForm.invalid">Lưu</button>
           </div>
         </form>
       </div>

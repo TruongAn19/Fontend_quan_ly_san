@@ -42,12 +42,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/products/detail/detail').then(m => m.ProductDetailComponent)
   },
   {
-    path: 'rackets',
-    loadComponent: () => import('./features/rackets/rackets').then(m => m.RacketsComponent)
+    path: 'equipments',
+    loadComponent: () => import('./features/equipments/equipments').then(m => m.EquipmentsComponent)
   },
   {
-    path: 'rackets/detail/:id',
-    loadComponent: () => import('./features/rackets/detail/detail').then(m => m.RacketDetailComponent)
+    path: 'equipments/detail/:id',
+    loadComponent: () => import('./features/equipments/detail/detail').then(m => m.EquipmentDetailComponent)
   },
   {
     path: 'booking/:id',
@@ -85,21 +85,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'match-posts',
-    loadComponent: () => import('./features/match-posts/match-posts').then(m => m.MatchPostsComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'match-posts/create',
-    loadComponent: () => import('./features/match-post-create/match-post-create').then(m => m.MatchPostCreateComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'match-posts/detail/:id',
-    loadComponent: () => import('./features/match-post-detail/match-post-detail').then(m => m.MatchPostDetailComponent),
-    canActivate: [authGuard]
-  },
-  {
     path: 'admin/dashboard',
     loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.AdminDashboardComponent),
     canActivate: [adminGuard]
@@ -115,8 +100,8 @@ export const routes: Routes = [
     canActivate: [adminGuard]
   },
   {
-    path: 'admin/rackets',
-    loadComponent: () => import('./features/admin/rackets/rackets').then(m => m.AdminRacketsComponent),
+    path: 'admin/equipments',
+    loadComponent: () => import('./features/admin/equipments/equipments').then(m => m.AdminEquipmentsComponent),
     canActivate: [adminGuard]
   },
   {

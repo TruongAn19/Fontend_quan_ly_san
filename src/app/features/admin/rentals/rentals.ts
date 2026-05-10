@@ -24,7 +24,7 @@ export class AdminRentalsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Chờ bàn giao', 'Đang thuê', 'Đã trả', 'Hủy bỏ'];
+  statusList = ['Chờ thanh toán', 'Đã thanh toán', 'Đã trả', 'Đã hủy'];
 
   ngOnInit(): void {
     this.loadRentals();

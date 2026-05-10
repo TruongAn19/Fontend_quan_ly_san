@@ -14,7 +14,7 @@ export class AdminDashboardComponent implements OnInit {
 
   stats = signal<any>(null);
   revenue = signal<any>(null);
-  racketStats = signal<any>(null);
+  equipmentStats = signal<any>(null);
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
@@ -45,7 +45,7 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.getRevenueStats(start, end).subscribe({
       next: (res) => {
         this.revenue.set(res.data || res);
-        this.loadRackets();
+        this.loadEquipments();
       },
       error: () => {
         this.isLoading.set(false);
@@ -53,11 +53,11 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  loadRackets(): void {
-    this.adminService.getRacketStats().subscribe({
+  loadEquipments(): void {
+    this.adminService.getEquipmentStats().subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.racketStats.set(res.data || res);
+        this.equipmentStats.set(res.data || res);
       },
       error: () => {
         this.isLoading.set(false);

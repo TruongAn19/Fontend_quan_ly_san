@@ -21,8 +21,8 @@ export class AdminService {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/products/statistics/revenue`, { params });
   }
 
-  getRacketStats(): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.API_URL}/racket-statistics`);
+  getEquipmentStats(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/equipment-statistics`);
   }
 
   getUsers(): Observable<ApiResponse<any[]>> {
@@ -63,17 +63,17 @@ export class AdminService {
     return this.http.delete<ApiResponse<null>>(`${this.API_URL}/products/${productId}`);
   }
 
-  getRackets(page: number = 1): Observable<any> {
+  getEquipments(page: number = 1): Observable<any> {
     const params = new HttpParams().set('page', page.toString());
-    return this.http.get<any>(`${this.API_URL}/rackets`, { params });
+    return this.http.get<any>(`${this.API_URL}/equipments`, { params });
   }
 
-  createRacket(payload: FormData): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.API_URL}/rackets`, payload);
+  createEquipment(payload: FormData): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/equipments`, payload);
   }
 
-  updateRacket(racketId: number, payload: FormData): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(`${this.API_URL}/rackets/${racketId}`, payload);
+  updateEquipment(equipmentId: number, payload: FormData): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.API_URL}/equipments/${equipmentId}`, payload);
   }
 
   getBookings(filters: any = {}): Observable<any> {

@@ -29,15 +29,16 @@
               <th>Số lượng</th>
               <th>Thời gian thuê</th>
               <th>Trạng thái</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of rentals()">
               <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
-              <td>{{ item.racketName || 'Dụng cụ bóng đá' }}</td>
+              <td>{{ item.equipmentName || 'Dụng cụ bóng đá' }}</td>
               <td>
                 <span class="type-badge" [class.daily]="item.type === 'DAILY'">
-                  {{ item.type }}
+                  {{ getTypeLabel(item.type) }}
                 </span>
               </td>
               <td>{{ item.quantity }}</td>
@@ -45,13 +46,24 @@
                 @if (item.type === 'DAILY') {
                   <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
                 } @else {
-                  <span>Mã sân: {{ item.bookingCode }}</span>
+                  <div class="booking-time-info">
+                    <strong>{{ item.bookingDate || item.rentalDate }}</strong><br>
+                    @if (item.bookingTime) {
+                      <span>{{ item.bookingTime }}</span><br>
+                    }
+                    <small class="text-muted">Mã sân: {{ item.bookingCode }}</small>
+                  </div>
                 }
               </td>
               <td>
                 <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ item.status }}
+                  {{ getStatusLabel(item.status) }}
                 </span>
+              </td>
+              <td>
+                @if (item.status === 'PENDING') {
+                  <button class="btn-retry" (click)="onRetryPayment(item.id)">Thanh toán</button>
+                }
               </td>
             </tr>
           </tbody>

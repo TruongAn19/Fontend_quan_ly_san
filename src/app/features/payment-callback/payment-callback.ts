@@ -55,7 +55,7 @@ export class PaymentCallbackComponent implements OnInit {
               state: {
                 rentalCode: data.rentalCode,
                 rentalId: data.rentalToolId ?? null,
-                message: res?.message ?? 'Thanh toán thuê vợt thành công!'
+                message: res?.message ?? 'Thanh toán thuê đồ thành công!'
               }
             });
           } else {

@@ -1,39 +1,38 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
-  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
-  });
+  loginRequest = {
+    email: '',
+    password: ''
+  };
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+  onLogin(): void {
+    if (!this.loginRequest.email || !this.loginRequest.password) {
+      this.errorMessage.set('Vui lòng nhập đầy đủ email và mật khẩu.');
       return;
     }
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.authService.login(this.loginForm.value).subscribe({
+    this.authService.login(this.loginRequest).subscribe({
       next: () => {
         this.isLoading.set(false);
         const role = this.authService.role();

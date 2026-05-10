@@ -25,7 +25,7 @@ export class AdminBookingsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Đang giữ chỗ', 'Đã đặt', 'Đã thanh toán', 'Đã hủy', 'Đang sử dụng', 'Đã kết thúc'];
+  statusList = ['Chờ thanh toán', 'Đã đặt', 'Đã thanh toán', 'Đã hủy'];
 
   ngOnInit(): void {
     this.loadBookings();
@@ -64,6 +64,21 @@ export class AdminBookingsComponent implements OnInit {
       next: () => this.loadBookings(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
     });
+  }
+
+  getStatusLabel(status: string): string {
+    const mapping: any = {
+      'CHO_THANH_TOAN': 'Chờ thanh toán',
+      'DA_DAT': 'Đã đặt',
+      'DA_THANH_TOAN': 'Đã thanh toán',
+      'DA_HUY': 'Đã hủy',
+      // Thêm dự phòng nếu backend trả về chính label
+      'Chờ thanh toán': 'Chờ thanh toán',
+      'Đã đặt': 'Đã đặt',
+      'Đã thanh toán': 'Đã thanh toán',
+      'Đã hủy': 'Đã hủy'
+    };
+    return mapping[status] || status;
   }
 
   changePage(page: number): void {
