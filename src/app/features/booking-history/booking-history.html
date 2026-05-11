@@ -1,5 +1,8 @@
 <div class="history-container animate-fade-in">
-  <h1 class="page-title">Lịch sử Đặt sân</h1>
+  <div class="page-header">
+    <h1 class="page-title">Lịch sử Đặt sân</h1>
+    <p class="page-subtitle">Theo dõi và quản lý các đơn đặt sân của bạn</p>
+  </div>
 
   @if (errorMessage()) {
     <div class="error-alert">
@@ -15,46 +18,55 @@
 
     @if (bookings().length === 0) {
       <div class="empty-state">
+        <div class="empty-icon">📅</div>
         <p>Bạn chưa có lịch sử đặt sân nào.</p>
+        <a routerLink="/products" class="btn-primary">Đặt sân ngay</a>
       </div>
     } @else {
       
-      <div class="table-responsive glass-card">
-        <table class="premium-table">
-          <thead>
-            <tr>
-              <th>Mã đặt</th>
-              <th>Tên sân</th>
-              <th>Ngày đặt</th>
-              <th>Khung giờ</th>
-              <th>Trạng thái</th>
-              <th>Tổng tiền</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of bookings()">
-              <td><strong>{{ item.bookingCode }}</strong></td>
-              <td>{{ item.pitchName || 'Sân bóng đá' }}</td>
-              <td>{{ item.bookingDate }}</td>
-              <td>{{ item.time }}</td>
-              <td>
-                <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ getStatusLabel(item.status) }}
-                </span>
-              </td>
-              <td class="total-price">{{ item.totalPrice | number }} VNĐ</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="history-card">
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Mã đặt</th>
+                <th>Sân bóng</th>
+                <th>Ngày đặt</th>
+                <th>Khung giờ</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Tổng tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bookings()">
+                <td class="booking-code">{{ item.bookingCode }}</td>
+                <td>
+                  <div class="pitch-info">
+                    <span class="pitch-name">{{ item.pitchName || 'Sân bóng đá' }}</span>
+                  </div>
+                </td>
+                <td>{{ item.bookingDate }}</td>
+                <td class="time-slot">{{ item.time }}</td>
+                <td>
+                  <span class="status-badge" [class]="item.status?.toLowerCase()">
+                    {{ getStatusLabel(item.status) }}
+                  </span>
+                </td>
+                <td class="total-price text-right">{{ item.totalPrice | number }}đ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <!-- Pagination -->
-      <div class="pagination-wrapper">
-        <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
-        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
-        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+        <!-- Pagination -->
+        <div class="pagination-row" *ngIf="totalPages() > 1">
+          <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">‹</button>
+          <div class="page-numbers">
+            Trang {{ currentPage() }} / {{ totalPages() }}
+          </div>
+          <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">›</button>
+        </div>
       </div>
-
     }
 
   }

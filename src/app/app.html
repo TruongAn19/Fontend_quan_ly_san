@@ -1,22 +1,15 @@
-<div class="app-wrapper">
+<div class="app-wrapper" [class.admin-layout]="isAdmin()">
 
-  <!-- GoalField Navbar -->
-  <nav class="premium-navbar animate-fade-in">
-    <div class="nav-container">
+  <!-- Client Navbar (Only for non-admin) -->
+  @if (!isAdmin()) {
+    <nav class="premium-navbar animate-fade-in">
+      <div class="nav-container">
+        <a routerLink="/" class="nav-logo">
+          <div class="logo-icon">🛡️</div>
+          <span class="logo-text">GoalField</span>
+        </a>
 
-      <a routerLink="/" class="nav-logo">
-        <div class="logo-icon">🛡️</div>
-        <span class="logo-text">GoalField</span>
-      </a>
-
-      <div class="nav-links">
-        @if (isAdmin()) {
-          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
-          <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">Quản lý Sân</a>
-          <a routerLink="/admin/equipments" routerLinkActive="active" class="nav-item">Thiết bị</a>
-          <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Đơn đặt</a>
-          <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Đơn thuê</a>
-        } @else {
+        <div class="nav-links">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">Trang chủ</a>
           <a routerLink="/products" routerLinkActive="active" class="nav-item">Sân bóng</a>
           <a routerLink="/equipments" routerLinkActive="active" class="nav-item">Thiết bị</a>
@@ -24,31 +17,65 @@
             <a routerLink="/booking-history" routerLinkActive="active" class="nav-item">Lịch sử đặt sân</a>
             <a routerLink="/rental-history" routerLinkActive="active" class="nav-item">Lịch sử thuê đồ</a>
           }
-        }
+        </div>
+
+        <div class="nav-actions">
+          @if (authService.isLoggedIn()) {
+            <a routerLink="/profile" class="btn-profile">👤</a>
+            <button class="btn-logout" (click)="onLogout()">Đăng xuất</button>
+          } @else {
+            <a routerLink="/login" class="btn-login">Đăng nhập</a>
+            <a routerLink="/register" class="btn-primary">Đăng ký</a>
+          }
+        </div>
+      </div>
+    </nav>
+  }
+
+  <!-- Admin Sidebar (Only for admin) -->
+  @if (isAdmin()) {
+    <aside class="admin-sidebar animate-fade-in">
+      <div class="sidebar-header">
+        <div class="logo-icon">🛡️</div>
+        <span class="logo-text">GoalField Admin</span>
+      </div>
+      
+      <div class="sidebar-links">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar-item">
+          <span class="icon">📊</span> Dashboard
+        </a>
+        <a routerLink="/admin/products" routerLinkActive="active" class="sidebar-item">
+          <span class="icon">🏟️</span> Quản lý Sân
+        </a>
+        <a routerLink="/admin/equipments" routerLinkActive="active" class="sidebar-item">
+          <span class="icon">⚽</span> Thiết bị
+        </a>
+        <a routerLink="/admin/bookings" routerLinkActive="active" class="sidebar-item">
+          <span class="icon">📅</span> Đơn đặt sân
+        </a>
+        <a routerLink="/admin/rentals" routerLinkActive="active" class="sidebar-item">
+          <span class="icon">🤝</span> Đơn thuê đồ
+        </a>
       </div>
 
-      <div class="nav-actions">
-        @if (authService.isLoggedIn()) {
-          <a routerLink="/profile" class="btn-profile">
-            👤
-          </a>
-          <button class="btn-logout" (click)="onLogout()">Đăng xuất</button>
-        } @else {
-          <a routerLink="/login" class="btn-login">Đăng nhập</a>
-          <a routerLink="/register" class="btn-primary">Đăng ký</a>
-        }
+      <div class="sidebar-footer">
+        <button class="btn-logout-sidebar" (click)="onLogout()">
+          <span class="icon">🚪</span> Đăng xuất
+        </button>
       </div>
+    </aside>
+  }
 
-    </div>
-  </nav>
+  <!-- Content Wrapper -->
+  <div class="content-layout-wrapper">
+    <!-- Router Outlet Content -->
+    <main class="app-main-content">
+      <router-outlet></router-outlet>
+    </main>
 
-  <!-- Router Outlet Content -->
-  <main class="app-main-content">
-    <router-outlet></router-outlet>
-  </main>
-
-  <!-- Global Footer -->
-  <footer class="global-footer">
+    <!-- Global Footer (Hidden for admin) -->
+    @if (!isAdmin()) {
+      <footer class="global-footer">
     <div class="footer-container">
       <div class="footer-main">
         <div class="footer-brand">
@@ -93,6 +120,8 @@
       </div>
     </div>
   </footer>
+  }
 
   <app-chatbot></app-chatbot>
+  </div>
 </div>

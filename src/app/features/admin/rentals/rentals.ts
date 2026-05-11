@@ -24,7 +24,17 @@ export class AdminRentalsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Chờ thanh toán', 'Đã thanh toán', 'Đã trả', 'Đã hủy'];
+  statusList = [
+    { value: 'PENDING', label: 'Chờ thanh toán' },
+    { value: 'PAID', label: 'Đã thanh toán' },
+    { value: 'RETURNED', label: 'Đã trả' },
+    { value: 'CANCELLED', label: 'Đã hủy' }
+  ];
+
+  getStatusLabel(status: string): string {
+    const found = this.statusList.find(s => s.value === status);
+    return found ? found.label : (status || 'Chờ thanh toán');
+  }
 
   ngOnInit(): void {
     this.loadRentals();

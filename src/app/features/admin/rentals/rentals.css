@@ -1,72 +1,98 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f172a;
-  color: #f8fafc;
+  background: #F8FAFC;
+  color: #111827;
   font-family: 'Inter', sans-serif;
-  padding: 40px 20px;
+  padding: 32px;
 }
 
 .admin-rentals {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
+.page-header {
+  margin-bottom: 0;
+  position: sticky;
+  top: -32px;
+  z-index: 110;
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 20px 0;
+  margin-top: -20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
 .page-title {
-  font-size: 2rem;
+  font-size: 24px;
   font-weight: 800;
-  margin-bottom: 40px;
+  color: #111827;
+  margin: 0;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  padding: 24px;
-  margin-bottom: 32px;
-}
-
+/* Filters Bar */
 .filters-bar {
   display: flex;
+  gap: 16px;
+  margin: 20px 0 32px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
   align-items: flex-end;
-  gap: 24px;
-  flex-wrap: wrap;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 65px;
+  z-index: 105;
 }
 
 .filter-group {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .filter-group label {
-  color: #cbd5e1;
-  font-size: 0.85rem;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6B7280;
 }
 
 .filter-group input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 16px;
-  border-radius: 12px;
-  color: white;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
 }
 
 .btn-filter {
-  background: #6366f1;
+  background: #10B981;
   color: white;
   border: none;
-  padding: 10px 24px;
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 0 24px;
+  height: 46px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  height: 42px;
 }
 
 .btn-filter:hover {
-  background: #4f46e5;
+  background: #059669;
+}
+
+/* Table Card */
+.history-card {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 .table-responsive {
@@ -76,47 +102,49 @@
 .premium-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
 }
 
 .premium-table th {
-  padding: 16px;
-  color: #cbd5e1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #F9FAFB;
+  padding: 16px 24px;
+  color: #6B7280;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: left;
+  border-bottom: 1px solid #F3F4F6;
 }
 
 .premium-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px 24px;
+  color: #374151;
+  font-size: 14px;
+  border-bottom: 1px solid #F3F4F6;
+  vertical-align: middle;
+}
+
+.booking-code {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-weight: 700;
+  color: #111827;
+}
+
+.total-price {
+  font-weight: 700;
+  color: #111827;
 }
 
 .status-badge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 12px;
   font-weight: 700;
-  display: inline-block;
+  display: inline-flex;
 }
 
-.status-badge[data-status="Đã trả"] {
-  background: rgba(16, 185, 129, 0.2);
-  color: #6ee7b7;
-}
-
-.status-badge[data-status="Đang thuê"] {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fcd34d;
-}
-
-.status-badge[data-status="Chờ bàn giao"] {
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-}
-
-.status-badge[data-status="Hủy bỏ"] {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-}
+.status-badge.paid, .status-badge.da_thanh_toan { background: #DCFCE7; color: #166534; }
+.status-badge.pending, .status-badge.cho_thanh_toan { background: #FEF3C7; color: #92400E; }
+.status-badge.cancelled, .status-badge.da_huy { background: #FEE2E2; color: #991B1B; }
+.status-badge.returned, .status-badge.da_tra { background: #F3F4F6; color: #374151; }
 
 .action-dropdown select {
   background: rgba(0, 0, 0, 0.2);

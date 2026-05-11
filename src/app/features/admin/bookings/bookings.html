@@ -1,22 +1,19 @@
 <div class="admin-bookings animate-fade-in">
-  <h1 class="page-title">Quản lý Đặt sân (Staff)</h1>
+  <div class="page-header">
+    <h1 class="page-title">Quản lý Đặt sân</h1>
+    <p class="page-subtitle">Theo dõi và cập nhật trạng thái các đơn đặt sân bóng</p>
+  </div>
 
-  @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
-  }
-
-  <form [formGroup]="filterForm" (ngSubmit)="onFilterSubmit()" class="filters-bar glass-card">
+  <form [formGroup]="filterForm" (ngSubmit)="onFilterSubmit()" class="filters-bar">
     <div class="filter-group">
-      <label for="date">Lọc theo ngày</label>
-      <input type="date" id="date" formControlName="date" />
+      <span class="filter-icon">📅</span>
+      <input type="date" formControlName="date" />
     </div>
-    <div class="filter-group">
-      <label for="search">Tìm người đặt (Họ tên/SĐT)</label>
-      <input type="text" id="search" formControlName="search" placeholder="Tìm kiếm..." />
+    <div class="filter-group search">
+      <span class="filter-icon">🔍</span>
+      <input type="text" formControlName="search" placeholder="Tìm người đặt (Họ tên/SĐT)..." />
     </div>
-    <button type="submit" class="btn-filter">Áp dụng</button>
+    <button type="submit" class="btn-filter">Tìm kiếm</button>
   </form>
 
   @if (isLoading()) {
@@ -25,48 +22,51 @@
     </div>
   } @else {
 
-    <div class="table-responsive glass-card">
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Khách hàng</th>
-            <th>Ngày</th>
-            <th>Giờ</th>
-            <th>Tổng tiền</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of bookings()">
-            <td>{{ item.id }}</td>
-            <td>
-              <strong>{{ item.user?.fullName || item.receiverName }}</strong>
-              <br>
-              <small>{{ item.user?.phone || item.receiverPhone }}</small>
-            </td>
-            <td>{{ item.bookingDate }}</td>
-            <td>{{ item.time }}</td>
-            <td>{{ item.totalPrice | number }} VNĐ</td>
-            <td>
-              <span class="status-badge" [attr.data-status]="item.status">
-                {{ getStatusLabel(item.status) }}
-              </span>
-            </td>
-            <td>
-              <div class="action-dropdown">
-                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
-                  <option value="">-- Đổi trạng thái --</option>
-                  <option *ngFor="let st of statusList" [value]="st" [selected]="getStatusLabel(item.status) === st">
-                    {{ st }}
-                  </option>
-                </select>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="history-card">
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Khách hàng</th>
+              <th>Ngày</th>
+              <th>Giờ</th>
+              <th>Tổng tiền</th>
+              <th>Trạng thái</th>
+              <th class="text-right">Cập nhật trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of bookings()">
+              <td class="booking-code">#{{ item.id }}</td>
+              <td>
+                <div class="user-info-cell">
+                  <span class="user-name">{{ item.user?.fullName || item.receiverName }}</span>
+                  <small class="user-phone">{{ item.user?.phone || item.receiverPhone }}</small>
+                </div>
+              </td>
+              <td>{{ item.bookingDate }}</td>
+              <td>{{ item.time }}</td>
+              <td class="total-price">{{ item.totalPrice | number }}đ</td>
+              <td>
+                <span class="status-badge" [class]="item.status?.toLowerCase()">
+                  {{ getStatusLabel(item.status) }}
+                </span>
+              </td>
+              <td class="text-right">
+                <div class="action-dropdown">
+                  <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
+                    <option value="">-- Đổi trạng thái --</option>
+                    <option *ngFor="let st of statusList" [value]="st" [selected]="getStatusLabel(item.status) === st">
+                      {{ st }}
+                    </option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="pagination-wrapper">

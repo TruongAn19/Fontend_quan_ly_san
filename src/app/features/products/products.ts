@@ -91,6 +91,17 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
+  resetFilters(): void {
+    this.filterForm.reset({
+      search: '',
+      address: '',
+      price: 2000000,
+      sort: ''
+    });
+    this.selectedAddresses = [];
+    this.applyFilters();
+  }
+
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);

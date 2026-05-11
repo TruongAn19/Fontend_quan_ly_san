@@ -1,51 +1,170 @@
 <div class="admin-dashboard animate-fade-in">
-  <h1 class="page-title">Admin Dashboard</h1>
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1 class="page-title">Bảng điều khiển</h1>
+      <p class="page-subtitle">Tổng quan hoạt động đặt sân bóng, Chủ Nhật 11/05/2026</p>
+    </div>
+    <div class="header-right">
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Tìm kiếm trong hệ thống...">
+      </div>
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <span class="user-name">Admin</span>
+          <span class="user-role">Quản trị viên</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div class="error-alert">
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tổng hợp dữ liệu...
-    </div>
+  <div class="loading-state">
+    <span class="spinner"></span> Đang tổng hợp dữ liệu...
+  </div>
   } @else {
-    
-    @if (stats()) {
-      <div class="stats-grid">
-        <div class="stat-card glass-card">
-          <h3 class="stat-label">Người dùng</h3>
-          <p class="stat-value">{{ stats().countUser || 0 }}</p>
-        </div>
-        <div class="stat-card glass-card">
-          <h3 class="stat-label">Sản phẩm / Sân</h3>
-          <p class="stat-value">{{ stats().countProduct || 0 }}</p>
-        </div>
-      </div>
-    }
 
-    @if (equipmentStats()) {
-      <div class="equipment-stats-section">
-        <h2 class="section-title">Thống kê thuê dụng cụ</h2>
-        
-        <div class="stats-grid secondary">
-          <div class="stat-card glass-card">
-            <h4 class="stat-label">Tổng số thiết bị</h4>
-            <p class="stat-value">{{ equipmentStats().totalEquipments || 0 }}</p>
+  <div class="stats-row">
+    <div class="stat-mini-card">
+      <div class="stat-mini-header">
+        <span class="stat-mini-label">Tổng người dùng</span>
+        <span class="stat-mini-icon users">👥</span>
+      </div>
+      <div class="stat-mini-body">
+        <span class="stat-mini-value">{{ stats()?.countUser || 0 | number }}</span>
+        <span class="stat-mini-trend up">+{{ stats()?.userTrend || '12.5' }}% so với tháng trước</span>
+      </div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-header">
+        <span class="stat-mini-label">Sân bóng</span>
+        <span class="stat-mini-icon pitches">⚽</span>
+      </div>
+      <div class="stat-mini-body">
+        <span class="stat-mini-value">{{ stats()?.countProduct || 0 | number }}</span>
+        <span class="stat-mini-trend up">+{{ stats()?.newProducts || '0' }} sân mới tuần này</span>
+      </div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-header">
+        <span class="stat-mini-label">Lịch đặt hôm nay</span>
+        <span class="stat-mini-icon bookings">📅</span>
+      </div>
+      <div class="stat-mini-body">
+        <span class="stat-mini-value">{{ stats()?.countBookingToday || 0 | number }}</span>
+        <span class="stat-mini-trend" [class.up]="(stats()?.bookingTrend || 0) >= 0">
+          {{ (stats()?.bookingTrend || 0) >= 0 ? '+' : '' }}{{ stats()?.bookingTrend || '0' }}% so với hôm qua
+        </span>
+      </div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-header">
+        <span class="stat-mini-label">Doanh thu (tháng)</span>
+        <span class="stat-mini-icon revenue">💰</span>
+      </div>
+      <div class="stat-mini-body">
+        <span class="stat-mini-value">{{ (stats()?.monthlyRevenue || 0) / 1000000 | number:'1.1-1' }}M</span>
+        <span class="stat-mini-trend up">+{{ stats()?.revenueTrend || '0' }}% so với tháng trước</span>
+      </div>
+    </div>
+    <div class="stat-mini-card">
+      <div class="stat-mini-header">
+        <span class="stat-mini-label">Thiết bị đang thuê</span>
+        <span class="stat-mini-icon equipment">👕</span>
+      </div>
+      <div class="stat-mini-body">
+        <span class="stat-mini-value">{{ equipmentStats()?.currentlyRented || 0 | number }}</span>
+        <span class="stat-mini-trend up">+{{ equipmentStats()?.rentTrend || '0' }}% so với tháng trước</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="grid-col-left">
+
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h3 class="card-title">Thiết bị phổ biến</h3>
+        </div>
+        <div class="rank-list">
+          <div class="rank-item" *ngFor="let item of equipmentStats()?.topEquipments; let i = index">
+            <span class="rank-num">{{ i + 1 | number:'2.0-0' }}</span>
+            <div class="rank-info">
+              <span class="rank-name">{{ item.name }}</span>
+              <span class="rank-desc">{{ item.rentCount }} lượt thuê</span>
+            </div>
+            <span class="rank-value">{{ item.revenue / 1000 | number }}k</span>
           </div>
-          <div class="stat-card glass-card">
-            <h4 class="stat-label">Đang cho thuê</h4>
-            <p class="stat-value">{{ equipmentStats().currentlyRented || 0 }}</p>
-          </div>
-          <div class="stat-card glass-card">
-            <h4 class="stat-label">Doanh thu tháng này</h4>
-            <p class="stat-value">{{ (equipmentStats().monthlyRevenue || 0) | number }} VNĐ</p>
+          <div class="empty-state" *ngIf="!equipmentStats()?.topEquipments?.length">
+            Chưa có dữ liệu thiết bị.
           </div>
         </div>
       </div>
-    }
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h3 class="card-title">Booking gần đây</h3>
+        </div>
+        <div class="recent-list">
+          <ng-container *ngIf="stats()?.recentBookings; else mockRecent">
+            <div class="recent-item" *ngFor="let bk of stats().recentBookings">
+              <span class="recent-code">#{{ bk.id }}</span>
+              <span class="recent-val">{{ bk.totalPrice | number }}đ</span>
+            </div>
+          </ng-container>
+          <ng-template #mockRecent>
+            <div class="recent-item"><span class="recent-code">#BK001</span><span class="recent-val">350,000đ</span>
+            </div>
+            <div class="recent-item"><span class="recent-code">#BK002</span><span class="recent-val">450,000đ</span>
+            </div>
+            <div class="recent-item"><span class="recent-code">#BK003</span><span class="recent-val">750,000đ</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-col-right">
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h3 class="card-title">Sân được đặt nhiều</h3>
+        </div>
+        <div class="rank-list">
+          <ng-container *ngIf="stats()?.topProducts; else mockRanks">
+            <div class="rank-item" *ngFor="let prod of stats().topProducts; let i = index">
+              <span class="rank-num">{{ i + 1 | number:'2.0-0' }}</span>
+              <div class="rank-info">
+                <span class="rank-name">{{ prod.name }}</span>
+                <span class="rank-desc">{{ prod.bookingCount }} lượt đặt</span>
+              </div>
+              <span class="rank-value">{{ prod.revenue / 1000000 | number:'1.0-1' }}M</span>
+            </div>
+          </ng-container>
+          <ng-template #mockRanks>
+            <div class="rank-item">
+              <span class="rank-num">01</span>
+              <div class="rank-info"><span class="rank-name">Sân Quận 7 Sport Center</span><span class="rank-desc">204
+                  lượt đặt</span></div>
+              <span class="rank-value">82M</span>
+            </div>
+            <div class="rank-item">
+              <span class="rank-num">02</span>
+              <div class="rank-info"><span class="rank-name">Top Goal Stadium</span><span class="rank-desc">187 lượt
+                  đặt</span></div>
+              <span class="rank-value">71M</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   }
 </div>

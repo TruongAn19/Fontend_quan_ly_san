@@ -21,44 +21,46 @@
     </div>
   } @else {
 
-    <div class="table-responsive glass-card">
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>ID đơn</th>
-            <th>Người thuê</th>
-            <th>Dụng cụ</th>
-            <th>Ngày thuê</th>
-            <th>Tổng chi phí</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of rentals()">
-            <td>{{ item.id }}</td>
-            <td><strong>{{ item.fullName || 'Khách vãng lai' }}</strong></td>
-            <td>{{ item.equipmentName || 'Thiết bị' }}</td>
-            <td>{{ item.rentalDate }}</td>
-            <td>{{ item.rentalPrice | number }} VNĐ</td>
-            <td>
-              <span class="status-badge" [attr.data-status]="item.status">
-                {{ item.status }}
-              </span>
-            </td>
-            <td>
-              <div class="action-dropdown">
-                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
-                  <option value="">-- Đổi trạng thái --</option>
-                  <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
-                    {{ st }}
-                  </option>
-                </select>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="history-card">
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>ID đơn</th>
+              <th>Người thuê</th>
+              <th>Dụng cụ</th>
+              <th>Ngày thuê</th>
+              <th>Tổng chi phí</th>
+              <th>Trạng thái</th>
+              <th class="text-right">Cập nhật trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of rentals()">
+              <td class="booking-code">#{{ item.id }}</td>
+              <td><strong>{{ item.fullName || 'Khách vãng lai' }}</strong></td>
+              <td>{{ item.equipmentName || 'Thiết bị' }}</td>
+              <td>{{ item.rentalDate }}</td>
+              <td class="total-price">{{ item.rentalPrice | number }}đ</td>
+              <td>
+                <span class="status-badge" [class]="item.status?.toLowerCase()">
+                  {{ getStatusLabel(item.status) }}
+                </span>
+              </td>
+              <td class="text-right">
+                <div class="action-dropdown">
+                  <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
+                    <option value="">-- Đổi trạng thái --</option>
+                    <option *ngFor="let st of statusList" [value]="st.value" [selected]="item.status === st.value">
+                      {{ st.label }}
+                    </option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="pagination-wrapper">

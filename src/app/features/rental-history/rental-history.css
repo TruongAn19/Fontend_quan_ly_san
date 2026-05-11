@@ -1,8 +1,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0B0F1A;
-  color: #F9FAFB;
+  background: #F8FAFC;
+  color: #1F2937;
   font-family: 'Inter', sans-serif;
   padding: 40px 20px;
 }
@@ -12,23 +12,31 @@
   margin: 0 auto;
 }
 
-.page-title {
-  font-size: 40px;
-  font-weight: 800;
-  margin-bottom: 48px;
+.page-header {
+  margin-bottom: 40px;
   text-align: center;
-  color: white;
-  letter-spacing: -0.04em;
 }
 
-.glass-card {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  padding: 32px;
-  margin-bottom: 40px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+.page-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.page-subtitle {
+  color: #6B7280;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+.history-card {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -38,62 +46,70 @@
 
 .premium-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 12px;
-  text-align: left;
+  border-collapse: collapse;
 }
 
 .premium-table th {
+  background: #F9FAFB;
   padding: 16px 24px;
-  color: #9CA3AF;
+  color: #6B7280;
   font-weight: 700;
-  text-transform: uppercase;
   font-size: 13px;
-  letter-spacing: 0.1em;
-  border-bottom: none;
+  text-align: left;
+  border-bottom: 1px solid #F3F4F6;
 }
 
 .premium-table td {
   padding: 20px 24px;
-  color: #E5E7EB;
-  background: rgba(255, 255, 255, 0.02);
-  font-size: 15px;
+  color: #374151;
+  font-size: 14px;
+  border-bottom: 1px solid #F3F4F6;
   vertical-align: middle;
+}
+
+.premium-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.premium-table td:first-child {
-  border-top-left-radius: 16px;
-  border-bottom-left-radius: 16px;
+.booking-code {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-weight: 700;
+  color: #111827;
+  font-size: 13px;
 }
 
-.premium-table td:last-child {
-  border-top-right-radius: 16px;
-  border-bottom-right-radius: 16px;
-}
-
-.premium-table tbody tr:hover td {
-  background: rgba(255, 255, 255, 0.05);
+.pitch-name {
+  font-weight: 700;
+  color: #111827;
 }
 
 .type-badge {
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
   font-weight: 700;
-  background: rgba(16, 185, 129, 0.1);
-  color: #34D399;
-  white-space: nowrap;
-  display: inline-block;
+  background: #F3F4F6;
+  color: #4B5563;
+  text-transform: uppercase;
 }
 
 .type-badge.daily {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10B981;
+  background: #F0F9FF;
+  color: #0369A1;
+}
+
+.time-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.time-detail {
+  font-size: 12px;
+  color: #9CA3AF;
 }
 
 .status-badge {
-  padding: 8px 18px;
   border-radius: 12px;
   font-size: 13px;
   font-weight: 700;

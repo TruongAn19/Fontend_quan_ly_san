@@ -1,5 +1,8 @@
 <div class="history-container animate-fade-in">
-  <h1 class="page-title">Lịch sử Thuê dụng cụ</h1>
+  <div class="page-header">
+    <h1 class="page-title">Lịch sử Thuê dụng cụ</h1>
+    <p class="page-subtitle">Quản lý các đơn thuê thiết bị thể thao của bạn</p>
+  </div>
 
   @if (errorMessage()) {
     <div class="error-alert">
@@ -15,66 +18,73 @@
 
     @if (rentals().length === 0) {
       <div class="empty-state">
+        <div class="empty-icon">👕</div>
         <p>Bạn chưa có đơn thuê dụng cụ nào.</p>
+        <a routerLink="/equipments" class="btn-primary">Thuê ngay</a>
       </div>
     } @else {
       
-      <div class="table-responsive glass-card">
-        <table class="premium-table">
-          <thead>
-            <tr>
-              <th>Mã đơn</th>
-              <th>Đồ bóng đá</th>
-              <th>Hình thức</th>
-              <th>Số lượng</th>
-              <th>Thời gian thuê</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of rentals()">
-              <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
-              <td>{{ item.equipmentName || 'Dụng cụ bóng đá' }}</td>
-              <td>
-                <span class="type-badge" [class.daily]="item.type === 'DAILY'">
-                  {{ getTypeLabel(item.type) }}
-                </span>
-              </td>
-              <td>{{ item.quantity }}</td>
-              <td>
-                @if (item.type === 'DAILY') {
-                  <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
-                } @else {
-                  <div class="booking-time-info">
-                    <strong>{{ item.bookingDate || item.rentalDate }}</strong><br>
-                    @if (item.bookingTime) {
-                      <span>{{ item.bookingTime }}</span><br>
-                    }
-                    <small class="text-muted">Mã sân: {{ item.bookingCode }}</small>
+      <div class="history-card">
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Dụng cụ</th>
+                <th>Hình thức</th>
+                <th>Số lượng</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of rentals()">
+                <td class="booking-code">{{ item.rentalToolCode || item.id }}</td>
+                <td>
+                  <div class="pitch-info">
+                    <span class="pitch-name">{{ item.equipmentName || 'Dụng cụ bóng đá' }}</span>
                   </div>
-                }
-              </td>
-              <td>
-                <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ getStatusLabel(item.status) }}
-                </span>
-              </td>
-              <td>
-                @if (item.status === 'PENDING') {
-                  <button class="btn-retry" (click)="onRetryPayment(item.id)">Thanh toán</button>
-                }
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                </td>
+                <td>
+                  <span class="type-badge" [class.daily]="item.type === 'DAILY'">
+                    {{ getTypeLabel(item.type) }}
+                  </span>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>
+                  <div class="time-slot">
+                    @if (item.type === 'DAILY') {
+                      <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
+                    } @else {
+                      <span>{{ item.bookingDate || item.rentalDate }}</span>
+                      <small class="time-detail" *ngIf="item.bookingTime">{{ item.bookingTime }}</small>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [class]="item.status?.toLowerCase()">
+                    {{ getStatusLabel(item.status) }}
+                  </span>
+                </td>
+                <td class="text-right">
+                  @if (item.status === 'PENDING') {
+                    <button class="btn-action" (click)="onRetryPayment(item.id)">Thanh toán</button>
+                  }
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <!-- Pagination -->
-      <div class="pagination-wrapper">
-        <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
-        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
-        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+        <!-- Pagination -->
+        <div class="pagination-row" *ngIf="totalPages() > 1">
+          <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">‹</button>
+          <div class="page-numbers">
+            Trang {{ currentPage() }} / {{ totalPages() }}
+          </div>
+          <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">›</button>
+        </div>
       </div>
 
     }

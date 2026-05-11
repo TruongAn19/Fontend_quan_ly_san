@@ -1,7 +1,12 @@
 <div class="admin-products animate-fade-in">
-  <div class="header-row">
-    <h1 class="page-title">Quản lý Sân Bóng Đá</h1>
-    <button class="btn-create" (click)="openCreateModal()">+ Thêm mới</button>
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Quản lý Sân Bóng Đá</h1>
+      <p class="page-subtitle">Quản lý danh sách sân bóng và thông tin chi tiết</p>
+    </div>
+    <button class="btn-create" (click)="openCreateModal()">
+      <span class="icon">+</span> Thêm sân bóng mới
+    </button>
   </div>
 
   @if (errorMessage()) {
@@ -16,34 +21,49 @@
   </div>
   } @else {
 
-  <div class="table-responsive glass-card">
-    <table class="premium-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Tên</th>
-          <th>Giá</th>
-          <th>Giảm giá</th>
-          <th>Khu vực</th>
-          <th>Địa chỉ chi tiết</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of products()">
-          <td>{{ item.id }}</td>
-          <td><strong>{{ item.name }}</strong></td>
-          <td>{{ item.price | number }} VNĐ</td>
-          <td>{{ item.sale || 0 }}%</td>
-          <td>{{ item.address }}</td>
-          <td>{{ item.addressDetail }}</td>
-          <td class="actions-cell">
-            <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
-            <button class="btn-delete" (click)="deleteProduct(item.id)">Xóa</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="history-card">
+    <div class="table-responsive">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Thông tin sân bóng</th>
+            <th>Bảng giá</th>
+            <th>Khu vực</th>
+            <th class="text-right">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of products()">
+            <td class="booking-code">#{{ item.id }}</td>
+            <td>
+              <div class="product-info-cell">
+                <span class="product-name">{{ item.name }}</span>
+                <small class="product-sale" *ngIf="item.sale > 0">Giảm giá {{ item.sale }}%</small>
+              </div>
+            </td>
+            <td>
+              <div class="price-cell">
+                <span class="main-price">{{ item.price | number }}đ</span>
+                <small class="sub-price" *ngIf="item.depositPrice">Cọc: {{ item.depositPrice | number }}đ</small>
+              </div>
+            </td>
+            <td>
+              <div class="address-cell">
+                <span class="area">{{ item.address }}</span>
+                <small class="detail-addr">{{ item.addressDetail }}</small>
+              </div>
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button class="btn-icon-action edit" (click)="openEditModal(item)" title="Chỉnh sửa">✏️</button>
+                <button class="btn-icon-action delete" (click)="deleteProduct(item.id)" title="Xóa sân">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="pagination-wrapper">
@@ -58,72 +78,81 @@
 
   @if (showModal()) {
   <div class="modal-overlay animate-fade-in">
-    <div class="modal-content glass-card">
-      <h3>{{ isEdit() ? 'Sửa thông tin sân' : 'Thêm sân bóng mới' }}</h3>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ isEdit() ? 'Chỉnh sửa thông tin sân' : 'Thêm sân bóng mới' }}</h3>
+        <button class="btn-close" (click)="closeModal()">×</button>
+      </div>
 
-      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="premium-form">
-        <div class="form-group">
-          <label for="name">Tên sân bóng (ví dụ: Sân cỏ nhân tạo ABC)</label>
-          <input type="text" id="name" formControlName="name" />
-        </div>
+      <div class="modal-body">
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="premium-form">
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label>Tên sân bóng</label>
+              <input type="text" formControlName="name" placeholder="Ví dụ: Sân cỏ nhân tạo ABC" />
+            </div>
+            <div class="form-group flex-1">
+              <label>Khuyến mãi (%)</label>
+              <input type="number" formControlName="sale" />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="price">Giá (VNĐ)</label>
-          <input type="number" id="price" formControlName="price" />
-        </div>
-        
-        <div class="form-group">
-          <label for="depositPrice">Tiền đặt cọc (VNĐ)</label>
-          <input type="number" id="depositPrice" formControlName="depositPrice" />
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Giá thuê (đ/h)</label>
+              <input type="number" formControlName="price" />
+            </div>
+            <div class="form-group">
+              <label>Tiền đặt cọc (VNĐ)</label>
+              <input type="number" formControlName="depositPrice" />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="sale">Khuyến mãi (%)</label>
-          <input type="number" id="sale" formControlName="sale" />
-        </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Số lượng sân</label>
+              <input type="number" formControlName="quantity" placeholder="Số sân con" />
+            </div>
+            <div class="form-group">
+              <label>Khu vực</label>
+              <input type="text" formControlName="address" placeholder="Hà Nội, TP.HCM..." />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="quantity">Số lượng sân (Hệ thống tự sinh tên "Sân 1", "Sân 2"...)</label>
-          <input type="number" id="quantity" formControlName="quantity" />
-        </div>
+          <div class="form-group">
+            <label>Địa chỉ chi tiết</label>
+            <input type="text" formControlName="addressDetail" placeholder="Số nhà, tên đường, phường/xã..." />
+          </div>
 
-        <div class="form-group">
-          <label for="subPitchNames">Hoặc nhập tên các sân con (cách nhau dấu phẩy, vd: Sân A, Sân B)</label>
-          <input type="text" id="subPitchNames" formControlName="subPitchNames" placeholder="Sân A, Sân B, Sân C..." />
-        </div>
+          <div class="form-group">
+            <label>Mô tả ngắn</label>
+            <textarea formControlName="shortDesc" rows="2" placeholder="Thông tin nhanh về sân bóng..."></textarea>
+          </div>
 
-        <div class="form-group">
-          <label for="address">Khu vực (Hà Nội, TP.HCM...)</label>
-          <input type="text" id="address" formControlName="address" />
-        </div>
+          <div class="form-group">
+            <label>Mô tả chi tiết</label>
+            <textarea formControlName="detailDesc" rows="3" placeholder="Đặc điểm nổi bật, dịch vụ đi kèm..."></textarea>
+          </div>
 
-        <div class="form-group">
-          <label for="addressDetail">Địa chỉ chi tiết</label>
-          <input type="text" id="addressDetail" formControlName="addressDetail" />
-        </div>
+          <div class="form-group">
+            <label>Hình ảnh</label>
+            <div class="image-input-container">
+              <input type="text" formControlName="image" placeholder="Dán link ảnh URL tại đây..." />
+              <div class="file-upload">
+                <span>Hoặc tải lên:</span>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+              </div>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="detailDesc">Mô tả chi tiết (Hiển thị dưới ảnh)</label>
-          <textarea id="detailDesc" formControlName="detailDesc" rows="3"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="shortDesc">Mô tả ngắn (Hiển thị phần thông tin bên phải)</label>
-          <textarea id="shortDesc" formControlName="shortDesc" rows="2"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="image">Hình ảnh (Nhập link URL hoặc tải file ảnh lên)</label>
-          <input type="text" id="image" formControlName="image" placeholder="https://example.com/image.jpg" />
-          <span style="font-size: 0.8rem; color: #94a3b8; margin: 4px 0;">Hoặc tải lên từ máy tính:</span>
-          <input type="file" id="productImg" (change)="onFileSelected($event)" accept="image/*" />
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
-          <button type="submit" class="btn-primary" [disabled]="productForm.invalid">Lưu</button>
-        </div>
-      </form>
+          <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeModal()">Hủy bỏ</button>
+            <button type="submit" class="btn-submit" [disabled]="productForm.invalid">
+              {{ isEdit() ? 'Cập nhật' : 'Thêm mới' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
   }

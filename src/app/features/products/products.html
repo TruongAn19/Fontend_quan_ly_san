@@ -2,8 +2,10 @@
 
   <!-- Page Header -->
   <header class="page-header">
-    <h1 class="page-title">Tất cả sân bóng</h1>
-    <p class="page-desc">Hiện có {{ totalElements() }} sân bóng đang cập nhật mới nhất</p>
+    <div class="header-container">
+      <h1 class="page-title">Tất cả sân bóng</h1>
+      <p class="page-desc">Hiện có {{ totalElements() }} sân bóng đang cập nhật mới nhất</p>
+    </div>
   </header>
 
   <!-- Products Content -->
@@ -13,9 +15,13 @@
     <aside class="filters-sidebar" [formGroup]="filterForm">
       
       <div class="filter-group">
-        <h4 class="filter-title">Tìm kiếm</h4>
+        <h4 class="filter-title">Bộ lọc</h4>
+        <button class="btn-reset-filters" (click)="resetFilters()">Xóa hết</button>
+      </div>
+
+      <div class="filter-group">
+        <p class="filter-subtitle">Tìm kiếm</p>
         <div class="search-box">
-          <span class="search-icon">🔍</span>
           <input type="text" 
                  class="search-input" 
                  placeholder="Tên sân..." 
@@ -25,17 +31,29 @@
       </div>
 
       <div class="filter-group">
-        <h4 class="filter-title">Khu vực</h4>
+        <p class="filter-subtitle">Khu vực</p>
         <div class="checkbox-list">
-          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Quận 1', $event)"> Quận 1</label>
-          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Quận 7', $event)"> Quận 7</label>
-          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Thủ Đức', $event)"> Thủ Đức</label>
-          <label class="checkbox-item"><input type="checkbox" (change)="onAddressChange('Tân Bình', $event)"> Tân Bình</label>
+          <label class="checkbox-item">
+            <input type="checkbox" (change)="onAddressChange('Quận 1', $event)"> 
+            <span class="checkbox-text">Quận 1 <small>(24)</small></span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" (change)="onAddressChange('Quận 7', $event)"> 
+            <span class="checkbox-text">Quận 7 <small>(42)</small></span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" (change)="onAddressChange('Thủ Đức', $event)"> 
+            <span class="checkbox-text">Thủ Đức <small>(12)</small></span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" (change)="onAddressChange('Tân Bình', $event)"> 
+            <span class="checkbox-text">Tân Bình <small>(32)</small></span>
+          </label>
         </div>
       </div>
 
       <div class="filter-group">
-        <h4 class="filter-title">Khoảng giá tối đa</h4>
+        <p class="filter-subtitle">Khoảng giá</p>
         <div class="price-range">
           <input type="range" 
                  class="range-slider" 
@@ -51,7 +69,7 @@
       </div>
 
       <div class="filter-group">
-        <h4 class="filter-title">Loại sân</h4>
+        <p class="filter-subtitle">Loại sân</p>
         <div class="type-tags">
           <span class="type-tag active">5 người</span>
           <span class="type-tag">7 người</span>
@@ -88,12 +106,21 @@
             <a [routerLink]="['/products/detail', item.id]" class="product-card">
               <div class="product-image">
                 <img [src]="item.imageUrl || 'assets/img/default-pitch.png'" [alt]="item.name">
+                <div class="card-badge">Phổ biến</div>
               </div>
               <div class="product-info">
                 <h4 class="product-name">{{ item.name }}</h4>
-                <p class="product-addr">📍 {{ item.address }}</p>
+                <div class="product-meta">
+                  <span class="product-addr">📍 {{ item.address }}</span>
+                  <div class="product-rating">
+                    <span class="star">⭐</span> 4.8 <small>(120)</small>
+                  </div>
+                </div>
                 <div class="product-footer">
-                  <span class="product-price">{{ item.pricePerHour | number }}đ/h</span>
+                  <div class="price-box">
+                    <span class="price-value">{{ item.pricePerHour | number }}đ</span>
+                    <span class="price-unit">/ giờ</span>
+                  </div>
                 </div>
               </div>
             </a>

@@ -1,105 +1,135 @@
-<div class="admin-rackets animate-fade-in">
-  <div class="header-row">
-    <h1 class="page-title">Quản lý Thiết bị</h1>
-    <button class="btn-create" (click)="openCreateModal()">+ Thêm mới</button>
-  </div>
+<div class="admin-equipments animate-fade-in">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-title">
+      <h1>Quản lý Thiết bị</h1>
+      <p>Danh sách trang thiết bị cho thuê tại hệ thống sân bóng</p>
+    </div>
+    <button class="btn-create" (click)="openCreateModal()">
+      <span>+</span> Thêm thiết bị mới
+    </button>
+  </header>
 
+  <!-- Alerts -->
   @if (errorMessage()) {
     <div class="error-alert">
       <span>{{ errorMessage() }}</span>
     </div>
   }
 
+  <!-- Content Section -->
   @if (isLoading()) {
     <div class="loading-state">
-      <span class="spinner"></span> Đang tải danh sách...
+      <span class="spinner"></span> Đang cập nhật dữ liệu thiết bị...
     </div>
   } @else {
+    <div class="content-card">
+      <div class="table-container">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>Thông tin thiết bị</th>
+              <th>Hãng</th>
+              <th>Giá trị</th>
+              <th>Giá thuê / lượt</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of equipments()">
+              <td>
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-factory">ID: #{{ item.id }}</span>
+              </td>
+              <td>{{ item.factory }}</td>
+              <td>{{ item.price | number }} VNĐ</td>
+              <td>{{ item.rentalPricePerPlay | number }} VNĐ</td>
+              <td>
+                <span class="status-badge" [ngClass]="item.status?.toLowerCase() || 'active'">
+                  {{ item.status === 'ACTIVE' ? 'Sẵn sàng' : (item.status === 'MAINTENANCE' ? 'Bảo trì' : 'Ngừng dùng') }}
+                </span>
+              </td>
+              <td class="actions">
+                <button class="btn-edit" (click)="openEditModal(item)">Chỉnh sửa</button>
+              </td>
+            </tr>
+            <tr *ngIf="equipments().length === 0">
+              <td colspan="6" style="text-align: center; padding: 40px; color: #9CA3AF;">
+                Chưa có thiết bị nào trong hệ thống.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <div class="table-responsive glass-card">
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tên Thiết bị</th>
-            <th>Hãng</th>
-            <th>Giá trị</th>
-            <th>Giá thuê</th>
-            <th>Tình trạng</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of equipments()">
-            <td>{{ item.id }}</td>
-            <td><strong>{{ item.name }}</strong></td>
-            <td>{{ item.factory }}</td>
-            <td>{{ item.price | number }} VNĐ</td>
-            <td>{{ item.rentalPricePerPlay | number }} VNĐ</td>
-            <td>{{ item.status }}</td>
-            <td class="actions-cell">
-              <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Pagination -->
+      <footer class="pagination">
+        <div class="pagination-info">
+          Trang {{ currentPage() }} trên tổng số {{ totalPages() }}
+        </div>
+        <div class="pagination-controls">
+          <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">
+            Trước
+          </button>
+          <button class="page-btn" [disabled]="currentPage() >= totalPages()" (click)="changePage(currentPage() + 1)">
+            Sau
+          </button>
+        </div>
+      </footer>
     </div>
-
-    <div class="pagination-wrapper">
-      <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
-      <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
-      <button class="page-btn" [disabled]="currentPage() + 1 > totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
-    </div>
-
   }
 
+  <!-- Form Modal -->
   @if (showModal()) {
     <div class="modal-overlay animate-fade-in">
-      <div class="modal-content glass-card">
-        <h3>{{ isEdit() ? 'Sửa thông tin thiết bị' : 'Thêm thiết bị mới' }}</h3>
+      <div class="modal-content">
+        <h3>{{ isEdit() ? 'Cập nhật thiết bị' : 'Thêm thiết bị mới' }}</h3>
         
-        <form [formGroup]="equipmentForm" (ngSubmit)="onSubmit()" class="premium-form">
+        <form [formGroup]="equipmentForm" (ngSubmit)="onSubmit()" class="modern-form">
           <div class="form-group">
             <label for="name">Tên thiết bị</label>
-            <input type="text" id="name" formControlName="name" />
+            <input type="text" id="name" formControlName="name" placeholder="Nhập tên thiết bị..." />
           </div>
 
           <div class="form-group">
             <label for="factory">Hãng sản xuất</label>
-            <input type="text" id="factory" formControlName="factory" placeholder="Ví dụ: Adidas, Nike..." />
+            <input type="text" id="factory" formControlName="factory" placeholder="Ví dụ: Nike, Adidas..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="price">Giá trị (VNĐ)</label>
+              <input type="number" id="price" formControlName="price" />
+            </div>
+            <div class="form-group">
+              <label for="rentalPricePerPlay">Giá thuê (VNĐ)</label>
+              <input type="number" id="rentalPricePerPlay" formControlName="rentalPricePerPlay" />
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="price">Giá trị thiết bị (VNĐ)</label>
-            <input type="number" id="price" formControlName="price" />
-          </div>
-
-          <div class="form-group">
-            <label for="rentalPricePerPlay">Giá cho thuê mỗi lượt (VNĐ)</label>
-            <input type="number" id="rentalPricePerPlay" formControlName="rentalPricePerPlay" />
-          </div>
-
-          <div class="form-group">
-            <label for="status">Trạng thái thiết bị</label>
+            <label for="status">Trạng thái hiện tại</label>
             <select id="status" formControlName="status">
               <option value="ACTIVE">Sẵn sàng cho thuê</option>
               <option value="MAINTENANCE">Đang bảo trì</option>
-              <option value="INACTIVE">Hỏng/Ngừng sử dụng</option>
+              <option value="INACTIVE">Hỏng / Ngừng sử dụng</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="equipmentImg">Hình ảnh</label>
+            <label for="equipmentImg">Hình ảnh thiết bị</label>
             <input type="file" id="equipmentImg" (change)="onFileSelected($event)" accept="image/*" />
           </div>
 
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
-            <button type="submit" class="btn-primary" [disabled]="equipmentForm.invalid">Lưu</button>
+            <button type="button" class="btn-secondary" (click)="closeModal()">Đóng</button>
+            <button type="submit" class="btn-primary" [disabled]="equipmentForm.invalid">
+              {{ isEdit() ? 'Cập nhật' : 'Thêm mới' }}
+            </button>
           </div>
         </form>
       </div>
     </div>
   }
-
 </div>

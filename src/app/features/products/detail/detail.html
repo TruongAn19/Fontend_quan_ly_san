@@ -31,6 +31,11 @@
             class="main-image"
           />
         </div>
+        <div class="secondary-images">
+          <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt=""></div>
+          <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt=""></div>
+          <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt=""></div>
+        </div>
       </div>
 
       <!-- Main Layout -->
@@ -40,12 +45,13 @@
         <div class="left-content">
           
           <div class="header-info">
-            <div class="status-row">
-              <span class="badge-hot">🔥 Phổ biến</span>
+            <div class="meta-tags">
+              <span class="rating-badge">⭐ 4.8 (120 đánh giá)</span>
+              <span class="hot-badge">🔥 Phổ biến</span>
             </div>
             <h1 class="product-name">{{ productDetail().product?.name }}</h1>
             <div class="address-row">
-              <i class="location-icon">📍</i>
+              <span class="location-icon">📍</span>
               <span>{{ productDetail().product?.addressDetail || productDetail().product?.address }}</span>
             </div>
           </div>
