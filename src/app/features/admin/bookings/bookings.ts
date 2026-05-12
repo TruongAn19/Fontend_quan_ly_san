@@ -25,7 +25,15 @@ export class AdminBookingsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Đang giữ chỗ', 'Đã đặt', 'Đã thanh toán', 'Đã hủy', 'Đang sử dụng', 'Đã kết thúc'];
+  statusMap: { [key: string]: string } = {
+    'CHO_THANH_TOAN': 'Chờ thanh toán',
+    'DA_DAT': 'Đã đặt',
+    'DA_DAT_COC': 'Đã đặt cọc',
+    'DA_THANH_TOAN': 'Đã thanh toán',
+    'DA_HUY': 'Đã hủy'
+  };
+
+  statusList = Object.keys(this.statusMap);
 
   ngOnInit(): void {
     this.loadBookings();
@@ -43,7 +51,8 @@ export class AdminBookingsComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.bookings.set(res.bookings || res.data?.bookings || []);
+          const data = res.bookings || res.data?.bookings || [];
+          this.bookings.set(data);
           this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
         }
       },
@@ -60,10 +69,15 @@ export class AdminBookingsComponent implements OnInit {
   }
 
   updateStatus(bookingId: number, status: string): void {
+    if (!status) return;
     this.adminService.updateBookingStatus(bookingId, status).subscribe({
       next: () => this.loadBookings(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
     });
+  }
+
+  getStatusDisplay(status: string): string {
+    return this.statusMap[status] || status;
   }
 
   changePage(page: number): void {

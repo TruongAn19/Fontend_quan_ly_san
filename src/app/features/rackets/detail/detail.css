@@ -90,7 +90,7 @@
 }
 
 .price-item.rental .value.main {
-  color: #818cf8;
+  color: #22c55e;
   font-size: 1.5rem;
   font-weight: 800;
 }
@@ -194,7 +194,7 @@
   font-size: 1.125rem;
   font-weight: 700;
   color: white;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   border: none;
   border-radius: 16px;
   cursor: pointer;
@@ -204,7 +204,7 @@
 
 .btn-rent:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 12px 24px -6px rgba(22, 163, 74, 0.5);
 }
 
 .btn-rent:disabled {

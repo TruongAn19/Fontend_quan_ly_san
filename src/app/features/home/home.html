@@ -3,8 +3,8 @@
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-content">
-      <h1 class="hero-title">Sân Cầu Lông <span class="highlight">Premium</span></h1>
-      <p class="hero-subtitle">Đặt sân trực tuyến nhanh chóng, tiện lợi. Trải nghiệm tốt nhất cho người đam mê cầu lông.</p>
+      <h1 class="hero-title">Sân Pickleball <span class="highlight">Premium</span></h1>
+      <p class="hero-subtitle">Đặt sân trực tuyến nhanh chóng, tiện lợi. Trải nghiệm tốt nhất cho người đam mê Pickleball.</p>
       <div class="hero-actions">
         <a routerLink="/products" class="btn-primary">Đặt Sân Ngay</a>
         <a routerLink="/rackets" class="btn-secondary">Thuê Vợt</a>
@@ -29,7 +29,7 @@
     
     <!-- Top Products Section -->
     <section class="section-grid-container" *ngIf="homeData()?.topProducts?.length">
-      <h2 class="section-title">Sân Cầu Lông Nổi Bật</h2>
+      <h2 class="section-title">Sân Pickleball Nổi Bật</h2>
       <div class="product-grid">
         <div class="product-card" *ngFor="let item of homeData()?.topProducts">
           <img [src]="item.imageUrl || 'assets/img/default-court.png'" alt="{{item.name}}" class="card-img">

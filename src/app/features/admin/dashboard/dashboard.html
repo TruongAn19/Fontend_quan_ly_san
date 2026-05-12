@@ -14,9 +14,17 @@
   } @else {
     
     @if (stats()) {
-      <div class="stats-grid">
+      <div class="stats-grid animate-fade-in">
         <div class="stat-card glass-card">
-          <h3 class="stat-label">Người dùng</h3>
+          <h3 class="stat-label">Doanh thu hôm nay</h3>
+          <p class="stat-value highlight">{{ (stats().revenueToday || 0) | number }} VNĐ</p>
+        </div>
+        <div class="stat-card glass-card">
+          <h3 class="stat-label">Doanh thu tháng này</h3>
+          <p class="stat-value highlight">{{ (stats().revenueMonth || 0) | number }} VNĐ</p>
+        </div>
+        <div class="stat-card glass-card">
+          <h3 class="stat-label">Tổng người dùng</h3>
           <p class="stat-value">{{ stats().countUser || 0 }}</p>
         </div>
         <div class="stat-card glass-card">
@@ -27,7 +35,7 @@
     }
 
     @if (racketStats()) {
-      <div class="racket-stats-section">
+      <div class="racket-stats-section animate-fade-in">
         <h2 class="section-title">Thống kê thuê dụng cụ</h2>
         
         <div class="stats-grid secondary">
@@ -43,6 +51,15 @@
             <h4 class="stat-label">Doanh thu tháng này</h4>
             <p class="stat-value">{{ (racketStats().monthlyRevenue || 0) | number }} VNĐ</p>
           </div>
+        </div>
+
+        <div class="chart-container glass-card">
+          <h4 class="chart-title">Top vợt được thuê nhiều nhất</h4>
+          <canvas baseChart
+                  [data]="barChartData"
+                  [options]="barChartOptions"
+                  [type]="barChartType">
+          </canvas>
         </div>
       </div>
     }

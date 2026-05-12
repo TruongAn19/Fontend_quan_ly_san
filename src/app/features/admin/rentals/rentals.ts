@@ -24,7 +24,16 @@ export class AdminRentalsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Chờ bàn giao', 'Đang thuê', 'Đã trả', 'Hủy bỏ'];
+  statusMap: { [key: string]: string } = {
+    'PENDING': 'Chờ thanh toán',
+    'PAID': 'Đã thanh toán',
+    'RENTING': 'Đang thuê',
+    'RETURNED': 'Đã trả vợt',
+    'COMPLETED': 'Hoàn thành',
+    'CANCELLED': 'Đã hủy'
+  };
+
+  statusList = Object.keys(this.statusMap);
 
   ngOnInit(): void {
     this.loadRentals();
@@ -38,7 +47,8 @@ export class AdminRentalsComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.rentals.set(res.rentals || res.data?.rentals || []);
+          const data = res.rentals || res.data?.rentals || [];
+          this.rentals.set(data);
           this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
         }
       },
@@ -55,10 +65,15 @@ export class AdminRentalsComponent implements OnInit {
   }
 
   updateStatus(rentalId: number, status: string): void {
+    if (!status) return;
     this.adminService.updateRentalStatus(rentalId, status).subscribe({
       next: () => this.loadRentals(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
     });
+  }
+
+  getStatusDisplay(status: string): string {
+    return this.statusMap[status] || status;
   }
 
   changePage(page: number): void {

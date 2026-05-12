@@ -12,7 +12,10 @@ import { BookingService } from '../../core/services/booking.service';
 export class BookingHistoryComponent implements OnInit {
   private bookingService = inject(BookingService);
 
-  bookings = signal<any[]>([]);
+  allValidBookings = signal<any[]>([]);
+  displayBookings = signal<any[]>([]);
+  pageSize = 5;
+
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -26,15 +29,19 @@ export class BookingHistoryComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const apiPage = this.currentPage() - 1;
-
-    this.bookingService.getBookingHistory(apiPage).subscribe({
+    // Tải 1000 đơn để tự phân trang ở Frontend nhằm tránh bị gãy trang khi lọc
+    this.bookingService.getBookingHistory(0, 1000).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        if (res && res.data && res.data.bookings) {
-          this.bookings.set(res.data.bookings);
-          this.totalPages.set(res.data.totalPages || 1);
-        }
+        const rawData = res.data?.bookings || res.bookings || [];
+        
+        // Chỉ lấy các đơn đã thanh toán, đã đặt cọc hoặc đã đặt
+        const valid = rawData.filter((b: any) => 
+          ['PAID', 'DA_THANH_TOAN', 'BOOKED', 'DA_DAT', 'DA_DAT_COC'].includes(b.status?.toUpperCase())
+        );
+        
+        this.allValidBookings.set(valid);
+        this.updateDisplay();
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -43,10 +50,41 @@ export class BookingHistoryComponent implements OnInit {
     });
   }
 
+  updateDisplay(): void {
+    const total = this.allValidBookings().length;
+    this.totalPages.set(Math.ceil(total / this.pageSize) || 1);
+
+    // Cắt mảng theo trang hiện tại
+    const start = (this.currentPage() - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.displayBookings.set(this.allValidBookings().slice(start, end));
+  }
+
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.loadHistory();
+      this.updateDisplay();
+    }
+  }
+
+  getStatusText(status: string): string {
+    if (!status) return '';
+    switch (status.toUpperCase()) {
+      case 'DA_THANH_TOAN':
+      case 'PAID':
+      case 'DA_DAT_COC':
+        return 'Đã đặt cọc';
+      case 'CHO_THANH_TOAN':
+      case 'PENDING':
+        return 'Chờ đặt cọc';
+      case 'DA_HUY':
+      case 'CANCELLED':
+        return 'Đã huỷ';
+      case 'DA_DAT':
+      case 'BOOKED':
+        return 'Đã giữ sân';
+      default:
+        return status;
     }
   }
 }

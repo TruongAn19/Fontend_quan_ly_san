@@ -1,11 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
@@ -18,6 +20,25 @@ export class AdminDashboardComponent implements OnInit {
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+
+  // Chart configuration
+  public barChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    scales: {
+      x: {},
+      y: { min: 0 }
+    },
+    plugins: {
+      legend: { display: true },
+    }
+  };
+  public barChartType: ChartType = 'bar';
+  public barChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: [
+      { data: [], label: 'Lượt thuê', backgroundColor: '#16a34a' }
+    ]
+  };
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -57,7 +78,18 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.getRacketStats().subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.racketStats.set(res.data || res);
+        const data = res.data || res;
+        this.racketStats.set(data);
+        
+        // Update chart data
+        if (data.popularRackets && data.popularRackets.length > 0) {
+          this.barChartData = {
+            labels: data.popularRackets.map((r: any) => r.racketName),
+            datasets: [
+              { data: data.popularRackets.map((r: any) => r.rentalCount), label: 'Lượt thuê', backgroundColor: '#22c55e' }
+            ]
+          };
+        }
       },
       error: () => {
         this.isLoading.set(false);

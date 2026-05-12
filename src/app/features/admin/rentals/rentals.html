@@ -37,13 +37,13 @@
         <tbody>
           <tr *ngFor="let item of rentals()">
             <td>{{ item.id }}</td>
-            <td><strong>{{ item.customerName || 'Khách vãng lai' }}</strong></td>
+            <td><strong>{{ item.accountName || item.fullName || 'Khách vãng lai' }}</strong></td>
             <td>{{ item.racketName || 'Vợt' }}</td>
             <td>{{ item.rentalDate }}</td>
-            <td>{{ item.totalFee | number }} VNĐ</td>
+            <td>{{ item.rentalPrice | number }} VNĐ</td>
             <td>
               <span class="status-badge" [attr.data-status]="item.status">
-                {{ item.status }}
+                {{ getStatusDisplay(item.status) }}
               </span>
             </td>
             <td>
@@ -51,7 +51,7 @@
                 <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
                   <option value="">-- Đổi trạng thái --</option>
                   <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
-                    {{ st }}
+                    {{ statusMap[st] }}
                   </option>
                 </select>
               </div>

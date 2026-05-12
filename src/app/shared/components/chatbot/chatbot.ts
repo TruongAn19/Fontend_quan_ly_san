@@ -27,7 +27,7 @@ export class ChatbotComponent {
   chatId = 'session-' + Math.random().toString(36).substr(2, 9);
   
   messages = signal<Message[]>([
-    { role: 'assistant', content: 'Chào mừng bạn đến với hệ thống đặt sân cầu lông! Tôi là trợ lý AI Antigravity, tôi có thể giúp gì cho bạn?' }
+    { role: 'assistant', content: 'Chào mừng bạn đến với hệ thống đặt sân Pickleball! Tôi là trợ lý AI Antigravity, tôi có thể giúp gì cho bạn?' }
   ]);
 
   suggestions = signal<string[]>([

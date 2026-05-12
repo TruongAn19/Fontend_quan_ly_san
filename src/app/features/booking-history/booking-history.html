@@ -13,7 +13,7 @@
     </div>
   } @else {
 
-    @if (bookings().length === 0) {
+    @if (displayBookings().length === 0) {
       <div class="empty-state">
         <p>Bạn chưa có lịch sử đặt sân nào.</p>
       </div>
@@ -32,14 +32,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of bookings()">
+            <tr *ngFor="let item of displayBookings()">
               <td><strong>{{ item.bookingCode }}</strong></td>
-              <td>{{ item.courtName || 'Sân cầu lông' }}</td>
+              <td>{{ item.courtName || 'Sân Pickleball' }}</td>
               <td>{{ item.bookingDate }}</td>
               <td>{{ item.time }}</td>
               <td>
                 <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ item.status }}
+                  {{ getStatusText(item.status) }}
                 </span>
               </td>
               <td class="total-price">{{ item.totalPrice | number }} VNĐ</td>

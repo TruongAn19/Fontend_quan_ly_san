@@ -33,8 +33,8 @@ export class BookingService {
     return this.http.post<ApiResponse<{ bookingId: number; bookingCode: string; paymentUrl: string }>>(`${this.API_URL}/place`, payload);
   }
 
-  getBookingHistory(page: number = 0): Observable<any> {
-    const params = new HttpParams().set('page', page.toString()).set('size', '5');
+  getBookingHistory(page: number = 0, size: number = 5): Observable<any> {
+    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
     return this.http.get<any>(`${environment.apiBaseUrl}/client/booking-history`, { params });
   }
 }

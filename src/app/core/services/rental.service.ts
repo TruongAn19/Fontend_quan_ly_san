@@ -30,8 +30,12 @@ export class RentalService {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/payments/vnpay-callback`, { params: httpParams });
   }
 
-  getRentalHistory(page: number = 0): Observable<any> {
-    const params = new HttpParams().set('page', page.toString()).set('size', '5');
+  getRentalHistory(page: number = 0, size: number = 5): Observable<any> {
+    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
     return this.http.get<any>(`${this.API_URL}/client/rental-history`, { params });
+  }
+
+  getRacketById(id: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/rackets/${id}`);
   }
 }

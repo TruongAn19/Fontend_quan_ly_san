@@ -48,7 +48,7 @@
   bottom: 0;
   width: 40px;
   height: 3px;
-  background: #6366f1;
+  background: #16a34a;
   border-radius: 2px;
 }
 
@@ -69,14 +69,14 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(99, 102, 241, 0.5);
+  border: 3px solid rgba(22, 163, 74, 0.5);
 }
 
 .upload-badge {
   position: absolute;
   bottom: 0;
   right: 0;
-  background: #6366f1;
+  background: #16a34a;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -127,8 +127,8 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  border-color: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
 }
 
 input.invalid {
@@ -141,7 +141,7 @@ input.invalid {
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -158,7 +158,7 @@ input.invalid {
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 20px -5px rgba(22, 163, 74, 0.4);
 }
 
 .password-btn {

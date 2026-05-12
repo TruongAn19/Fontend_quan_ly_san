@@ -63,8 +63,8 @@ input, select {
 
 input:focus, select:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  border-color: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
 }
 
 select option {
@@ -74,7 +74,7 @@ select option {
 
 .btn-primary {
   align-self: flex-end;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -87,7 +87,7 @@ select option {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 20px -5px rgba(22, 163, 74, 0.4);
 }
 
 .product-grid {
@@ -137,16 +137,16 @@ select option {
 .card-price {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #818cf8;
+  color: #22c55e;
   margin-bottom: 24px;
 }
 
 .btn-detail {
   display: block;
   text-align: center;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(22, 163, 74, 0.1);
   color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(22, 163, 74, 0.2);
   padding: 12px;
   border-radius: 12px;
   text-decoration: none;
@@ -155,7 +155,7 @@ select option {
 }
 
 .btn-detail:hover {
-  background: #6366f1;
+  background: #16a34a;
   color: white;
 }
 

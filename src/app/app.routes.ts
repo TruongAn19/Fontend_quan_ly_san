@@ -84,21 +84,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/payment-callback/payment-callback').then(m => m.PaymentCallbackComponent),
     canActivate: [authGuard]
   },
-  {
-    path: 'match-posts',
-    loadComponent: () => import('./features/match-posts/match-posts').then(m => m.MatchPostsComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'match-posts/create',
-    loadComponent: () => import('./features/match-post-create/match-post-create').then(m => m.MatchPostCreateComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'match-posts/detail/:id',
-    loadComponent: () => import('./features/match-post-detail/match-post-detail').then(m => m.MatchPostDetailComponent),
-    canActivate: [authGuard]
-  },
+
   {
     path: 'admin/dashboard',
     loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.AdminDashboardComponent),
@@ -129,11 +115,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/admin/rentals/rentals').then(m => m.AdminRentalsComponent),
     canActivate: [adminGuard]
   },
-  {
-    path: 'admin/ntfy',
-    loadComponent: () => import('./features/admin/ntfy/ntfy').then(m => m.AdminNtfyComponent),
-    canActivate: [adminGuard]
-  },
+
   {
     path: '**',
     redirectTo: ''

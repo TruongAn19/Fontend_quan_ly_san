@@ -2,70 +2,79 @@
   <h1 class="page-title">Lịch sử Thuê dụng cụ</h1>
 
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div class="error-alert">
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tải lịch sử...
-    </div>
+  <div class="loading-state">
+    <span class="spinner"></span> Đang tải lịch sử...
+  </div>
   } @else {
 
-    @if (rentals().length === 0) {
-      <div class="empty-state">
-        <p>Bạn chưa có đơn thuê dụng cụ nào.</p>
-      </div>
-    } @else {
-      
-      <div class="table-responsive glass-card">
-        <table class="premium-table">
-          <thead>
-            <tr>
-              <th>Mã đơn</th>
-              <th>Vợt thuê</th>
-              <th>Hình thức</th>
-              <th>Số lượng</th>
-              <th>Thời gian thuê</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of rentals()">
-              <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
-              <td>{{ item.racketName || 'Vợt cầu lông' }}</td>
-              <td>
-                <span class="type-badge" [class.daily]="item.type === 'DAILY'">
-                  {{ item.type }}
-                </span>
-              </td>
-              <td>{{ item.quantity }}</td>
-              <td>
-                @if (item.type === 'DAILY') {
-                  <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
-                } @else {
-                  <span>Mã sân: {{ item.bookingCode }}</span>
-                }
-              </td>
-              <td>
-                <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ item.status }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  @if (displayRentals().length === 0) {
+  <div class="empty-state">
+    <p>Bạn chưa có đơn thuê dụng cụ nào.</p>
+  </div>
+  } @else {
 
-      <!-- Pagination -->
-      <div class="pagination-wrapper">
-        <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang trước</button>
-        <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
-        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
-      </div>
+  <div class="table-responsive glass-card">
+    <table class="premium-table">
+      <thead>
+        <tr>
+          <th>Mã đơn</th>
+          <th>Vợt thuê</th>
+          <th>Hình thức</th>
+          <th>Số lượng</th>
+          <th>Thời gian thuê</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of displayRentals()">
+          <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
+          <td>{{ item.racketName || 'Vợt Pickleball' }}</td>
+          <td>
+            <span class="type-badge" [class.daily]="item.type === 'DAILY'">
+              {{ getTypeDisplay(item.type) }}
+            </span>
+          </td>
+          <td>{{ item.quantity }}</td>
+          <td class="time-cell">
+            @if (item.type === 'DAILY') {
+            <strong>{{ item.rentalDate }}</strong>
+            <div style="font-size: 0.85rem; color: #94a3b8;">({{ item.quantityDay }} ngày)</div>
+            } @else {
+            <div class="booking-time-info">
+              <div style="font-weight: 700; color: #38bdf8;">{{ item.rentalDate }}</div>
+              <div style="font-size: 0.85rem;">Mã sân: <strong>{{ item.bookingCode }}</strong></div>
+              <!-- <div style="font-size: 0.85rem; color: #fbbf24; font-weight: 600;">
+                Giờ thuê: {{ item.bookingTime }}
+              </div> -->
+            </div>
+            }
+          </td>
+          <td>
+            <span class="status-badge" [class]="item.status?.toLowerCase()">
+              {{ getStatusText(item.status) }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    }
+  <!-- Pagination -->
+  <div class="pagination-wrapper">
+    <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">Trang
+      trước</button>
+    <span class="page-indicator">Trang {{ currentPage() }} / {{ totalPages() }}</span>
+    <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang
+      sau</button>
+  </div>
+
+  }
 
   }
 </div>

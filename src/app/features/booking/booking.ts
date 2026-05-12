@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingService } from '../../core/services/booking.service';
+import { StompService } from '../../core/services/stomp.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-booking',
@@ -16,6 +18,9 @@ export class BookingComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private bookingService = inject(BookingService);
+  private stompService = inject(StompService);
+
+  private stompSubscription?: Subscription;
 
   productId = signal<number | null>(null);
   bookingInfo = signal<any>(null);
@@ -48,6 +53,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.stompService.initStomp();
     this.selectedDate.set(this.toLocalDateString(new Date()));
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -61,6 +67,10 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearHoldTimer();
+    if (this.stompSubscription) {
+      this.stompSubscription.unsubscribe();
+    }
+    this.stompService.deactivate();
   }
 
   initForm(): void {
@@ -68,8 +78,6 @@ export class BookingComponent implements OnInit, OnDestroy {
       receiverName: ['', [Validators.required]],
       receiverAddress: ['', [Validators.required]],
       receiverPhone: ['', [Validators.required, Validators.pattern(/^0[35789][0-9]{8}$/)]],
-      bookingType: ['ONE_TIME', [Validators.required]],
-      recurringEndDate: [null],
       availableTimeId: ['', [Validators.required]]
     });
   }
@@ -100,9 +108,42 @@ export class BookingComponent implements OnInit, OnDestroy {
       next: (res) => {
         if (res && res.data) {
           this.availableTimes.set(res.data);
+          this.subscribeToRealtimeSlots();
         }
       }
     });
+  }
+
+  private subscribeToRealtimeSlots(): void {
+    if (this.stompSubscription) {
+      this.stompSubscription.unsubscribe();
+    }
+    const topic = `/topic/slots.${this.selectedCourtId()}.${this.selectedDate()}`;
+    this.stompSubscription = this.stompService.watch(topic).subscribe(message => {
+      const event = JSON.parse(message.body);
+      this.handleRealtimeEvent(event);
+    });
+  }
+
+  private handleRealtimeEvent(event: any): void {
+    // event could be { timeId: number, status: 'HOLD' | 'RELEASE' | 'BOOKED' }
+    const currentTimes = [...this.availableTimes()];
+    const index = currentTimes.findIndex(t => t.id === event.timeId);
+    if (index !== -1) {
+      if (event.status === 'RELEASE') {
+        currentTimes[index].status = null;
+        if (this.bookingForm.get('availableTimeId')?.value === event.timeId) {
+            this.showError('Khung giờ bạn đang xem vừa được nhả! Bạn có thể đặt ngay.');
+        }
+      } else {
+        currentTimes[index].status = event.status;
+        if (this.bookingForm.get('availableTimeId')?.value === event.timeId) {
+            this.showError('Rất tiếc, khung giờ bạn chọn vừa có người khác thao tác.');
+            this.bookingForm.get('availableTimeId')?.setValue('');
+        }
+      }
+      this.availableTimes.set(currentTimes);
+    }
   }
 
   onDateChange(event: any): void {
@@ -176,6 +217,7 @@ export class BookingComponent implements OnInit, OnDestroy {
 
     const payload = {
       ...this.bookingForm.value,
+      bookingType: 'ONE_TIME',
       productId: this.productId(),
       courtId: this.selectedCourtId(),
       bookingDate: this.selectedDate(),

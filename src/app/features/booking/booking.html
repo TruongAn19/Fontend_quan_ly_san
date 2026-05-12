@@ -44,9 +44,14 @@
           } @else {
             <form [formGroup]="bookingForm">
               <div class="time-radio-group">
-                <label *ngFor="let time of availableTimes()" class="time-radio-label" [class.selected]="bookingForm.get('availableTimeId')?.value == time.id">
-                  <input type="radio" formControlName="availableTimeId" [value]="time.id" style="display: none;" />
+                <label *ngFor="let time of availableTimes()" class="time-radio-label" 
+                       [class.selected]="bookingForm.get('availableTimeId')?.value == time.id"
+                       [class.disabled]="time.status === 'HOLD' || time.status === 'BOOKED'"
+                       [title]="time.status === 'HOLD' ? 'Đang được người khác giữ chỗ' : (time.status === 'BOOKED' ? 'Đã được đặt' : '')">
+                  <input type="radio" formControlName="availableTimeId" [value]="time.id" style="display: none;" [attr.disabled]="(time.status === 'HOLD' || time.status === 'BOOKED') ? true : null" />
                   {{ time.time }}
+                  @if(time.status === 'HOLD') { <span class="slot-status badge-hold">Giữ chỗ</span> }
+                  @if(time.status === 'BOOKED') { <span class="slot-status badge-booked">Đã đặt</span> }
                 </label>
               </div>
             </form>
@@ -93,20 +98,6 @@
             }
           </div>
 
-          <div class="form-group">
-            <label for="bookingType">Hình thức đặt</label>
-            <select id="bookingType" formControlName="bookingType">
-              <option value="ONE_TIME">Đặt 1 lần</option>
-              <option value="WEEKLY_RECURRING">Đặt định kỳ hàng tuần</option>
-            </select>
-          </div>
-
-          @if (bookingForm.get('bookingType')?.value === 'WEEKLY_RECURRING') {
-            <div class="form-group animate-fade-in">
-              <label for="recurringEndDate">Ngày kết thúc định kỳ</label>
-              <input type="date" id="recurringEndDate" formControlName="recurringEndDate" />
-            </div>
-          }
 
           <button type="submit" class="btn-place-booking" [disabled]="isPlacing() || !isHeld()">
             @if (isPlacing()) {

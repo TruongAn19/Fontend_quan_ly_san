@@ -33,7 +33,7 @@
 }
 
 .hero-title .highlight {
-  background: linear-gradient(to right, #818cf8, #c084fc);
+  background: linear-gradient(to right, #22c55e, #c084fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -53,7 +53,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
   padding: 16px 32px;
   border-radius: 16px;
@@ -61,12 +61,12 @@
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 20px -5px rgba(22, 163, 74, 0.4);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 15px 30px -5px rgba(22, 163, 74, 0.5);
 }
 
 .btn-secondary {
@@ -105,7 +105,7 @@
   bottom: 0;
   width: 60px;
   height: 4px;
-  background: #6366f1;
+  background: #16a34a;
   border-radius: 2px;
 }
 
@@ -155,16 +155,16 @@
 .card-price {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #818cf8;
+  color: #22c55e;
   margin-bottom: 24px;
 }
 
 .btn-book {
   display: block;
   text-align: center;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(22, 163, 74, 0.1);
   color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(22, 163, 74, 0.2);
   padding: 12px;
   border-radius: 12px;
   text-decoration: none;
@@ -173,7 +173,7 @@
 }
 
 .btn-book:hover {
-  background: #6366f1;
+  background: #16a34a;
   color: white;
 }
 

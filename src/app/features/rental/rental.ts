@@ -18,6 +18,7 @@ export class RentalComponent implements OnInit {
   private rentalService = inject(RentalService);
 
   racketId = signal<number | null>(null);
+  racket = signal<any | null>(null);
   rentalForm!: FormGroup;
 
   isLoading = signal<boolean>(false);
@@ -30,21 +31,33 @@ export class RentalComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.racketId.set(+id);
+      this.loadRacketDetails(+id);
       this.initForm();
     } else {
       this.errorMessage.set('Mã vợt không hợp lệ.');
     }
   }
 
+  loadRacketDetails(id: number): void {
+    this.rentalService.getRacketById(id).subscribe({
+      next: (res) => {
+        this.racket.set(res.data);
+      },
+      error: () => {
+        this.errorMessage.set('Không thể tải thông tin vợt.');
+      }
+    });
+  }
+
   initForm(): void {
     this.rentalForm = this.fb.group({
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^(0[3|5|7|8|9])+([0-9]{8})\b$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^0[0-9]{9}$/)]],
       type: ['DAILY', [Validators.required]],
       quantity: [1, [Validators.required, Validators.min(1)]],
-      quantityDay: [1],
-      rentalDate: [new Date().toISOString().split('T')[0]],
+      quantityDay: [1, [Validators.required, Validators.min(1)]],
+      rentalDate: [new Date().toISOString().split('T')[0], [Validators.required]],
       bookingCode: [''],
       paymentMethod: ['VNPAY', [Validators.required]]
     });
@@ -63,6 +76,25 @@ export class RentalComponent implements OnInit {
       this.rentalForm.get('rentalDate')?.updateValueAndValidity();
       this.rentalForm.get('bookingCode')?.updateValueAndValidity();
     });
+  }
+
+
+  get totalPrice(): number {
+    const racket = this.racket();
+    if (!racket || !this.rentalForm) return 0;
+    const formValue = this.rentalForm.value;
+    const type = formValue.type;
+    const quantity = formValue.quantity || 0;
+    const days = formValue.quantityDay || 1;
+    const unitPrice = type === 'DAILY' ? racket.rentalPricePerDay : racket.rentalPricePerPlay;
+    return unitPrice * quantity * (type === 'DAILY' ? days : 1);
+  }
+
+  get depositTotal(): number {
+    const racket = this.racket();
+    if (!racket || !this.rentalForm) return 0;
+    const quantity = this.rentalForm.get('quantity')?.value || 0;
+    return (racket.price || 0) * quantity;
   }
 
   onSubmitRental(): void {
@@ -88,7 +120,9 @@ export class RentalComponent implements OnInit {
       payload.quantityDay = formValue.quantityDay;
       payload.rentalDate = formValue.rentalDate;
     } else {
-      payload.bookingCode = formValue.bookingCode;
+      payload.bookingCode = formValue.bookingCode?.trim().toUpperCase();
+      payload.quantityDay = 1;
+      payload.rentalDate = new Date().toISOString().split('T')[0];
     }
 
     this.rentalService.createRental(payload).subscribe({

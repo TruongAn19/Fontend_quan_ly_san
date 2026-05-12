@@ -71,6 +71,23 @@
         <p>Lưu ý: Hệ thống sẽ thu phí đặt cọc bằng giá trị gốc của vợt để đảm bảo an toàn thiết bị. Số tiền này sẽ được đối soát khi trả vợt.</p>
       </div>
 
+      <div class="order-summary glass-card animate-fade-in" *ngIf="totalPrice > 0">
+        <h3>Chi tiết thanh toán</h3>
+        <div class="summary-row">
+          <span>Tiền thuê ({{ rentalForm.get('quantity')?.value }} vợt):</span>
+          <strong>{{ totalPrice | number }} VNĐ</strong>
+        </div>
+        <div class="summary-row">
+          <span>Tiền cọc thiết bị:</span>
+          <strong>{{ depositTotal | number }} VNĐ</strong>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total">
+          <span>Tổng cộng:</span>
+          <span class="price">{{ totalPrice + depositTotal | number }} VNĐ</span>
+        </div>
+      </div>
+
       <button type="submit" class="btn-submit" [disabled]="isCreating() || isPaying()">
         @if (isCreating() || isPaying()) {
           <span class="spinner"></span> Đang xử lý...
