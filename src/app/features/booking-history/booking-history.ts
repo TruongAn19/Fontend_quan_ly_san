@@ -50,26 +50,55 @@ export class BookingHistoryComponent implements OnInit {
     }
   }
 
+  onCancelBooking(bookingId: number): void {
+    if (confirm('Bạn có chắc chắn muốn hủy lịch đặt sân này? (Thao tác này sẽ giải phóng sân cho người khác và không thể hoàn tác)')) {
+      this.isLoading.set(true);
+      this.bookingService.cancelBooking(bookingId).subscribe({
+        next: (res) => {
+          this.isLoading.set(false);
+          alert(res.message || 'Đã hủy lịch thành công.');
+          this.loadHistory();
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          alert(err.error?.message || 'Không thể hủy lịch. Vui lòng thử lại sau.');
+        }
+      });
+    }
+  }
+
   getStatusLabel(status: string): string {
     if (!status) return 'Không xác định';
     const s = status.toUpperCase();
     switch (s) {
       case 'PAID': 
       case 'DA_THANH_TOAN':
+      case 'ĐÃ THANH TOÁN':
         return 'Đã thanh toán';
       case 'COMPLETED': 
       case 'RETURNED':
         return 'Đã trả đồ';
       case 'PENDING': 
       case 'CHO_THANH_TOAN':
+      case 'CHỜ THANH TOÁN':
         return 'Chờ thanh toán';
       case 'CANCELLED': 
       case 'DA_HUY':
+      case 'ĐÃ HỦY':
         return 'Đã hủy';
       case 'DEPOSITED':
       case 'DA_DAT':
+      case 'ĐÃ ĐẶT':
+      case 'ĐÃ CỌC':
         return 'Đã cọc';
       default: return status;
     }
+  }
+
+  isCancellable(status: string): boolean {
+    if (!status) return false;
+    const s = status.toUpperCase();
+    return s === 'DA_DAT' || s === 'ĐÃ ĐẶT' || s === 'DEPOSITED' || s === 'ĐÃ CỌC' ||
+           s === 'CHO_THANH_TOAN' || s === 'CHỜ THANH TOÁN' || s === 'PENDING';
   }
 }

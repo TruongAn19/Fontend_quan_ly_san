@@ -4,7 +4,7 @@
   <header class="page-header">
     <div class="header-container">
       <h1 class="page-title">Tất cả sân bóng</h1>
-      <p class="page-desc">Hiện có {{ totalElements() }} sân bóng đang cập nhật mới nhất</p>
+      <p class="page-desc">Hiện có {{ totalProductCount() }} sân bóng đang cập nhật mới nhất</p>
     </div>
   </header>
 
@@ -85,7 +85,7 @@
     <main class="main-grid-area">
       
       <div class="grid-header">
-        <span class="results-count">Hiển thị {{ products().length }} trong {{ totalElements() }} sân</span>
+        <span class="results-count">Hiển thị {{ products().length }} trong {{ totalProductCount() }} sân</span>
         <div class="sort-box">
           <span style="font-size: 13px; color: #6B7280; margin-right: 8px;">Sắp xếp:</span>
           <select class="sort-dropdown">

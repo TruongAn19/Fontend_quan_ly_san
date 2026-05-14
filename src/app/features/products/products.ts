@@ -36,7 +36,7 @@ export class ProductsComponent implements OnInit {
   products = signal<any[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
-  totalElements = signal<number>(0);
+  totalProductCount = signal<number>(0);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
@@ -71,7 +71,7 @@ export class ProductsComponent implements OnInit {
 
         this.products.set(mappedData);
         this.totalPages.set(pages);
-        this.totalElements.set(res?.data?.totalElements || res?.totalElements || 0);
+        this.totalProductCount.set(res?.data?.totalElements || res?.totalElements || 0);
       },
       error: (err) => {
         this.isLoading.set(false);

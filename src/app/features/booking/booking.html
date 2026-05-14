@@ -77,7 +77,7 @@
         </h3>
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Ngày đặt</label>
+            <label class="form-label">Ngày bắt đầu</label>
             <input type="date" class="form-input" [value]="selectedDate()" (change)="onDateChange($event)">
           </div>
           <div class="form-group">
@@ -101,6 +101,59 @@
             }
           </div>
         </div>
+      </div>
+
+      <!-- Block 3: Kiểu đặt sân -->
+      <div class="form-block">
+        <h3 class="block-title">
+          <span class="block-icon">🔄</span>
+          Loại hình đặt sân
+        </h3>
+        <div class="booking-type-options">
+          <label class="type-option" [class.active]="bookingForm.get('bookingType')?.value === 'ONE_TIME'">
+            <input type="radio" name="bookingType" value="ONE_TIME" formControlName="bookingType">
+            <div class="option-content">
+              <span class="option-title">Đặt một lần</span>
+              <span class="option-desc">Chỉ đặt cho ngày {{ selectedDate() | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </label>
+          <label class="type-option" [class.active]="bookingForm.get('bookingType')?.value === 'WEEKLY_RECURRING'">
+            <input type="radio" name="bookingType" value="WEEKLY_RECURRING" formControlName="bookingType">
+            <div class="option-content">
+              <span class="option-title">Sân cố định (Sân tháng)</span>
+              <span class="option-desc">Giữ sân định kỳ theo tuần và nhận ưu đãi</span>
+            </div>
+          </label>
+        </div>
+
+        @if (bookingForm.get('bookingType')?.value === 'WEEKLY_RECURRING') {
+          <div class="recurring-config animate-fade-in">
+            <!-- Chọn Thứ -->
+            <div class="form-group">
+              <label class="form-label">Chọn các ngày trong tuần *</label>
+              <div class="weekday-selector">
+                @for (day of weekDays; track day.value) {
+                  <label class="weekday-chip" [class.selected]="isDaySelected(day.value)">
+                    <input type="checkbox" [value]="day.value" (change)="toggleDay(day.value)" hidden>
+                    {{ day.label }}
+                  </label>
+                }
+              </div>
+            </div>
+
+            <!-- Chọn Thời hạn -->
+            <div class="form-group mt-3">
+              <label class="form-label">Thời hạn thuê sân *</label>
+              <select class="form-input" formControlName="durationMonths">
+                <option [value]="1">Thuê trong 1 tháng (Giảm 5%)</option>
+                <option [value]="2">Thuê trong 2 tháng (Giảm 8%)</option>
+                <option [value]="3">Thuê trong 3 tháng (Giảm 10%)</option>
+              </select>
+            </div>
+            
+            <p class="hint-text">💡 Hệ thống sẽ tự động đăng ký sân cho bạn vào các thứ đã chọn trong suốt thời hạn thuê.</p>
+          </div>
+        }
       </div>
 
       <!-- Hold alert -->
@@ -207,18 +260,23 @@
         <div class="popup-body">
           <div class="price-breakdown">
             <div class="breakdown-row">
-              <span class="breakdown-label">Giá sân cơ bản</span>
-              <span class="breakdown-value">{{ priceEstimate().basePrice | number:'1.0-0' }}đ</span>
+              <span class="breakdown-label">Số buổi đăng ký</span>
+              <span class="breakdown-value">{{ priceEstimate().sessions }} buổi</span>
+            </div>
+            
+            <div class="breakdown-row">
+              <span class="breakdown-label">Giá sân mỗi buổi (trung bình)</span>
+              <span class="breakdown-value">{{ (priceEstimate().totalPrice / priceEstimate().sessions) | number:'1.0-0' }}đ</span>
             </div>
 
-            @if (priceEstimate().hasSurcharge) {
-              <div class="breakdown-row surcharge">
-                <span class="breakdown-label">⚡ Phụ phí {{ priceEstimate().surchargeReason }}</span>
-                <span class="breakdown-value surcharge-val">+{{ (priceEstimate().surchargeRate * 100) | number:'1.0-0' }}%</span>
+            @if (priceEstimate().discountRate > 0) {
+              <div class="breakdown-row discount">
+                <span class="breakdown-label">🎁 Ưu đãi đặt sân cố định</span>
+                <span class="breakdown-value discount-val">-{{ priceEstimate().discountRate }}%</span>
               </div>
-              <div class="breakdown-row">
-                <span class="breakdown-label">Giá sau phụ phí</span>
-                <span class="breakdown-value">{{ priceEstimate().pricePerSession | number:'1.0-0' }}đ</span>
+              <div class="breakdown-row savings">
+                <span class="breakdown-label">Bạn tiết kiệm được</span>
+                <span class="breakdown-value">{{ priceEstimate().savings | number:'1.0-0' }}đ</span>
               </div>
             }
           </div>
@@ -226,7 +284,7 @@
           <div class="price-divider"></div>
 
           <div class="price-total-row">
-            <span>Tổng giá trị đặt sân</span>
+            <span>Tổng giá trị đơn hàng</span>
             <span class="total-amount">{{ priceEstimate().totalPrice | number:'1.0-0' }}đ</span>
           </div>
 

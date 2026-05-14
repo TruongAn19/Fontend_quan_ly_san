@@ -5,69 +5,83 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div class="error-alert">
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tải lịch sử...
-    </div>
+  <div class="loading-state">
+    <span class="spinner"></span> Đang tải lịch sử...
+  </div>
   } @else {
 
-    @if (bookings().length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">📅</div>
-        <p>Bạn chưa có lịch sử đặt sân nào.</p>
-        <a routerLink="/products" class="btn-primary">Đặt sân ngay</a>
-      </div>
-    } @else {
-      
-      <div class="history-card">
-        <div class="table-responsive">
-          <table class="premium-table">
-            <thead>
-              <tr>
-                <th>Mã đặt</th>
-                <th>Sân bóng</th>
-                <th>Ngày đặt</th>
-                <th>Khung giờ</th>
-                <th>Trạng thái</th>
-                <th class="text-right">Tổng tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bookings()">
-                <td class="booking-code">{{ item.bookingCode }}</td>
-                <td>
-                  <div class="pitch-info">
-                    <span class="pitch-name">{{ item.pitchName || 'Sân bóng đá' }}</span>
-                  </div>
-                </td>
-                <td>{{ item.bookingDate }}</td>
-                <td class="time-slot">{{ item.time }}</td>
-                <td>
-                  <span class="status-badge" [class]="item.status?.toLowerCase()">
-                    {{ getStatusLabel(item.status) }}
-                  </span>
-                </td>
-                <td class="total-price text-right">{{ item.totalPrice | number }}đ</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  @if (bookings().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">📅</div>
+    <p>Bạn chưa có lịch sử đặt sân nào.</p>
+    <a routerLink="/products" class="btn-primary">Đặt sân ngay</a>
+  </div>
+  } @else {
 
-        <!-- Pagination -->
-        <div class="pagination-row" *ngIf="totalPages() > 1">
-          <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">‹</button>
-          <div class="page-numbers">
-            Trang {{ currentPage() }} / {{ totalPages() }}
-          </div>
-          <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">›</button>
-        </div>
+  <div class="history-card">
+    <div class="table-responsive">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Mã đặt</th>
+            <th>Sân bóng</th>
+            <th>Ngày đặt</th>
+            <th>Khung giờ</th>
+            <th style="text-align: left">Trạng thái</th>
+            <th style="text-align: left">Tổng tiền</th>
+            <th style="text-align: left">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of bookings()">
+            <td class="booking-code">{{ item.bookingCode }}</td>
+            <td>
+              <div class="pitch-info">
+                <span class="pitch-name">{{ item.pitchName || 'Sân bóng đá' }}</span>
+              </div>
+            </td>
+            <td>{{ item.bookingDate }}</td>
+            <td class="time-slot">{{ item.time }}</td>
+            <td style="text-align: left">
+              <span class="status-badge" [class]="item.status?.toLowerCase()">
+                {{ getStatusLabel(item.status) }}
+              </span>
+            </td>
+            <td class="total-price" style="text-align: left">{{ item.totalPrice | number }}đ</td>
+            <td style="text-align: left">
+              @if (isCancellable(item.status)) {
+              <button class="btn-cancel-small" (click)="onCancelBooking(item.id)">Hủy</button>
+              } @else if (item.status === 'DA_HUY' || item.status === 'CANCELLED' || item.status === 'Đã hủy') {
+              <span class="cancelled-text">Đã hủy</span>
+              } @else if (item.status === 'DA_THANH_TOAN' || item.status === 'PAID' || item.status === 'Đã thanh toán')
+              {
+              <span class="paid-text">Đã thanh toán</span>
+              } @else {
+              <span class="other-text">{{ getStatusLabel(item.status) }}</span>
+              }
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-row" *ngIf="totalPages() > 1">
+      <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">‹</button>
+      <div class="page-numbers">
+        Trang {{ currentPage() }} / {{ totalPages() }}
       </div>
-    }
+      <button class="page-btn" [disabled]="currentPage() === totalPages()"
+        (click)="changePage(currentPage() + 1)">›</button>
+    </div>
+  </div>
+  }
 
   }
 </div>

@@ -56,6 +56,17 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   today = new Date();
 
+  weekDays = [
+    { label: 'Thứ 2', value: 1 },
+    { label: 'Thứ 3', value: 2 },
+    { label: 'Thứ 4', value: 3 },
+    { label: 'Thứ 5', value: 4 },
+    { label: 'Thứ 6', value: 5 },
+    { label: 'Thứ 7', value: 6 },
+    { label: 'CN', value: 7 }
+  ];
+  selectedDays: number[] = [];
+
   private showError(msg: string): void {
     this.errorMessage.set(msg);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -160,8 +171,24 @@ export class BookingComponent implements OnInit, OnDestroy {
       receiverName: ['', [Validators.required]],
       receiverAddress: ['', [Validators.required]],
       receiverPhone: ['', [Validators.required, Validators.pattern(/^0[35789][0-9]{8}$/)]],
-      availableTimeId: ['', [Validators.required]]
+      availableTimeId: ['', [Validators.required]],
+      bookingType: ['ONE_TIME', [Validators.required]],
+      recurringEndDate: [null],
+      durationMonths: [1]
     });
+  }
+
+  toggleDay(dayValue: number): void {
+    const idx = this.selectedDays.indexOf(dayValue);
+    if (idx > -1) {
+      this.selectedDays.splice(idx, 1);
+    } else {
+      this.selectedDays.push(dayValue);
+    }
+  }
+
+  isDaySelected(dayValue: number): boolean {
+    return this.selectedDays.includes(dayValue);
   }
 
   loadUserProfile(): void {
@@ -315,12 +342,12 @@ export class BookingComponent implements OnInit, OnDestroy {
 
     const payload = {
       ...this.bookingForm.value,
-      bookingType: 'ONE_TIME',
       productId: this.productId(),
       courtId: this.selectedPitchId(),
       bookingDate: this.selectedDate(),
       availableTimeId: +this.bookingForm.get('availableTimeId')?.value,
-      recurringEndDate: null
+      daysOfWeek: this.selectedDays,
+      durationMonths: this.bookingForm.get('durationMonths')?.value
     };
 
     this.pendingPayload = payload;
@@ -329,7 +356,10 @@ export class BookingComponent implements OnInit, OnDestroy {
       productId: payload.productId,
       availableTimeId: payload.availableTimeId,
       bookingDate: payload.bookingDate,
-      bookingType: 'ONE_TIME'
+      bookingType: payload.bookingType,
+      recurringEndDate: payload.recurringEndDate,
+      daysOfWeek: payload.daysOfWeek,
+      durationMonths: payload.durationMonths
     }).subscribe({
       next: (res) => {
         this.isEstimating.set(false);

@@ -81,9 +81,11 @@
 /* Main Content Layout */
 .main-layout {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 40px;
-  padding: 40px 80px;
+  grid-template-columns: 1fr 400px;
+  gap: 32px;
+  padding: 40px 80px 80px;
+  margin-top: 200px;
+  /* Đảm bảo tách biệt hoàn toàn với ảnh gallery */
 }
 
 .left-content {
@@ -93,14 +95,22 @@
 }
 
 .right-sidebar {
-  width: 380px;
+  width: 400px;
 }
 
-/* Header Info */
-.header-info {
+/* Header Info Integrated */
+.header-info-integrated {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 8px;
+}
+
+.divider-thin {
+  height: 1px;
+  background: #F3F4F6;
+  width: 100%;
+  margin: 10px 0;
 }
 
 .meta-tags {
@@ -108,37 +118,40 @@
   gap: 12px;
 }
 
-.rating-badge, .hot-badge {
-  padding: 6px 12px;
-  border-radius: 8px;
+.rating-badge,
+.hot-badge {
+  padding: 8px 16px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
 }
 
 .rating-badge {
   background: #FFFBEB;
-  color: #92400E;
+  color: #D97706;
 }
 
 .hot-badge {
-  background: #ECFDF5;
-  color: #065F46;
+  background: #F0FDF4;
+  color: #16A34A;
 }
 
 .product-name {
-  font-size: 42px;
+  font-size: 32px;
   font-weight: 800;
   color: #111827;
   margin: 0;
   letter-spacing: -0.04em;
+  line-height: 1.2;
 }
 
 .address-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #6B7280;
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 /* Content Blocks */
@@ -309,15 +322,13 @@
 /* Sidebar Booking */
 .sidebar-card {
   background: white;
-  border: 1px solid #E5E7EB;
-  border-radius: 24px;
+  border: 1px solid rgba(229, 231, 235, 0.7);
+  border-radius: 28px;
   padding: 32px;
-  position: sticky;
-  top: 100px;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
 }
 
 .price-display {
@@ -433,21 +444,31 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Mobile adjustments */
 @media (max-width: 1024px) {
-  .gallery-row, .main-layout, .breadcrumb {
+
+  .gallery-row,
+  .main-layout,
+  .breadcrumb {
     padding-left: 20px;
     padding-right: 20px;
   }
-  
+
   .main-layout {
     flex-direction: column;
   }
-  
+
   .right-sidebar {
     width: 100%;
   }

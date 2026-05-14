@@ -99,22 +99,26 @@
 }
 
 /* Status Colors - Light Theme */
-.status-badge.da_thanh_toan, .status-badge.paid {
+.status-badge.da_thanh_toan,
+.status-badge.paid {
   background: #DCFCE7;
   color: #166534;
 }
 
-.status-badge.cho_thanh_toan, .status-badge.pending {
+.status-badge.cho_thanh_toan,
+.status-badge.pending {
   background: #FEF3C7;
   color: #92400E;
 }
 
-.status-badge.da_huy, .status-badge.cancelled {
+.status-badge.da_huy,
+.status-badge.cancelled {
   background: #FEE2E2;
   color: #991B1B;
 }
 
-.status-badge.da_dat, .status-badge.da_coc {
+.status-badge.da_dat,
+.status-badge.da_coc {
   background: #E0F2FE;
   color: #075985;
 }
@@ -171,7 +175,8 @@
 }
 
 /* States */
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   padding: 80px 0;
   text-align: center;
 }
@@ -218,4 +223,45 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn-cancel-small {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FEE2E2;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-small:hover {
+  background: #DC2626;
+  color: white;
+  border-color: #DC2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.cancelled-text {
+  color: #9CA3AF;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.paid-text {
+  color: #10B981;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.other-text {
+  color: #6B7280;
+  font-weight: 500;
+  font-size: 13px;
 }

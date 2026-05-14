@@ -552,3 +552,132 @@
 }
 .btn-confirm-popup:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
 .btn-confirm-popup:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ===== BOOKING TYPE OPTIONS ===== */
+.booking-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.type-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #0f1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.type-option:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.02);
+}
+
+.type-option.active {
+  border-color: #10B981;
+  background: rgba(16, 185, 129, 0.05);
+  box-shadow: 0 0 0 1px #10B981, 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.type-option input[type="radio"] {
+  margin-top: 4px;
+  width: 18px;
+  height: 18px;
+  accent-color: #10B981;
+  cursor: pointer;
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.option-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.option-desc {
+  font-size: 12px;
+  color: #9CA3AF;
+  line-height: 1.4;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+/* ===== RECURRING CONFIG ===== */
+.recurring-config {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+}
+
+.weekday-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.weekday-chip {
+  padding: 8px 16px;
+  background: #1a1d26;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9CA3AF;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.weekday-chip:hover {
+  background: #252936;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.weekday-chip.selected {
+  background: #10B981;
+  border-color: #10B981;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.discount-val {
+  color: #10B981;
+  font-weight: 800;
+}
+
+.savings {
+  background: rgba(16, 185, 129, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.savings .breakdown-label {
+  color: #10B981;
+}
+
+.savings .breakdown-value {
+  color: #10B981;
+  font-weight: 800;
+}

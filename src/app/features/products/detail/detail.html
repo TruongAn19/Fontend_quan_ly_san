@@ -1,165 +1,164 @@
 <div class="detail-container animate-fade-in">
-  
+
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div class="error-alert">
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tải chi tiết...
-    </div>
+  <div class="loading-state">
+    <span class="spinner"></span> Đang tải chi tiết...
+  </div>
   } @else {
-    
-    @if (productDetail()) {
-      <!-- Breadcrumb -->
-      <nav class="breadcrumb">
-        <a routerLink="/">Trang chủ</a>
-        <span class="separator">›</span>
-        <a routerLink="/products">Sân bóng</a>
-        <span class="separator">›</span>
-        <span class="active">{{ productDetail().product?.name }}</span>
-      </nav>
 
-      <!-- Gallery Row -->
-      <div class="gallery-row">
-        <div class="main-image-wrapper">
-          <img 
-            [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" 
-            alt="{{ productDetail().product?.name }}" 
-            class="main-image"
-          />
+  @if (productDetail()) {
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a routerLink="/">Trang chủ</a>
+    <span class="separator">›</span>
+    <a routerLink="/products">Sân bóng</a>
+    <span class="separator">›</span>
+    <span class="active">{{ productDetail().product?.name }}</span>
+  </nav>
+
+  <!-- Gallery Row -->
+  <div class="gallery-row">
+    <div class="main-image-wrapper">
+      <img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'"
+        alt="{{ productDetail().product?.name }}" class="main-image" />
+    </div>
+    <div class="secondary-images">
+      <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt="">
+      </div>
+      <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt="">
+      </div>
+      <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt="">
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+
+    <!-- Left Content -->
+    <div class="left-content">
+
+      <!-- Amenities & Basic Info -->
+      <div class="content-block">
+        <div class="header-info-integrated">
+          <h1 class="product-name">{{ productDetail().product?.name }}</h1>
+          <div class="address-row">
+            <span class="location-icon">📍</span>
+            <span>{{ productDetail().product?.addressDetail || productDetail().product?.address }}</span>
+          </div>
         </div>
-        <div class="secondary-images">
-          <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt=""></div>
-          <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt=""></div>
-          <div class="sub-image"><img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'" alt=""></div>
+
+        <div class="divider-thin"></div>
+
+        <h3 class="block-title">Tiện ích sân</h3>
+        <div class="amenities-grid">
+          <div class="amenity-item"><i>🅿️</i> Bãi đỗ xe</div>
+          <div class="amenity-item"><i>🚿</i> Phòng tắm</div>
+          <div class="amenity-item"><i>💡</i> Đèn chiếu sáng</div>
+          <div class="amenity-item"><i>📶</i> Wifi miễn phí</div>
+          <div class="amenity-item"><i>📷</i> Camera an ninh</div>
+          <div class="amenity-item"><i>🚰</i> Quầy nước</div>
         </div>
       </div>
 
-      <!-- Main Layout -->
-      <div class="main-layout">
-        
-        <!-- Left Content -->
-        <div class="left-content">
-          
-          <div class="header-info">
-            <div class="meta-tags">
-              <span class="rating-badge">⭐ 4.8 (120 đánh giá)</span>
-              <span class="hot-badge">🔥 Phổ biến</span>
-            </div>
-            <h1 class="product-name">{{ productDetail().product?.name }}</h1>
-            <div class="address-row">
-              <span class="location-icon">📍</span>
-              <span>{{ productDetail().product?.addressDetail || productDetail().product?.address }}</span>
-            </div>
-          </div>
+      <!-- Description -->
+      <div class="content-block">
+        <h3 class="block-title">Mô tả</h3>
+        <p class="description-text">
+          {{ productDetail().product?.detailDesc || productDetail().product?.shortDesc || 'Sân bóng chất lượng cao, mặt
+          cỏ nhân tạo đạt chuẩn FIFA, hệ thống chiếu sáng hiện đại phục vụ nhu cầu tập luyện và thi đấu.' }}
+        </p>
+      </div>
 
-          <!-- Amenities -->
-          <div class="content-block">
-            <h3 class="block-title">Tiện ích sân</h3>
-            <div class="amenities-grid">
-              <div class="amenity-item"><i>🅿️</i> Bãi đỗ xe</div>
-              <div class="amenity-item"><i>🚿</i> Phòng tắm</div>
-              <div class="amenity-item"><i>💡</i> Đèn chiếu sáng</div>
-              <div class="amenity-item"><i>📶</i> Wifi miễn phí</div>
-              <div class="amenity-item"><i>📷</i> Camera an ninh</div>
-              <div class="amenity-item"><i>🚰</i> Quầy nước</div>
-            </div>
-          </div>
+      <!-- Time Slots -->
+      <div class="content-block">
+        <div class="slots-header">
+          <h3 class="block-title">Khung giờ trống</h3>
+          <!-- <a href="#" class="btn-check-all">Thử ngay</a> -->
+        </div>
 
-          <!-- Description -->
-          <div class="content-block">
-            <h3 class="block-title">Mô tả</h3>
-            <p class="description-text">
-              {{ productDetail().product?.detailDesc || productDetail().product?.shortDesc || 'Sân bóng chất lượng cao, mặt cỏ nhân tạo đạt chuẩn FIFA, hệ thống chiếu sáng hiện đại phục vụ nhu cầu tập luyện và thi đấu.' }}
-            </p>
+        @if (productDetail().availableTime?.length) {
+        <div class="slots-grid">
+          @for (time of productDetail().availableTime; track time.time) {
+          <div class="slot-item available">
+            <span class="slot-time">{{ time.time }}</span>
+            <span class="slot-status">Trống</span>
           </div>
-
-          <!-- Time Slots -->
-          <div class="content-block">
-            <div class="slots-header">
-              <h3 class="block-title">Khung giờ trống</h3>
-              <a href="#" class="btn-check-all">Thử ngay</a>
-            </div>
-            
-            @if (productDetail().availableTime?.length) {
-              <div class="slots-grid">
-                @for (time of productDetail().availableTime; track time.time) {
-                  <div class="slot-item available">
-                    <span class="slot-time">{{ time.time }}</span>
-                    <span class="slot-status">Trống</span>
-                  </div>
-                }
-              </div>
-            } @else {
-              <p class="empty-time">Hôm nay đã hết khung giờ trống.</p>
-            }
-          </div>
-
-          <!-- Equipment Section -->
-          @if (productDetail().equipments?.length) {
-            <div class="content-block">
-              <h3 class="block-title">Thiết bị cho thuê tại sân</h3>
-              <div class="equipment-list">
-                @for (equipment of productDetail().equipments; track equipment.id) {
-                  <div class="equipment-item">
-                    <div class="equipment-info">
-                      <span class="equipment-name">{{ equipment.name }}</span>
-                      <span class="equipment-factory">{{ equipment.factory }}</span>
-                    </div>
-                    <div class="equipment-action">
-                      <span class="equipment-price">{{ (equipment.rentalPricePerPlay || equipment.price) | number }}đ</span>
-                      <a [routerLink]="['/equipments/detail', equipment.id]" class="btn-view-equipment">Chi tiết</a>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
           }
+        </div>
+        } @else {
+        <p class="empty-time">Hôm nay đã hết khung giờ trống.</p>
+        }
+      </div>
 
+      <!-- Equipment Section -->
+      @if (productDetail().equipments?.length) {
+      <div class="content-block">
+        <h3 class="block-title">Thiết bị cho thuê tại sân</h3>
+        <div class="equipment-list">
+          @for (equipment of productDetail().equipments; track equipment.id) {
+          <div class="equipment-item">
+            <div class="equipment-info">
+              <span class="equipment-name">{{ equipment.name }}</span>
+              <span class="equipment-factory">{{ equipment.factory }}</span>
+            </div>
+            <div class="equipment-action">
+              <span class="equipment-price">{{ (equipment.rentalPricePerPlay || equipment.price) | number }}đ</span>
+              <a [routerLink]="['/equipments/detail', equipment.id]" class="btn-view-equipment">Chi tiết</a>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+    </div>
+
+    <!-- Right Sidebar (Booking) -->
+    <div class="right-sidebar">
+      <div class="sidebar-card">
+        <div class="price-display">
+          <span class="price-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
+          <span class="price-unit">/ giờ</span>
         </div>
 
-        <!-- Right Sidebar (Booking) -->
-        <div class="right-sidebar">
-          <div class="sidebar-card">
-            <div class="price-display">
-              <span class="price-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
-              <span class="price-unit">/ giờ</span>
-            </div>
-            
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <div class="summary-details">
-              <div class="summary-row">
-                <span class="summary-label">Khung giờ</span>
-                <span class="summary-value">06:00 - 07:30</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label">Loại sân</span>
-                <span class="summary-value">7 người</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label">Thời lượng</span>
-                <span class="summary-value">1.5 giờ</span>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="total-row">
-              <span class="total-label">Tổng tiền</span>
-              <span class="total-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
-            </div>
-
-            <a [routerLink]="['/booking', productId()]" class="btn-primary">Đặt sân ngay</a>
-            <button class="btn-secondary">Đặt định kỳ hàng tuần</button>
+        <div class="summary-details">
+          <div class="summary-row">
+            <span class="summary-label">Khung giờ</span>
+            <span class="summary-value">06:00 - 07:30</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Loại sân</span>
+            <span class="summary-value">7 người</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Thời lượng</span>
+            <span class="summary-value">1.5 giờ</span>
           </div>
         </div>
 
+        <div class="divider"></div>
+
+        <div class="total-row">
+          <span class="total-label">Tổng tiền</span>
+          <span class="total-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
+        </div>
+
+        <a [routerLink]="['/booking', productId()]" class="btn-primary">Đặt sân ngay</a>
+        <button class="btn-secondary">Đặt định kỳ hàng tuần</button>
       </div>
-    }
+    </div>
+
+  </div>
+  }
   }
 
 </div>

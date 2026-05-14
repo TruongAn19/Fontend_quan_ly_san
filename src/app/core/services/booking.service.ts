@@ -41,4 +41,8 @@ export class BookingService {
     const params = new HttpParams().set('page', page.toString()).set('size', '5');
     return this.http.get<any>(`${environment.apiBaseUrl}/client/booking-history`, { params });
   }
+
+  cancelBooking(bookingId: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/${bookingId}`);
+  }
 }
