@@ -22,8 +22,6 @@ export class ProfileComponent implements OnInit {
   passwordForm!: FormGroup;
 
   profileData = signal<UserResponseDTO | null>(null);
-  selectedFile: File | null = null;
-  avatarPreview = signal<string | null>(null);
 
   isLoading = signal<boolean>(false);
   isSaving = signal<boolean>(false);
@@ -70,9 +68,6 @@ export class ProfileComponent implements OnInit {
             phone: res.data.phone,
             address: res.data.address
           });
-          if (res.data.avatarUrl) {
-            this.avatarPreview.set(res.data.avatarUrl);
-          }
         }
       },
       error: (err) => {
@@ -80,18 +75,6 @@ export class ProfileComponent implements OnInit {
         this.errorMessage.set('Không thể tải thông tin người dùng.');
       }
     });
-  }
-
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.avatarPreview.set(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
   }
 
   onUpdateProfile(): void {
@@ -104,17 +87,20 @@ export class ProfileComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
+    // Chỉ gửi dữ liệu văn bản, không gửi file
     const formData = FormDataHelper.createMultipartData(
       'user',
-      this.profileForm.value,
-      'avatarFile',
-      this.selectedFile || undefined
+      this.profileForm.value
     );
 
     this.profileService.updateProfile(formData).subscribe({
       next: (res) => {
         this.isSaving.set(false);
         this.successMessage.set('Cập nhật thông tin thành công!');
+        
+        // Tự động ẩn thông báo sau 3 giây
+        setTimeout(() => this.successMessage.set(null), 3000);
+
         if (res.data) {
           this.profileData.set(res.data);
           if (res.data.email !== this.authService.currentUser()) {
@@ -144,6 +130,7 @@ export class ProfileComponent implements OnInit {
         this.isChangingPassword.set(false);
         this.successMessage.set('Đổi mật khẩu thành công! Đang đăng xuất...');
         setTimeout(() => {
+          this.successMessage.set(null);
           this.authService.logout();
         }, 2000);
       },

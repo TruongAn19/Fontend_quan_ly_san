@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingService } from '../../core/services/booking.service';
+import { ProfileService } from '../../core/services/profile.service';
 import { StompService } from '../../core/services/stomp.service';
 import { Subscription } from 'rxjs';
 
@@ -27,6 +28,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   availableTimes = signal<any[]>([]);
 
   bookingForm!: FormGroup;
+  priceEstimate = signal<any>(null);
 
   isLoading = signal<boolean>(false);
   isHolding = signal<boolean>(false);
@@ -39,6 +41,20 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   selectedDate = signal<string>('');
   selectedCourtId = signal<number | null>(null);
+
+  weekDays = [
+    { label: 'T2', value: 1 },
+    { label: 'T3', value: 2 },
+    { label: 'T4', value: 3 },
+    { label: 'T5', value: 4 },
+    { label: 'T6', value: 5 },
+    { label: 'T7', value: 6 },
+    { label: 'CN', value: 0 }
+  ];
+
+  selectedDays: number[] = [];
+
+  private profileService = inject(ProfileService);
 
   private showError(msg: string): void {
     this.errorMessage.set(msg);
@@ -60,6 +76,7 @@ export class BookingComponent implements OnInit, OnDestroy {
       this.productId.set(+id);
       this.initForm();
       this.loadBookingInfo();
+      this.loadUserProfile(); // Tự động điền thông tin người dùng
     } else {
       this.showError('Mã sản phẩm không hợp lệ.');
     }
@@ -78,8 +95,89 @@ export class BookingComponent implements OnInit, OnDestroy {
       receiverName: ['', [Validators.required]],
       receiverAddress: ['', [Validators.required]],
       receiverPhone: ['', [Validators.required, Validators.pattern(/^0[35789][0-9]{8}$/)]],
-      availableTimeId: ['', [Validators.required]]
+      availableTimeId: ['', [Validators.required]],
+      bookingType: ['ONE_TIME', [Validators.required]],
+      durationMonths: [1],
     });
+
+    this.bookingForm.valueChanges.subscribe(() => {
+      this.calculatePriceEstimate();
+    });
+  }
+
+  loadUserProfile(): void {
+    this.profileService.getProfile().subscribe({
+      next: (res) => {
+        if (res && res.data) {
+          this.bookingForm.patchValue({
+            receiverName: res.data.fullName,
+            receiverPhone: res.data.phone,
+            receiverAddress: res.data.address
+          });
+        }
+      }
+    });
+  }
+
+  toggleDay(day: number): void {
+    const idx = this.selectedDays.indexOf(day);
+    if (idx === -1) {
+      this.selectedDays.push(day);
+    } else {
+      this.selectedDays.splice(idx, 1);
+    }
+    this.calculatePriceEstimate();
+  }
+
+  isDaySelected(day: number): boolean {
+    return this.selectedDays.includes(day);
+  }
+
+  calculatePriceEstimate(): void {
+    const type = this.bookingForm.get('bookingType')?.value;
+    const info = this.bookingInfo();
+    if (!info) return;
+
+    const basePrice = info.product?.price || 0;
+    const sale = info.product?.sale || 0;
+    const priceAfterSale = basePrice - (basePrice * sale / 100);
+    const depositPricePerSlot = info.product?.depositPrice || 0;
+
+    if (type === 'ONE_TIME') {
+      this.priceEstimate.set({
+        sessions: 1,
+        totalPrice: priceAfterSale,
+        depositPrice: depositPricePerSlot,
+        discountRate: 0,
+        savings: 0
+      });
+    } else {
+      const months = this.bookingForm.get('durationMonths')?.value || 1;
+      const daysInWeek = this.selectedDays.length;
+      if (daysInWeek === 0) {
+        this.priceEstimate.set(null);
+        return;
+      }
+
+      const totalSessions = Math.round(daysInWeek * 4.3 * months);
+      let recurringDiscount = 0;
+      if (months === 1) recurringDiscount = 5;
+      else if (months === 2) recurringDiscount = 8;
+      else if (months >= 3) recurringDiscount = 10;
+
+      const totalPriceBeforeRecurring = priceAfterSale * totalSessions;
+      const savings = (totalPriceBeforeRecurring * recurringDiscount / 100);
+      const finalTotalPrice = totalPriceBeforeRecurring - savings;
+      const finalDepositPrice = depositPricePerSlot * totalSessions;
+
+      this.priceEstimate.set({
+        sessions: totalSessions,
+        totalPrice: finalTotalPrice,
+        depositPrice: finalDepositPrice,
+        discountRate: recurringDiscount,
+        savings: savings
+      });
+    }
   }
 
   loadBookingInfo(): void {
@@ -92,6 +190,7 @@ export class BookingComponent implements OnInit, OnDestroy {
         if (data && data.courts && data.courts.length > 0) {
           this.selectedCourtId.set(data.courts[0].id);
           this.loadAvailableTimes();
+          this.calculatePriceEstimate();
         }
       },
       error: (err) => {
@@ -126,15 +225,11 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   private handleRealtimeEvent(event: any): void {
-    // event could be { timeId: number, status: 'HOLD' | 'RELEASE' | 'BOOKED' }
     const currentTimes = [...this.availableTimes()];
     const index = currentTimes.findIndex(t => t.id === event.timeId);
     if (index !== -1) {
       if (event.status === 'RELEASE') {
         currentTimes[index].status = null;
-        if (this.bookingForm.get('availableTimeId')?.value === event.timeId) {
-            this.showError('Khung giờ bạn đang xem vừa được nhả! Bạn có thể đặt ngay.');
-        }
       } else {
         currentTimes[index].status = event.status;
         if (this.bookingForm.get('availableTimeId')?.value === event.timeId) {
@@ -212,16 +307,31 @@ export class BookingComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const type = this.bookingForm.get('bookingType')?.value;
+    if (type === 'WEEKLY_RECURRING' && this.selectedDays.length === 0) {
+      this.showError('Vui lòng chọn ít nhất một thứ trong tuần để đặt sân tháng.');
+      return;
+    }
+
     this.isPlacing.set(true);
     this.errorMessage.set(null);
 
+    let recurringEndDate = null;
+    if (type === 'WEEKLY_RECURRING') {
+      const startDate = new Date(this.selectedDate());
+      const months = this.bookingForm.get('durationMonths')?.value;
+      startDate.setMonth(startDate.getMonth() + months);
+      recurringEndDate = this.toLocalDateString(startDate);
+    }
+
     const payload = {
       ...this.bookingForm.value,
-      bookingType: 'ONE_TIME',
+      selectedDays: this.selectedDays,
       productId: this.productId(),
-      courtId: this.selectedCourtId(),
+      courtId: this.selectedCourtId(), // Đổi subCourtId thành courtId cho API /place
       bookingDate: this.selectedDate(),
-      availableTimeId: +this.bookingForm.get('availableTimeId')?.value
+      availableTimeId: +this.bookingForm.get('availableTimeId')?.value,
+      recurringEndDate: recurringEndDate
     };
 
     this.bookingService.placeBooking(payload).subscribe({

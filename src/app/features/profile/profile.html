@@ -1,101 +1,106 @@
 <div class="profile-container animate-fade-in">
-  
+
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div class="error-alert">
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
   @if (successMessage()) {
-    <div class="success-alert">
-      <span>{{ successMessage() }}</span>
-    </div>
+  <div class="success-alert">
+    <span>{{ successMessage() }}</span>
+  </div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tải thông tin...
-    </div>
+  <div class="loading-state">
+    <span class="spinner"></span> Đang tải thông tin...
+  </div>
   } @else {
-    <div class="grid-layout">
-      
-      <!-- Profile Info Section -->
-      <div class="glass-card">
-        <h2 class="section-title">Thông tin cá nhân</h2>
-        
-        <div class="avatar-section">
-          <div class="avatar-wrapper">
-            <img [src]="avatarPreview() || 'assets/img/default-avatar.png'" alt="Avatar" class="avatar-img"/>
-            <label for="avatarUpload" class="upload-badge">
-              <span class="icon-edit"></span>
-            </label>
-            <input type="file" id="avatarUpload" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
-          </div>
+  <div class="grid-layout">
+
+    <!-- Profile Info Section -->
+    <div class="glass-card">
+      <h2 class="section-title">Thông tin cá nhân</h2>
+
+      <div class="avatar-section">
+        <div class="avatar-wrapper">
+          <!-- Sử dụng ảnh mặc định cố định -->
+          <img
+            src="https://thumbs.dreamstime.com/z/default-avatar-profile-icon-social-media-user-image-gray-blank-silhouette-vector-illustration-305503988.jpg?w=768"
+            alt="Avatar" class="avatar-img static-avatar" />
+        </div>
+      </div>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="premium-form">
+        <div class="form-group">
+          <label for="fullName">Họ và Tên</label>
+          <input type="text" id="fullName" formControlName="fullName"
+            [class.invalid]="profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched" />
         </div>
 
-        <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="premium-form">
-          <div class="form-group">
-            <label for="fullName">Họ và Tên</label>
-            <input type="text" id="fullName" formControlName="fullName" [class.invalid]="profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched"/>
-          </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email"
+            [class.invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
+        </div>
 
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" formControlName="email" [class.invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"/>
-          </div>
+        <div class="form-group">
+          <label for="phone">Số điện thoại</label>
+          <input type="text" id="phone" formControlName="phone"
+            [class.invalid]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched" />
+        </div>
 
-          <div class="form-group">
-            <label for="phone">Số điện thoại</label>
-            <input type="text" id="phone" formControlName="phone" [class.invalid]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched"/>
-          </div>
+        <div class="form-group">
+          <label for="address">Địa chỉ</label>
+          <input type="text" id="address" formControlName="address" />
+        </div>
 
-          <div class="form-group">
-            <label for="address">Địa chỉ</label>
-            <input type="text" id="address" formControlName="address"/>
-          </div>
-
-          <button type="submit" class="submit-btn" [disabled]="isSaving()">
-            @if (isSaving()) {
-              <span class="spinner"></span> Đang lưu...
-            } @else {
-              Lưu thay đổi
-            }
-          </button>
-        </form>
-      </div>
-
-      <!-- Change Password Section -->
-      <div class="glass-card">
-        <h2 class="section-title">Đổi mật khẩu</h2>
-        
-        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="premium-form">
-          <div class="form-group">
-            <label for="oldPassword">Mật khẩu hiện tại</label>
-            <input type="password" id="oldPassword" formControlName="oldPassword" [class.invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('password')?.touched"/>
-          </div>
-
-          <div class="form-group">
-            <label for="newPassword">Mật khẩu mới</label>
-            <input type="password" id="newPassword" formControlName="newPassword" [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched"/>
-          </div>
-
-          <div class="form-group">
-            <label for="confirmPassword">Xác nhận mật khẩu mới</label>
-            <input type="password" id="confirmPassword" formControlName="confirmPassword" [class.invalid]="(passwordForm.get('confirmPassword')?.invalid || passwordForm.hasError('mismatch')) && passwordForm.get('confirmPassword')?.touched"/>
-            @if (passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched) {
-              <span class="validation-error">Mật khẩu không khớp</span>
-            }
-          </div>
-
-          <button type="submit" class="submit-btn password-btn" [disabled]="isChangingPassword()">
-            @if (isChangingPassword()) {
-              <span class="spinner"></span> Đang cập nhật...
-            } @else {
-              Cập nhật mật khẩu
-            }
-          </button>
-        </form>
-      </div>
-
+        <button type="submit" class="submit-btn" [disabled]="isSaving()">
+          @if (isSaving()) {
+          <span class="spinner"></span> Đang lưu...
+          } @else {
+          Lưu thay đổi
+          }
+        </button>
+      </form>
     </div>
+
+    <!-- Change Password Section -->
+    <div class="glass-card">
+      <h2 class="section-title">Đổi mật khẩu</h2>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="premium-form">
+        <div class="form-group">
+          <label for="oldPassword">Mật khẩu hiện tại</label>
+          <input type="password" id="oldPassword" formControlName="oldPassword"
+            [class.invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('password')?.touched" />
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Mật khẩu mới</label>
+          <input type="password" id="newPassword" formControlName="newPassword"
+            [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+          <input type="password" id="confirmPassword" formControlName="confirmPassword"
+            [class.invalid]="(passwordForm.get('confirmPassword')?.invalid || passwordForm.hasError('mismatch')) && passwordForm.get('confirmPassword')?.touched" />
+          @if (passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched) {
+          <span class="validation-error">Mật khẩu không khớp</span>
+          }
+        </div>
+
+        <button type="submit" class="submit-btn password-btn" [disabled]="isChangingPassword()">
+          @if (isChangingPassword()) {
+          <span class="spinner"></span> Đang cập nhật...
+          } @else {
+          Cập nhật mật khẩu
+          }
+        </button>
+      </form>
+    </div>
+
+  </div>
   }
 </div>
