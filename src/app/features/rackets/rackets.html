@@ -65,7 +65,10 @@
       <!-- Racket Grid -->
       <div class="product-grid">
         <div class="product-card animate-fade-in" *ngFor="let racket of rackets()">
-          <img [src]="racket.imageUrl || 'assets/img/default-racket.png'" alt="{{racket.name}}" class="card-img"/>
+          <div class="img-frame">
+            <img [src]="racket.imageUrl || 'assets/img/default-racket.png'" alt="" class="img-bg" aria-hidden="true"/>
+            <img [src]="racket.imageUrl || 'assets/img/default-racket.png'" alt="{{racket.name}}" class="card-img"/>
+          </div>
           <div class="card-body">
             <h3 class="card-name">{{ racket.name }}</h3>
             <p class="card-address">Hãng: {{ racket.factory }}</p>

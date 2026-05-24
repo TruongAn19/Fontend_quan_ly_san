@@ -32,8 +32,8 @@
             <td>{{ user.email }}</td>
             <td>{{ user.phone }}</td>
             <td>
-              <span class="role-badge" [class]="user.role?.toLowerCase()">
-                {{ user.role }}
+              <span class="role-badge" [class]="user.roleName?.toLowerCase()">
+                {{ user.roleName || '—' }}
               </span>
             </td>
             <td class="actions-cell">

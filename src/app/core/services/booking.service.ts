@@ -20,6 +20,10 @@ export class BookingService {
     return this.http.get<any>(`${this.API_URL}/${productId}/info`);
   }
 
+  getRacketsByProduct(productId: number): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/products/${productId}/rackets`);
+  }
+
   getAvailableTimes(date: string, courtId: number): Observable<ApiResponse<any[]>> {
     const params = new HttpParams().set('date', date).set('courtId', courtId.toString());
     return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/available-times`, { params });
@@ -33,8 +37,19 @@ export class BookingService {
     return this.http.post<ApiResponse<{ bookingId: number; bookingCode: string; paymentUrl: string }>>(`${this.API_URL}/place`, payload);
   }
 
-  getBookingHistory(page: number = 0): Observable<any> {
-    const params = new HttpParams().set('page', page.toString()).set('size', '5');
+  getBookingHistory(page: number = 0, type?: 'ONE_TIME' | 'WEEKLY_RECURRING'): Observable<any> {
+    let params = new HttpParams().set('page', page.toString()).set('size', '5');
+    if (type) {
+      params = params.set('type', type);
+    }
     return this.http.get<any>(`${environment.apiBaseUrl}/client/booking-history`, { params });
+  }
+
+  getBookingDetail(id: number): Observable<any> {
+    return this.http.get<any>(`${environment.apiBaseUrl}/client/booking-history/${id}`);
+  }
+
+  cancelBooking(id: number, reason?: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/${id}/cancel`, { reason: reason ?? null });
   }
 }

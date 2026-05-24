@@ -65,6 +65,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'booking-detail/:id',
+    loadComponent: () => import('./features/booking-detail/booking-detail').then(m => m.BookingDetailComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'rentals/:id',
     loadComponent: () => import('./features/rental/rental').then(m => m.RentalComponent),
     canActivate: [authGuard]
@@ -80,25 +85,16 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'rental-detail/:id',
+    loadComponent: () => import('./features/rental-detail/rental-detail').then(m => m.RentalDetailComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'payments/vnpay-callback',
     loadComponent: () => import('./features/payment-callback/payment-callback').then(m => m.PaymentCallbackComponent),
     canActivate: [authGuard]
   },
-  {
-    path: 'match-posts',
-    loadComponent: () => import('./features/match-posts/match-posts').then(m => m.MatchPostsComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'match-posts/create',
-    loadComponent: () => import('./features/match-post-create/match-post-create').then(m => m.MatchPostCreateComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'match-posts/detail/:id',
-    loadComponent: () => import('./features/match-post-detail/match-post-detail').then(m => m.MatchPostDetailComponent),
-    canActivate: [authGuard]
-  },
+
   {
     path: 'admin/dashboard',
     loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.AdminDashboardComponent),
@@ -130,10 +126,11 @@ export const routes: Routes = [
     canActivate: [adminGuard]
   },
   {
-    path: 'admin/ntfy',
-    loadComponent: () => import('./features/admin/ntfy/ntfy').then(m => m.AdminNtfyComponent),
+    path: 'admin/refund-requests',
+    loadComponent: () => import('./features/admin/refund-requests/refund-requests').then(m => m.AdminRefundRequestsComponent),
     canActivate: [adminGuard]
   },
+
   {
     path: '**',
     redirectTo: ''

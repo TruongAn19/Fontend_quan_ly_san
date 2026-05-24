@@ -1,0 +1,50 @@
+<div class="detail-container animate-fade-in">
+
+  <a routerLink="/rental-history" class="back-link">← Quay lại lịch sử thuê</a>
+
+  @if (errorMessage()) {
+    <div class="error-alert"><span>{{ errorMessage() }}</span></div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state"><span class="spinner"></span> Đang tải chi tiết...</div>
+  } @else if (rental()) {
+
+    <h1 class="page-title">Chi tiết đơn thuê vợt</h1>
+
+    <div class="glass-card section">
+      <h2 class="section-title">Thông tin đơn thuê</h2>
+      <div class="info-grid">
+        <div class="info-row"><span class="label">Mã đơn:</span><strong>{{ rental().rentalToolCode || rental().id }}</strong></div>
+        <div class="info-row"><span class="label">Tên vợt:</span><span>{{ rental().racketName || 'Vợt #' + rental().racketId }}</span></div>
+        <div class="info-row"><span class="label">Số lượng:</span><span>{{ rental().quantity }}</span></div>
+        <div class="info-row"><span class="label">Hình thức:</span><span>{{ typeLabel(rental().type) }}</span></div>
+        @if (rental().type === 'DAILY') {
+          <div class="info-row"><span class="label">Ngày thuê:</span><span>{{ rental().rentalDate }}</span></div>
+          <div class="info-row"><span class="label">Số ngày:</span><span>{{ rental().quantityDay }} ngày</span></div>
+        }
+        <div class="info-row"><span class="label">Đơn giá:</span><span>{{ rental().rentalPrice | number }} VNĐ</span></div>
+        <div class="info-row"><span class="label">Thành tiền:</span><strong>{{ rental().price | number }} VNĐ</strong></div>
+        <div class="info-row"><span class="label">Trạng thái:</span>
+          <span class="status-badge" [class]="rental().status?.toLowerCase()">{{ statusLabel(rental().status) }}</span>
+        </div>
+      </div>
+    </div>
+
+    @if (rental().type === 'ON_SITE' && booking()) {
+      <div class="glass-card section">
+        <h2 class="section-title">🏟 Booking sân gắn kèm</h2>
+        <div class="info-grid">
+          <div class="info-row">
+            <span class="label">Mã đặt sân:</span>
+            <a class="booking-link" [routerLink]="['/booking-detail', booking().id]">{{ booking().bookingCode }}</a>
+          </div>
+          <div class="info-row"><span class="label">Tên sân:</span><span>{{ booking().courtName || '—' }}</span></div>
+          <div class="info-row"><span class="label">Ngày:</span><span>{{ booking().bookingDate }}</span></div>
+          <div class="info-row"><span class="label">Khung giờ:</span><span>{{ booking().time }}</span></div>
+        </div>
+      </div>
+    }
+
+  }
+</div>

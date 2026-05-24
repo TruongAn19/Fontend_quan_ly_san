@@ -29,31 +29,37 @@
               <th>Số lượng</th>
               <th>Thời gian thuê</th>
               <th>Trạng thái</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of rentals()">
-              <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
-              <td>{{ item.racketName || 'Vợt cầu lông' }}</td>
-              <td>
-                <span class="type-badge" [class.daily]="item.type === 'DAILY'">
-                  {{ item.type }}
-                </span>
-              </td>
-              <td>{{ item.quantity }}</td>
-              <td>
-                @if (item.type === 'DAILY') {
-                  <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
-                } @else {
-                  <span>Mã sân: {{ item.bookingCode }}</span>
-                }
-              </td>
-              <td>
-                <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ item.status }}
-                </span>
-              </td>
-            </tr>
+            @for (item of rentals(); track item.id) {
+              <tr>
+                <td><strong>{{ item.rentalToolCode || item.id }}</strong></td>
+                <td>{{ item.racketName || 'Vợt cầu lông' }}</td>
+                <td>
+                  <span class="type-badge" [class.daily]="item.type === 'DAILY'">
+                    {{ typeLabel(item.type) }}
+                  </span>
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td>
+                  @if (item.type === 'DAILY') {
+                    <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
+                  } @else {
+                    <span>Mã sân: {{ item.bookingCode }}</span>
+                  }
+                </td>
+                <td>
+                  <span class="status-badge" [class]="item.status?.toLowerCase()">
+                    {{ statusLabel(item.status) }}
+                  </span>
+                </td>
+                <td>
+                  <a class="detail-link" [routerLink]="['/rental-detail', item.id]">Xem chi tiết</a>
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>

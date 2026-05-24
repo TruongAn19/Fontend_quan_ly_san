@@ -67,4 +67,29 @@ export class AdminRentalsComponent implements OnInit {
       this.loadRentals();
     }
   }
+
+  statusLabel(status: string | null | undefined): string {
+    if (!status) return '';
+    const map: Record<string, string> = {
+      PENDING: 'Chờ bàn giao',
+      IN_USE: 'Đang thuê',
+      COMPLETED: 'Đã trả',
+      CANCELLED: 'Hủy bỏ',
+    };
+    return map[status] ?? status;
+  }
+
+  typeLabel(type: string | null | undefined): string {
+    if (!type) return '';
+    const map: Record<string, string> = {
+      DAILY: 'Thuê theo ngày',
+      ON_SITE: 'Thuê kèm theo sân',
+    };
+    return map[type] ?? type;
+  }
+
+  /** Đơn thuê đã đóng (đã trả hoặc đã hủy) — không cho phép đổi nữa. */
+  isStatusLocked(status: string | null | undefined): boolean {
+    return status === 'COMPLETED' || status === 'CANCELLED';
+  }
 }

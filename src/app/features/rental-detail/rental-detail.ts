@@ -1,54 +1,50 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { RentalService } from '../../core/services/rental.service';
 
 @Component({
-  selector: 'app-rental-history',
+  selector: 'app-rental-detail',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './rental-history.html',
-  styleUrls: ['./rental-history.css']
+  templateUrl: './rental-detail.html',
+  styleUrls: ['./rental-detail.css']
 })
-export class RentalHistoryComponent implements OnInit {
+export class RentalDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
   private rentalService = inject(RentalService);
 
-  rentals = signal<any[]>([]);
-  currentPage = signal<number>(1);
-  totalPages = signal<number>(1);
+  rental = signal<any>(null);
+  booking = signal<any>(null);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadHistory();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.errorMessage.set('Mã đơn thuê không hợp lệ.');
+      return;
+    }
+    this.load(+id);
   }
 
-  loadHistory(): void {
+  load(id: number): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-
-    const apiPage = this.currentPage() - 1;
-
-    this.rentalService.getRentalHistory(apiPage).subscribe({
+    this.rentalService.getRentalDetail(id).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        if (res && res.data && res.data.rentals) {
-          this.rentals.set(res.data.rentals);
-          this.totalPages.set(res.data.totalPages || 1);
+        const data = res?.data;
+        if (data) {
+          this.rental.set(data.rental);
+          this.booking.set(data.booking ?? null);
         }
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Không thể tải lịch sử thuê dụng cụ.');
+        this.errorMessage.set(err?.error?.message ?? 'Không thể tải chi tiết đơn thuê.');
       }
     });
-  }
-
-  changePage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-      this.loadHistory();
-    }
   }
 
   statusLabel(status: string | null | undefined): string {
@@ -66,7 +62,7 @@ export class RentalHistoryComponent implements OnInit {
     if (!type) return '';
     const map: Record<string, string> = {
       DAILY: 'Thuê theo ngày',
-      ON_SITE: 'Thuê tại sân',
+      ON_SITE: 'Thuê kèm theo sân',
     };
     return map[type] ?? type;
   }

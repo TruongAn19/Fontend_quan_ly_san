@@ -1,0 +1,38 @@
+<div class="bell-wrapper">
+  <button class="bell-btn" (click)="toggle()" aria-label="Thông báo">
+    <span class="bell-icon">🔔</span>
+    @if (unreadCount() > 0) {
+      <span class="bell-badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <!-- Click backdrop để đóng -->
+    <div class="bell-backdrop" (click)="close()"></div>
+
+    <div class="bell-dropdown" (click)="$event.stopPropagation()">
+      <div class="dropdown-header">
+        <strong>Thông báo</strong>
+        @if (unreadCount() > 0) {
+          <button class="link-btn" (click)="markAllRead($event)">Đánh dấu tất cả đã đọc</button>
+        }
+      </div>
+
+      @if (isLoading()) {
+        <div class="dropdown-loading">Đang tải...</div>
+      } @else if (notifications().length === 0) {
+        <div class="dropdown-empty">Không có thông báo nào.</div>
+      } @else {
+        <ul class="notif-list">
+          @for (item of notifications(); track item.id) {
+            <li class="notif-item" [class.unread]="!item.read" (click)="onClickItem(item)">
+              <div class="notif-title">{{ item.title }}</div>
+              <div class="notif-msg">{{ item.message }}</div>
+              <div class="notif-time">{{ relativeTime(item.createdAt) }}</div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

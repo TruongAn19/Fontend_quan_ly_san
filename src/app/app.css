@@ -10,6 +10,91 @@
   min-height: 100vh;
 }
 
+/* Admin mode: sidebar trái + content phải */
+.app-wrapper.admin-mode {
+  flex-direction: row;
+}
+
+.admin-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 24px;
+  z-index: 1000;
+}
+
+.admin-sidebar .nav-logo {
+  padding: 0 8px;
+  display: block;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-links .nav-item {
+  display: block;
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-links .nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: white;
+}
+
+.sidebar-links .nav-item.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(79, 70, 229, 0.14));
+  color: white;
+}
+
+/* Tắt underline ::after của .nav-item.active vốn dành cho top navbar */
+.sidebar-links .nav-item.active::after {
+  display: none;
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 16px;
+}
+
+.sidebar-actions .btn-logout {
+  text-align: left;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+
+.sidebar-actions .btn-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Admin-mode main content fill phần còn lại bên phải, không tràn */
+.app-wrapper.admin-mode .app-main-content {
+  min-width: 0;
+  width: 100%;
+}
+
 .premium-navbar {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(16px);

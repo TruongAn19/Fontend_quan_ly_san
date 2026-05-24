@@ -1,6 +1,22 @@
 <div class="history-container animate-fade-in">
   <h1 class="page-title">Lịch sử Đặt sân</h1>
 
+  <!-- Tabs -->
+  <div class="tabs-wrapper">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'ONE_TIME'"
+      (click)="switchTab('ONE_TIME')">
+      Đặt không định kỳ
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'WEEKLY_RECURRING'"
+      (click)="switchTab('WEEKLY_RECURRING')">
+      Đặt sân theo tháng
+    </button>
+  </div>
+
   @if (errorMessage()) {
     <div class="error-alert">
       <span>{{ errorMessage() }}</span>
@@ -15,35 +31,51 @@
 
     @if (bookings().length === 0) {
       <div class="empty-state">
-        <p>Bạn chưa có lịch sử đặt sân nào.</p>
+        @if (activeTab() === 'WEEKLY_RECURRING') {
+          <p>Bạn chưa có đơn đặt sân theo tháng nào.</p>
+        } @else {
+          <p>Bạn chưa có đơn đặt sân không định kỳ nào.</p>
+        }
       </div>
     } @else {
-      
+
       <div class="table-responsive glass-card">
         <table class="premium-table">
           <thead>
             <tr>
               <th>Mã đặt</th>
               <th>Tên sân</th>
-              <th>Ngày đặt</th>
+              <th>Ngày bắt đầu</th>
+              @if (activeTab() === 'WEEKLY_RECURRING') {
+                <th>Ngày kết thúc</th>
+              }
               <th>Khung giờ</th>
               <th>Trạng thái</th>
               <th>Tổng tiền</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of bookings()">
-              <td><strong>{{ item.bookingCode }}</strong></td>
-              <td>{{ item.courtName || 'Sân cầu lông' }}</td>
-              <td>{{ item.bookingDate }}</td>
-              <td>{{ item.time }}</td>
-              <td>
-                <span class="status-badge" [class]="item.status?.toLowerCase()">
-                  {{ item.status }}
-                </span>
-              </td>
-              <td class="total-price">{{ item.totalPrice | number }} VNĐ</td>
-            </tr>
+            @for (item of bookings(); track item.id) {
+              <tr>
+                <td><strong>{{ item.bookingCode }}</strong></td>
+                <td>{{ item.courtName || 'Sân cầu lông' }}</td>
+                <td>{{ item.bookingDate }}</td>
+                @if (activeTab() === 'WEEKLY_RECURRING') {
+                  <td>{{ item.recurringEndDate || '—' }}</td>
+                }
+                <td>{{ item.time }}</td>
+                <td>
+                  <span class="status-badge" [class]="item.status?.toLowerCase()">
+                    {{ statusLabel(item.status) }}
+                  </span>
+                </td>
+                <td class="total-price">{{ item.totalPrice | number }} VNĐ</td>
+                <td>
+                  <a class="detail-link" [routerLink]="['/booking-detail', item.id]">Xem chi tiết</a>
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>

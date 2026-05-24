@@ -50,7 +50,10 @@
       <h2 class="section-title">Vợt Cho Thuê Hot</h2>
       <div class="product-grid">
         <div class="product-card" *ngFor="let item of homeData()?.topRackets">
-          <img [src]="item.imageUrl || 'assets/img/default-racket.png'" alt="{{item.name}}" class="card-img">
+          <div class="img-frame">
+            <img [src]="item.imageUrl || 'assets/img/default-racket.png'" alt="" class="img-bg" aria-hidden="true"/>
+            <img [src]="item.imageUrl || 'assets/img/default-racket.png'" alt="{{item.name}}" class="card-img"/>
+          </div>
           <div class="card-body">
             <h3 class="card-name">{{item.name}}</h3>
             <p class="card-address">Hãng: {{item.factory}}</p>

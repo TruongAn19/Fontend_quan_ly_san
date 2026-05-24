@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './core/services/auth.service';
 
 import { ChatbotComponent } from './shared/components/chatbot/chatbot';
+import { NotificationBellComponent } from './shared/components/notification-bell/notification-bell';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, ChatbotComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, ChatbotComponent, NotificationBellComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

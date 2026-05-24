@@ -15,12 +15,47 @@
 .page-title {
   font-size: 2.75rem;
   font-weight: 900;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   text-align: center;
   background: linear-gradient(to right, #f8fafc, #94a3b8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.05em;
+}
+
+.tabs-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(12px);
+}
+
+.tab-btn:hover {
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
 }
 
 .glass-card {
@@ -36,13 +71,73 @@
 
 .table-responsive {
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.table-responsive::-webkit-scrollbar {
+  display: none;
 }
 
 .premium-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0 12px;
   text-align: left;
+}
+
+/* ONE_TIME tab (7 cols: code, name, date, time, status, total, action) */
+.premium-table th:nth-child(1), .premium-table td:nth-child(1) { width: 16%; }
+.premium-table th:nth-child(2), .premium-table td:nth-child(2) { width: 22%; }
+.premium-table th:nth-child(3), .premium-table td:nth-child(3) { width: 13%; }
+.premium-table th:nth-child(4), .premium-table td:nth-child(4) { width: 8%; }
+.premium-table th:nth-child(5), .premium-table td:nth-child(5) { width: 16%; text-align: center; }
+.premium-table th:nth-child(6), .premium-table td:nth-child(6) { width: 14%; text-align: right; }
+.premium-table th:nth-child(7), .premium-table td:nth-child(7) { width: 11%; text-align: center; }
+
+/* WEEKLY tab (8 cols: code, name, startDate, endDate, time, status, total, action) */
+.premium-table:has(th:nth-child(8)) th:nth-child(1),
+.premium-table:has(th:nth-child(8)) td:nth-child(1) { width: 13%; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(2),
+.premium-table:has(th:nth-child(8)) td:nth-child(2) { width: 18%; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(3),
+.premium-table:has(th:nth-child(8)) td:nth-child(3) { width: 11%; text-align: left; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(4),
+.premium-table:has(th:nth-child(8)) td:nth-child(4) { width: 11%; text-align: left; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(5),
+.premium-table:has(th:nth-child(8)) td:nth-child(5) { width: 7%; text-align: left; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(6),
+.premium-table:has(th:nth-child(8)) td:nth-child(6) { width: 15%; text-align: center; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(7),
+.premium-table:has(th:nth-child(8)) td:nth-child(7) { width: 14%; text-align: right; }
+
+.premium-table:has(th:nth-child(8)) th:nth-child(8),
+.premium-table:has(th:nth-child(8)) td:nth-child(8) { width: 11%; text-align: center; }
+
+/* Tighter horizontal padding for 8-column layout */
+.premium-table:has(th:nth-child(8)) th,
+.premium-table:has(th:nth-child(8)) td {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.detail-link {
+  color: #a5b4fc;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.detail-link:hover {
+  color: #c7d2fe;
+  text-decoration: underline;
 }
 
 .premium-table th {
@@ -52,6 +147,9 @@
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .premium-table td {
@@ -60,6 +158,9 @@
   background: rgba(255, 255, 255, 0.02);
   font-size: 1rem;
   vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .premium-table td:first-child {
@@ -83,13 +184,14 @@
 }
 
 .status-badge {
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   display: inline-block;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 /* Vietnamese Status Colors */

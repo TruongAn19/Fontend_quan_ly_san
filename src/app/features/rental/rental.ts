@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RentalService } from '../../core/services/rental.service';
+import { ProfileService } from '../../core/services/profile.service';
 
 @Component({
   selector: 'app-rental',
@@ -16,6 +17,7 @@ export class RentalComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private rentalService = inject(RentalService);
+  private profileService = inject(ProfileService);
 
   racketId = signal<number | null>(null);
   rentalForm!: FormGroup;
@@ -31,9 +33,31 @@ export class RentalComponent implements OnInit {
     if (id) {
       this.racketId.set(+id);
       this.initForm();
+      this.prefillFromProfile();
     } else {
       this.errorMessage.set('Mã vợt không hợp lệ.');
     }
+  }
+
+  /**
+   * Auto-fill fullName/email/phone với thông tin user đang đăng nhập (route có authGuard).
+   * Field vẫn editable. Lỗi tải profile không chặn flow.
+   */
+  private prefillFromProfile(): void {
+    this.profileService.getProfile().subscribe({
+      next: (res) => {
+        const u = res?.data;
+        if (!u) return;
+        this.rentalForm.patchValue({
+          fullName: u.fullName ?? '',
+          email: u.email ?? '',
+          phone: u.phone ?? ''
+        });
+      },
+      error: (err) => {
+        console.warn('Không thể prefill profile cho rental form:', err?.message);
+      }
+    });
   }
 
   initForm(): void {

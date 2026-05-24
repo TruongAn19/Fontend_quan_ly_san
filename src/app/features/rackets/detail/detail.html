@@ -17,9 +17,15 @@
         
         <!-- Image Section -->
         <div class="image-section">
-          <img 
-            [src]="racketDetail().imageUrl || 'assets/img/default-racket.png'" 
-            alt="{{ racketDetail().name }}" 
+          <img
+            [src]="racketDetail().imageUrl || 'assets/img/default-racket.png'"
+            alt=""
+            class="detail-img-bg"
+            aria-hidden="true"
+          />
+          <img
+            [src]="racketDetail().imageUrl || 'assets/img/default-racket.png'"
+            alt="{{ racketDetail().name }}"
             class="detail-img"
           />
         </div>

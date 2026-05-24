@@ -24,23 +24,33 @@
             <th>Tên Vợt</th>
             <th>Hãng</th>
             <th>Giá trị</th>
-            <th>Giá thuê</th>
-            <th>Tình trạng</th>
+            <th>Thuê / ngày</th>
+            <th>Thuê / lượt</th>
+            <th>SL kho</th>
+            <th>SL khả dụng</th>
+            <th>Sân</th>
+            <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of rackets()">
-            <td>{{ item.id }}</td>
-            <td><strong>{{ item.name }}</strong></td>
-            <td>{{ item.brand }}</td>
-            <td>{{ item.price | number }} VNĐ</td>
-            <td>{{ item.rentalPrice | number }} VNĐ</td>
-            <td>{{ item.conditionStatus }}</td>
-            <td class="actions-cell">
-              <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
-            </td>
-          </tr>
+          @for (item of rackets(); track item.id) {
+            <tr>
+              <td>{{ item.id }}</td>
+              <td><strong>{{ item.name }}</strong></td>
+              <td>{{ item.factory }}</td>
+              <td>{{ item.price | number }} VNĐ</td>
+              <td>{{ item.rentalPricePerDay | number }} VNĐ</td>
+              <td>{{ item.rentalPricePerPlay | number }} VNĐ</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.bookingStockQuantity }}</td>
+              <td>{{ item.product?.name || '—' }}</td>
+              <td>{{ item.available ? 'Khả dụng' : 'Tạm ngưng' }}</td>
+              <td class="actions-cell">
+                <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
@@ -57,7 +67,7 @@
     <div class="modal-overlay animate-fade-in">
       <div class="modal-content glass-card">
         <h3>{{ isEdit() ? 'Sửa thông tin vợt' : 'Thêm vợt mới' }}</h3>
-        
+
         <form [formGroup]="racketForm" (ngSubmit)="onSubmit()" class="premium-form">
           <div class="form-group">
             <label for="name">Tên vợt</label>
@@ -65,27 +75,50 @@
           </div>
 
           <div class="form-group">
-            <label for="brand">Hãng</label>
-            <input type="text" id="brand" formControlName="brand" />
+            <label for="factory">Hãng</label>
+            <input type="text" id="factory" formControlName="factory" />
+          </div>
+
+          <div class="form-group">
+            <label for="productId">Sân</label>
+            <select id="productId" formControlName="productId">
+              <option [ngValue]="null" disabled>-- Chọn sân --</option>
+              @for (p of products(); track p.id) {
+                <option [ngValue]="p.id">{{ p.name }}</option>
+              }
+            </select>
           </div>
 
           <div class="form-group">
             <label for="price">Giá trị gốc (VNĐ)</label>
-            <input type="number" id="price" formControlName="price" />
+            <input type="number" id="price" formControlName="price" min="0" />
           </div>
 
           <div class="form-group">
-            <label for="rentalPrice">Giá cho thuê (VNĐ)</label>
-            <input type="number" id="rentalPrice" formControlName="rentalPrice" />
+            <label for="rentalPricePerDay">Giá thuê / ngày (VNĐ)</label>
+            <input type="number" id="rentalPricePerDay" formControlName="rentalPricePerDay" min="0" />
           </div>
 
           <div class="form-group">
-            <label for="conditionStatus">Tình trạng</label>
-            <select id="conditionStatus" formControlName="conditionStatus">
-              <option value="Tốt">Tốt</option>
-              <option value="Cũ">Cũ</option>
-              <option value="Bảo trì">Bảo trì</option>
-            </select>
+            <label for="rentalPricePerPlay">Giá thuê / lượt (VNĐ)</label>
+            <input type="number" id="rentalPricePerPlay" formControlName="rentalPricePerPlay" min="0" />
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Số lượng (kho)</label>
+            <input type="number" id="quantity" formControlName="quantity" min="1" />
+          </div>
+
+          <div class="form-group">
+            <label for="bookingStockQuantity">Số lượng khả dụng cho booking</label>
+            <input type="number" id="bookingStockQuantity" formControlName="bookingStockQuantity" min="0" />
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="available" />
+              Đang cho thuê
+            </label>
           </div>
 
           <div class="form-group">

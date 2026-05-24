@@ -135,6 +135,36 @@
   object-fit: cover;
 }
 
+/* Racket card variant: ảnh vợt portrait sẽ bị crop nếu dùng cover trên khung 180px.
+   Wrapper .img-frame + blur background + object-fit:contain để hiển thị full thân vợt
+   (đồng bộ với trang /rackets). Chỉ scope dưới .img-frame nên không ảnh hưởng card sân. */
+.img-frame {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+}
+
+.img-frame .img-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(28px) brightness(0.85) saturate(1.1);
+  transform: scale(1.2);
+  z-index: 0;
+}
+
+.img-frame .card-img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .card-body {
   padding: 24px;
 }

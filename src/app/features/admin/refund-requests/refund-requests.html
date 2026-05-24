@@ -1,0 +1,122 @@
+<div class="admin-refunds animate-fade-in">
+  <h1 class="page-title">Quản lý Hoàn cọc</h1>
+
+  @if (errorMessage()) {
+    <div class="error-alert"><span>{{ errorMessage() }}</span></div>
+  }
+
+  <div class="filter-tabs">
+    <button class="tab-btn" [class.active]="filterStatus() === 'PENDING_REFUND'"
+            (click)="changeFilter('PENDING_REFUND')">
+      ⏳ Chờ hoàn cọc
+    </button>
+    <button class="tab-btn" [class.active]="filterStatus() === 'REFUNDED'"
+            (click)="changeFilter('REFUNDED')">
+      ✅ Đã hoàn cọc
+    </button>
+    <button class="tab-btn" [class.active]="filterStatus() === 'ALL'"
+            (click)="changeFilter('ALL')">
+      Tất cả
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state"><span class="spinner"></span> Đang tải...</div>
+  } @else if (bookings().length === 0) {
+    <div class="empty-state">Không có yêu cầu hoàn cọc nào.</div>
+  } @else {
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Mã đặt</th>
+            <th>Khách</th>
+            <th>SĐT</th>
+            <th>Ngày huỷ</th>
+            <th>Tiền hoàn</th>
+            <th>Trạng thái hoàn</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of bookings(); track b.id) {
+            <tr>
+              <td><strong>{{ b.bookingCode }}</strong></td>
+              <td>{{ b.receiverName || b.user?.fullName || '—' }}</td>
+              <td>{{ b.receiverPhone || '—' }}</td>
+              <td>{{ b.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="refund-amount">{{ (b.refundAmount ?? 0) | number }} VNĐ</td>
+              <td>
+                <span class="refund-badge" [class]="b.refundStatus?.toLowerCase()">
+                  {{ refundStatusLabel(b.refundStatus) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-detail" (click)="openDetail(b)">Xem chi tiết</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Detail modal -->
+  @if (selected()) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h2 class="modal-title">Chi tiết yêu cầu hoàn cọc</h2>
+
+        <div class="detail-grid">
+          <div class="detail-row"><span class="label">Mã đặt:</span><strong>{{ selected().bookingCode }}</strong></div>
+          <div class="detail-row"><span class="label">Khách hàng:</span><span>{{ selected().receiverName || '—' }}</span></div>
+          <div class="detail-row"><span class="label">Số điện thoại:</span>
+            <a [href]="'tel:' + selected().receiverPhone">{{ selected().receiverPhone || '—' }}</a>
+          </div>
+          <div class="detail-row"><span class="label">Email:</span>
+            <a [href]="'mailto:' + selected().user?.email">{{ selected().user?.email || '—' }}</a>
+          </div>
+          <div class="detail-row"><span class="label">Sân:</span><span>{{ selected().courtName || '—' }}</span></div>
+          <div class="detail-row"><span class="label">Ngày đặt:</span><span>{{ selected().bookingDate }}</span></div>
+          <div class="detail-row"><span class="label">Khung giờ:</span><span>{{ selected().time }}</span></div>
+          <div class="detail-row"><span class="label">Loại đặt:</span>
+            <span>{{ selected().bookingType === 'WEEKLY_RECURRING' ? 'Đặt theo tháng' : 'Đặt 1 lần' }}</span>
+          </div>
+          @if (selected().totalSessionsAtCancel) {
+            <div class="detail-row"><span class="label">Đã sử dụng:</span>
+              <span>{{ selected().usedSessionsAtCancel ?? 0 }} / {{ selected().totalSessionsAtCancel }} buổi</span>
+            </div>
+          }
+          <div class="detail-row"><span class="label">Thời điểm huỷ:</span>
+            <span>{{ selected().cancelledAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          @if (selected().cancelReason) {
+            <div class="detail-row"><span class="label">Lý do:</span><span>{{ selected().cancelReason }}</span></div>
+          }
+          <div class="detail-row highlight">
+            <span class="label">Số tiền cần hoàn:</span>
+            <strong class="amount">{{ (selected().refundAmount ?? 0) | number }} VNĐ</strong>
+          </div>
+          <div class="detail-row"><span class="label">Trạng thái hoàn:</span>
+            <span class="refund-badge" [class]="selected().refundStatus?.toLowerCase()">
+              {{ refundStatusLabel(selected().refundStatus) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeDetail()" [disabled]="isConfirming()">Đóng</button>
+          @if (selected().refundStatus === 'PENDING_REFUND') {
+            <button class="btn-success" (click)="confirmRefund()" [disabled]="isConfirming()">
+              @if (isConfirming()) {
+                <span class="spinner"></span> Đang xử lý...
+              } @else {
+                ✅ Đã hoàn cọc
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

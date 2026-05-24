@@ -37,7 +37,7 @@ export class PaymentCallbackComponent implements OnInit {
         const data = res?.data;
         const isSuccess =
           data?.status === 'SUCCESS' ||
-          data?.status === 'PAID' ||
+          data?.status === 'IN_USE' ||
           data?.bookingCode ||
           data?.rentalCode;
 

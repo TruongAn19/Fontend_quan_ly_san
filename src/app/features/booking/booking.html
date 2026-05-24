@@ -6,6 +6,12 @@
     </div>
   }
 
+  @if (notice()) {
+    <div class="info-alert animate-fade-in">
+      <span>{{ notice() }}</span>
+    </div>
+  }
+
   <!-- Hold Slot Timer -->
   @if (isHeld()) {
     <div class="hold-timer-alert animate-pulse">
@@ -95,7 +101,7 @@
 
           <div class="form-group">
             <label for="bookingType">Hình thức đặt</label>
-            <select id="bookingType" formControlName="bookingType">
+            <select id="bookingType" formControlName="bookingType" (change)="onBookingTypeChange()">
               <option value="ONE_TIME">Đặt 1 lần</option>
               <option value="WEEKLY_RECURRING">Đặt định kỳ hàng tuần</option>
             </select>
@@ -103,10 +109,86 @@
 
           @if (bookingForm.get('bookingType')?.value === 'WEEKLY_RECURRING') {
             <div class="form-group animate-fade-in">
-              <label for="recurringEndDate">Ngày kết thúc định kỳ</label>
-              <input type="date" id="recurringEndDate" formControlName="recurringEndDate" />
+              <label>Chọn thứ trong tuần</label>
+              <div class="weekdays-grid">
+                <label *ngFor="let day of weekDays" class="weekday-checkbox-label">
+                  <input type="checkbox" [checked]="selectedWeekdays().includes(day.value)" (change)="toggleWeekday(day.value)" />
+                  {{ day.label }}
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group animate-fade-in mt-3">
+              <label for="durationMonths">Thời gian đặt</label>
+              <select id="durationMonths" formControlName="durationMonths">
+                <option [value]="1">1 Tháng (Giảm 5%)</option>
+                <option [value]="2">2 Tháng (Giảm 8%)</option>
+                <option [value]="3">3 Tháng (Giảm 10%)</option>
+              </select>
             </div>
           }
+
+          <!-- Bundled racket rental — chỉ cho ONE_TIME -->
+          @if (isOneTime()) {
+            <div class="form-group racket-section animate-fade-in">
+              <label class="rent-rackets-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="rentRackets()"
+                  (change)="toggleRentRackets($any($event.target).checked)"
+                />
+                <span>🏸 Thuê vợt của sân này (tùy chọn)</span>
+              </label>
+
+              @if (rentRackets()) {
+                <div class="rackets-picker animate-fade-in">
+                  @if (isLoadingRackets()) {
+                    <div class="loading-rackets"><span class="spinner"></span> Đang tải danh sách vợt...</div>
+                  } @else if (rackets().length === 0) {
+                    <p class="empty-rackets">Sân này chưa có vợt cho thuê.</p>
+                  } @else {
+                    <div class="racket-list">
+                      @for (racket of rackets(); track racket.id) {
+                        <div class="racket-item">
+                          <div class="racket-info">
+                            <strong>{{ racket.name }}</strong>
+                            <span class="racket-meta">
+                              {{ racket.rentalPricePerPlay | number }} VNĐ / buổi · Còn {{ racket.bookingStockQuantity }} chiếc
+                            </span>
+                          </div>
+                          <div class="racket-qty-controls">
+                            <button type="button" class="qty-btn" (click)="decrementRacket(racket)"
+                                    [disabled]="qtyFor(racket.id) === 0">−</button>
+                            <span class="qty-value">{{ qtyFor(racket.id) }}</span>
+                            <button type="button" class="qty-btn" (click)="incrementRacket(racket)"
+                                    [disabled]="qtyFor(racket.id) >= racket.bookingStockQuantity">+</button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Deposit summary -->
+          <div class="deposit-summary">
+            <div class="deposit-row">
+              <span>Cọc sân:</span>
+              <span>{{ courtDepositTotal() | number }} VNĐ</span>
+            </div>
+            @if (rentRackets() && rentalTotal() > 0) {
+              <div class="deposit-row">
+                <span>Cọc vợt:</span>
+                <span>{{ rentalTotal() | number }} VNĐ</span>
+              </div>
+            }
+            <div class="deposit-row total">
+              <span>Tổng đặt cọc:</span>
+              <strong>{{ totalDeposit() | number }} VNĐ</strong>
+            </div>
+          </div>
 
           <button type="submit" class="btn-place-booking" [disabled]="isPlacing() || !isHeld()">
             @if (isPlacing()) {

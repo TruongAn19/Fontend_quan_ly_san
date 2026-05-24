@@ -43,7 +43,7 @@ export class AdminUsersComponent implements OnInit {
 
   openRoleModal(user: any): void {
     this.selectedUser.set(user);
-    this.roleForm.patchValue({ role: user.role });
+    this.roleForm.patchValue({ role: user.roleName });
   }
 
   closeRoleModal(): void {

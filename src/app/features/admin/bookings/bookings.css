@@ -98,10 +98,21 @@
   display: inline-block;
 }
 
-.status-badge[data-status="Đã thanh toán"],
-.status-badge[data-status="Đã đặt"] {
+.status-badge[data-status="Đã thanh toán"] {
   background: rgba(16, 185, 129, 0.2);
   color: #6ee7b7;
+}
+
+.status-badge[data-status="Đặt cọc"] {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+}
+
+.locked-hint {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-style: italic;
+  white-space: nowrap;
 }
 
 .status-badge[data-status="Đang giữ chỗ"] {
@@ -112,6 +123,11 @@
 .status-badge[data-status="Đã hủy"] {
   background: rgba(239, 68, 68, 0.2);
   color: #fca5a5;
+}
+
+.status-badge[data-status="Chờ thanh toán"] {
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
 }
 
 .action-dropdown select {

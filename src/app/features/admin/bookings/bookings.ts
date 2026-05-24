@@ -25,7 +25,7 @@ export class AdminBookingsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Đang giữ chỗ', 'Đã đặt', 'Đã thanh toán', 'Đã hủy', 'Đang sử dụng', 'Đã kết thúc'];
+  statusList = ['Đang giữ chỗ', 'Đặt cọc', 'Đã thanh toán', 'Đã hủy', 'Đang sử dụng', 'Đã kết thúc'];
 
   ngOnInit(): void {
     this.loadBookings();
@@ -71,5 +71,21 @@ export class AdminBookingsComponent implements OnInit {
       this.currentPage.set(page);
       this.loadBookings();
     }
+  }
+
+  statusLabel(status: string | null | undefined): string {
+    if (!status) return '';
+    const map: Record<string, string> = {
+      CHO_THANH_TOAN: 'Chờ thanh toán',
+      DA_DAT: 'Đặt cọc',
+      DA_THANH_TOAN: 'Đã thanh toán',
+      DA_HUY: 'Đã hủy',
+    };
+    return map[status] ?? status;
+  }
+
+  /** Booking đã ở trạng thái "đóng" (đã thanh toán hoặc đã hủy) — không cho phép đổi nữa. */
+  isStatusLocked(status: string | null | undefined): boolean {
+    return status === 'DA_THANH_TOAN' || status === 'DA_HUY';
   }
 }
