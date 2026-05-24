@@ -1,7 +1,8 @@
-import { Component, signal, inject, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, signal, inject, ViewChild, ElementRef, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AIService } from '../../../core/services/ai.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,6 +19,7 @@ interface Message {
 })
 export class ChatbotComponent {
   private aiService = inject(AIService);
+  private authService = inject(AuthService);
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -25,17 +27,25 @@ export class ChatbotComponent {
   isProcessing = signal(false);
   userInput = '';
   chatId = 'session-' + Math.random().toString(36).substr(2, 9);
-  
+
   messages = signal<Message[]>([
     { role: 'assistant', content: 'Chào mừng bạn đến với hệ thống đặt sân cầu lông! Tôi là trợ lý AI Antigravity, tôi có thể giúp gì cho bạn?' }
   ]);
 
-  suggestions = signal<string[]>([
-    'Kiểm tra sân trống chiều nay',
-    'Địa chỉ sân ở đâu?',
-    'Cách cầm vợt đúng',
-    'Báo cáo doanh thu tuần này'
-  ]);
+  private isAdmin = computed(() => {
+    const role = this.authService.role();
+    return role === 'ADMIN' || role === 'ROLE_ADMIN';
+  });
+
+  /** Gợi ý dành riêng cho admin (vd báo cáo doanh thu) — ẩn cho user thường. */
+  suggestions = computed<string[]>(() => {
+    const base = [
+      'Kiểm tra sân trống chiều nay',
+      'Địa chỉ sân ở đâu?',
+      'Cách cầm vợt đúng'
+    ];
+    return this.isAdmin() ? [...base, 'Báo cáo doanh thu tuần này'] : base;
+  });
 
   constructor() {
     effect(() => {

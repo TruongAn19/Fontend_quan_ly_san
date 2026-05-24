@@ -37,8 +37,8 @@
   position: absolute;
   bottom: 85px;
   right: 0;
-  width: 400px;
-  height: 600px;
+  width: 360px;
+  height: 520px;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
