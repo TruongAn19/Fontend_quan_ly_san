@@ -9,7 +9,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        localStorage.removeItem('accessToken');
+        // FIX-S1: server side cookie is the source of truth; we just clear
+        // the identity bits we kept locally for UI gating.
+        localStorage.removeItem('email');
+        localStorage.removeItem('role');
         router.navigate(['/login']);
       } else if (error.status === 403) {
         router.navigate(['/access-denied']);
@@ -17,7 +20,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         // Validation errors logic
         console.error('Validation Errors:', error.error.data);
       }
-      
+
       return throwError(() => error);
     })
   );

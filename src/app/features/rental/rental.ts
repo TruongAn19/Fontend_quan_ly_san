@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RentalService } from '../../core/services/rental.service';
+import {
+  CreateRentalRequest,
+  RentalPaymentMethod,
+  RentalType,
+} from '../../core/models/rental.model';
 
 @Component({
   selector: 'app-rental',
@@ -41,12 +46,12 @@ export class RentalComponent implements OnInit {
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^(0[3|5|7|8|9])+([0-9]{8})\b$/)]],
-      type: ['DAILY', [Validators.required]],
+      type: ['DAILY' as RentalType, [Validators.required]],
       quantity: [1, [Validators.required, Validators.min(1)]],
       quantityDay: [1],
       rentalDate: [new Date().toISOString().split('T')[0]],
       bookingCode: [''],
-      paymentMethod: ['VNPAY', [Validators.required]]
+      paymentMethod: ['VNPAY' as RentalPaymentMethod, [Validators.required]]
     });
 
     this.rentalForm.get('type')?.valueChanges.subscribe(type => {
@@ -71,16 +76,22 @@ export class RentalComponent implements OnInit {
       return;
     }
 
+    const equipmentId = this.equipmentId();
+    if (equipmentId == null) {
+      this.errorMessage.set('Thiếu mã thiết bị.');
+      return;
+    }
+
     this.isCreating.set(true);
     this.errorMessage.set(null);
 
     const formValue = this.rentalForm.value;
-    const payload: any = {
+    const payload: CreateRentalRequest = {
       fullName: formValue.fullName,
       email: formValue.email,
       phone: formValue.phone,
       type: formValue.type,
-      equipmentId: this.equipmentId(),
+      equipmentId,
       quantity: formValue.quantity
     };
 
@@ -107,12 +118,13 @@ export class RentalComponent implements OnInit {
   }
 
   proceedToPay(): void {
-    if (!this.createdRentalId()) return;
+    const rentalId = this.createdRentalId();
+    if (!rentalId) return;
 
     this.isPaying.set(true);
-    const paymentMethod = this.rentalForm.get('paymentMethod')?.value;
+    const paymentMethod = this.rentalForm.get('paymentMethod')?.value as RentalPaymentMethod;
 
-    this.rentalService.payRental(this.createdRentalId()!, { paymentMethod }).subscribe({
+    this.rentalService.payRental(rentalId, { paymentMethod }).subscribe({
       next: (res) => {
         this.isPaying.set(false);
         if (res && res.data && res.data.paymentUrl) {

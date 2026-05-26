@@ -1,17 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { MatchPosts } from './match-posts';
+import { MatchPostsComponent } from './match-posts';
 
-describe('MatchPosts', () => {
-  let component: MatchPosts;
-  let fixture: ComponentFixture<MatchPosts>;
+describe('MatchPostsComponent', () => {
+  let component: MatchPostsComponent;
+  let fixture: ComponentFixture<MatchPostsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MatchPosts],
+      imports: [MatchPostsComponent],
+    providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MatchPosts);
+    fixture = TestBed.createComponent(MatchPostsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

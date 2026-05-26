@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookingService } from '../../core/services/booking.service';
+import { BookingHistoryItem } from '../../core/models/booking.model';
 
 @Component({
   selector: 'app-booking-history',
@@ -12,7 +13,7 @@ import { BookingService } from '../../core/services/booking.service';
 export class BookingHistoryComponent implements OnInit {
   private bookingService = inject(BookingService);
 
-  bookings = signal<any[]>([]);
+  bookings = signal<BookingHistoryItem[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -67,7 +68,7 @@ export class BookingHistoryComponent implements OnInit {
     }
   }
 
-  getStatusLabel(status: string): string {
+  getStatusLabel(status?: string | null): string {
     if (!status) return 'Không xác định';
     const s = status.toUpperCase();
     switch (s) {
@@ -95,7 +96,7 @@ export class BookingHistoryComponent implements OnInit {
     }
   }
 
-  isCancellable(status: string): boolean {
+  isCancellable(status?: string | null): boolean {
     if (!status) return false;
     const s = status.toUpperCase();
     return s === 'DA_DAT' || s === 'ĐÃ ĐẶT' || s === 'DEPOSITED' || s === 'ĐÃ CỌC' ||

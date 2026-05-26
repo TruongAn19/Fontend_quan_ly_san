@@ -1,17 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { PaymentCallback } from './payment-callback';
+import { PaymentCallbackComponent } from './payment-callback';
 
-describe('PaymentCallback', () => {
-  let component: PaymentCallback;
-  let fixture: ComponentFixture<PaymentCallback>;
+describe('PaymentCallbackComponent', () => {
+  let component: PaymentCallbackComponent;
+  let fixture: ComponentFixture<PaymentCallbackComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PaymentCallback],
+      imports: [PaymentCallbackComponent],
+    providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PaymentCallback);
+    fixture = TestBed.createComponent(PaymentCallbackComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

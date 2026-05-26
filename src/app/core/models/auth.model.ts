@@ -1,6 +1,10 @@
 export interface JwtAuthResponse {
-  accessToken: string;
-  tokenType: string;
+  /**
+   * @deprecated Token is now delivered via an httpOnly cookie set by the BE.
+   * Field kept for backward compatibility; will be `null` from the server.
+   */
+  accessToken?: string | null;
+  tokenType?: string;
   email: string;
   role: string;
 }

@@ -1,9 +1,9 @@
 export class FormDataHelper {
   /**
    * Tạo FormData chuẩn cho Multipart Requests chứa cả JSON và File
-   * @param jsonKey Tên trường JSON (ví dụ: 'user', 'product', 'racket')
+   * @param jsonKey Tên trường JSON (ví dụ: 'user', 'product', 'equipment')
    * @param jsonData Đối tượng dữ liệu JSON
-   * @param fileKey Tên trường File (ví dụ: 'avatarFile', 'productImg', 'racketImg')
+   * @param fileKey Tên trường File (ví dụ: 'avatarFile', 'productImg', 'equipmentImg')
    * @param file File cần upload
    */
   static createMultipartData(

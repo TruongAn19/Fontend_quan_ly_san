@@ -7,6 +7,15 @@ import { BookingService } from '../../core/services/booking.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { SlotEventsService, SlotHeldEvent } from '../../core/services/slot-events.service';
 import { AuthService } from '../../core/services/auth.service';
+import {
+  AvailableTimeDTO,
+  BookingInfoResponse,
+  EstimatePriceRequest,
+  EstimatePriceResponse,
+  PlaceBookingRequest,
+} from '../../core/models/booking.model';
+
+type TimerHandle = ReturnType<typeof setInterval>;
 
 @Component({
   selector: 'app-booking',
@@ -25,8 +34,8 @@ export class BookingComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
 
   productId = signal<number | null>(null);
-  productDetail = signal<any>(null);
-  availableTimes = signal<any[]>([]);
+  productDetail = signal<BookingInfoResponse | null>(null);
+  availableTimes = signal<AvailableTimeDTO[]>([]);
 
   bookingForm!: FormGroup;
 
@@ -36,7 +45,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   errorMessage = signal<string | null>(null);
 
   holdTimeLeft = signal<number>(0);
-  holdTimer: any;
+  holdTimer: TimerHandle | null = null;
   isHeld = signal<boolean>(false);
 
   selectedDate = signal<string>('');
@@ -45,14 +54,14 @@ export class BookingComponent implements OnInit, OnDestroy {
   // Popup xác nhận
   showConfirmPopup = signal<boolean>(false);
   isEstimating = signal<boolean>(false);
-  priceEstimate = signal<any>(null);
-  pendingPayload: any = null;
+  priceEstimate = signal<EstimatePriceResponse | null>(null);
+  pendingPayload: PlaceBookingRequest | null = null;
 
   // Realtime slot conflict
   conflictToast = signal<{ timeName: string; visible: boolean } | null>(null);
   blockedTimeIds = signal<Set<number>>(new Set());
   private slotEventsSub?: Subscription;
-  private conflictToastTimer: any;
+  private conflictToastTimer: TimerHandle | null = null;
 
   today = new Date();
 
@@ -82,7 +91,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   getSelectedTimeName(): string {
     const id = this.bookingForm?.get('availableTimeId')?.value;
     if (!id) return 'Chưa chọn';
-    const t = this.availableTimes().find((x: any) => x.id === +id);
+    const t = this.availableTimes().find((x) => x.id === +id);
     return t ? t.time : 'Chưa chọn';
   }
 
@@ -128,7 +137,7 @@ export class BookingComponent implements OnInit, OnDestroy {
       const selectedTimeId = +this.bookingForm?.get('availableTimeId')?.value;
       const isMySelectedSlot = evt.availableTimeId === selectedTimeId;
 
-      const heldTime = this.availableTimes().find((t: any) => t.id === evt.availableTimeId);
+      const heldTime = this.availableTimes().find((t) => t.id === evt.availableTimeId);
       const heldTimeName = heldTime?.time || 'khung giờ này';
 
       this.blockedTimeIds.update(set => {
@@ -212,7 +221,7 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.bookingService.getBookingInfo(this.productId()!).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const data = res?.data || res;
+        const data = (res?.data ?? res) as BookingInfoResponse;
         this.productDetail.set(data);
         if (data && data.courts && data.courts.length > 0) {
           this.selectedPitchId.set(data.courts[0].id);
@@ -236,7 +245,7 @@ export class BookingComponent implements OnInit, OnDestroy {
           this.availableTimes.set(res.data);
           if (res.data.length > 0) {
             const currentId = this.bookingForm.get('availableTimeId')?.value;
-            const exists = res.data.some((t: any) => t.id === +currentId);
+            const exists = res.data.some((t) => t.id === +currentId);
             if (!exists) {
               const next = opts.autoSelectFirst ? res.data[0].id : '';
               this.bookingForm.patchValue({ availableTimeId: next });
@@ -250,15 +259,17 @@ export class BookingComponent implements OnInit, OnDestroy {
     });
   }
 
-  onDateChange(event: any): void {
-    this.selectedDate.set(event.target.value);
+  onDateChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.selectedDate.set(target.value);
     this.blockedTimeIds.set(new Set());
     this.loadAvailableTimes();
     this.reconnectSlotEvents();
   }
 
-  onPitchChange(event: any): void {
-    this.selectedPitchId.set(+event.target.value);
+  onPitchChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedPitchId.set(+target.value);
     this.blockedTimeIds.set(new Set());
     this.loadAvailableTimes();
     this.reconnectSlotEvents();
@@ -289,7 +300,7 @@ export class BookingComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.isHolding.set(false);
         this.isHeld.set(true);
-        const remaining = (res?.data as any)?.remainingTime || 180;
+        const remaining = res?.data?.remainingTime ?? 180;
         this.startHoldTimer(remaining);
       },
       error: (err) => {
@@ -322,6 +333,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   clearHoldTimer(): void {
     if (this.holdTimer) {
       clearInterval(this.holdTimer);
+      this.holdTimer = null;
     }
   }
 
@@ -340,27 +352,41 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.errorMessage.set(null);
     this.isEstimating.set(true);
 
-    const payload = {
-      ...this.bookingForm.value,
-      productId: this.productId(),
-      courtId: this.selectedPitchId(),
+    const productId = this.productId();
+    const courtId = this.selectedPitchId();
+    if (productId == null || courtId == null) {
+      this.isEstimating.set(false);
+      this.showError('Thiếu thông tin sân.');
+      return;
+    }
+
+    const formValue = this.bookingForm.value;
+    const payload: PlaceBookingRequest = {
+      receiverName: formValue.receiverName,
+      receiverAddress: formValue.receiverAddress,
+      receiverPhone: formValue.receiverPhone,
+      productId,
+      courtId,
       bookingDate: this.selectedDate(),
       availableTimeId: +this.bookingForm.get('availableTimeId')?.value,
+      bookingType: formValue.bookingType,
+      recurringEndDate: formValue.recurringEndDate,
       daysOfWeek: this.selectedDays,
-      durationMonths: this.bookingForm.get('durationMonths')?.value
+      durationMonths: formValue.durationMonths
     };
 
     this.pendingPayload = payload;
 
-    this.bookingService.estimatePrice({
+    const estimateReq: EstimatePriceRequest = {
       productId: payload.productId,
       availableTimeId: payload.availableTimeId,
       bookingDate: payload.bookingDate,
       bookingType: payload.bookingType,
       recurringEndDate: payload.recurringEndDate,
       daysOfWeek: payload.daysOfWeek,
-      durationMonths: payload.durationMonths
-    }).subscribe({
+      durationMonths: payload.durationMonths,
+    };
+    this.bookingService.estimatePrice(estimateReq).subscribe({
       next: (res) => {
         this.isEstimating.set(false);
         this.priceEstimate.set(res.data);
@@ -384,6 +410,11 @@ export class BookingComponent implements OnInit, OnDestroy {
   confirmBooking(): void {
     this.showConfirmPopup.set(false);
     this.isPlacing.set(true);
+
+    if (!this.pendingPayload) {
+      this.isPlacing.set(false);
+      return;
+    }
 
     this.bookingService.placeBooking(this.pendingPayload).subscribe({
       next: (res) => {

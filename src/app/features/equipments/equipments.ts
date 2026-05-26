@@ -48,7 +48,7 @@ export class EquipmentsComponent implements OnInit {
 
         const mappedData = rawData.map((item: any) => ({
           ...item,
-          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/equipment/${item.image}`) : 'assets/img/default-racket.png',
+          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/equipment/${item.image}`) : 'assets/img/default-equipment.png',
           rentalPrice: item.rentalPricePerDay || item.rentalPricePerPlay || item.price
         }));
 

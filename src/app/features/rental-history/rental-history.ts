@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RentalService } from '../../core/services/rental.service';
+import { RentalHistoryItem } from '../../core/models/rental.model';
 
 @Component({
   selector: 'app-rental-history',
@@ -12,7 +13,7 @@ import { RentalService } from '../../core/services/rental.service';
 export class RentalHistoryComponent implements OnInit {
   private rentalService = inject(RentalService);
 
-  rentals = signal<any[]>([]);
+  rentals = signal<RentalHistoryItem[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -68,7 +69,7 @@ export class RentalHistoryComponent implements OnInit {
     }
   }
 
-  getStatusLabel(status: string): string {
+  getStatusLabel(status?: string | null): string {
     if (!status) return 'Không xác định';
     const s = status.toUpperCase();
     switch (s) {
@@ -91,7 +92,7 @@ export class RentalHistoryComponent implements OnInit {
     }
   }
 
-  getTypeLabel(type: string): string {
+  getTypeLabel(type?: string | null): string {
     if (!type) return 'Không xác định';
     const t = type.toUpperCase();
     switch (t) {

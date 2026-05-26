@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 import { RentalService } from '../../core/services/rental.service';
 
 @Component({
@@ -30,7 +30,7 @@ export class PaymentCallbackComponent implements OnInit {
     });
   }
 
-  verifyPayment(params: any): void {
+  verifyPayment(params: Params): void {
     this.rentalService.vnpayCallback(params).subscribe({
       next: (res) => {
         this.isLoading.set(false);
