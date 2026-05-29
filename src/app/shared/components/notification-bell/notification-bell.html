@@ -10,7 +10,7 @@
     <!-- Click backdrop để đóng -->
     <div class="bell-backdrop" (click)="close()"></div>
 
-    <div class="bell-dropdown" (click)="$event.stopPropagation()">
+    <div class="bell-dropdown" [class.admin-layout]="forAdmin" (click)="$event.stopPropagation()">
       <div class="dropdown-header">
         <strong>Thông báo</strong>
         @if (unreadCount() > 0) {

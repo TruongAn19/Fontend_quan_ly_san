@@ -65,6 +65,13 @@
   animation: bell-pop 0.15s ease;
 }
 
+.bell-dropdown.admin-layout {
+  bottom: calc(100% + 8px);
+  top: auto;
+  left: 0;
+  right: auto;
+}
+
 @keyframes bell-pop {
   from {
     opacity: 0;
