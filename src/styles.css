@@ -46,3 +46,74 @@ html, body {
   cursor: not-allowed;
   filter: grayscale(1);
 }
+
+/* ==========================================
+   GLOBAL OVERRIDES FOR ADMIN NOTIFICATION BELL
+   ========================================== */
+.admin-sidebar .bell-trigger {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 16px !important;
+  transition: all 0.2s ease !important;
+}
+
+.admin-sidebar .bell-trigger:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.admin-sidebar .bell-dropdown {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  left: 0 !important;
+  right: auto !important;
+  width: 320px !important;
+  background: #1F2937 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+  color: #F9FAFB !important;
+}
+
+.admin-sidebar .dropdown-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #F9FAFB !important;
+}
+
+.admin-sidebar .link-btn {
+  color: #34D399 !important;
+  font-weight: 600 !important;
+}
+
+.admin-sidebar .notif-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #E5E7EB !important;
+  background: transparent !important;
+  transition: background 0.2s !important;
+}
+
+.admin-sidebar .notif-item:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.admin-sidebar .notif-item.unread {
+  background: rgba(16, 185, 129, 0.08) !important;
+}
+
+.admin-sidebar .notif-title {
+  color: #F9FAFB !important;
+}
+
+.admin-sidebar .notif-message {
+  color: #9CA3AF !important;
+}
+
+.admin-sidebar .notif-time {
+  color: #6B7280 !important;
+}
+
+.admin-sidebar .empty {
+  color: #6B7280 !important;
+}

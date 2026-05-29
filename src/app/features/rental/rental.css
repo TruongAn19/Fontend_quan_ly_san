@@ -142,3 +142,66 @@ select option {
 .deposit-notice i {
   font-size: 1.2rem;
 }
+
+/* Equipment header — rendered above the form when /rentals/:id loads */
+.equipment-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 28px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 16px;
+}
+.equipment-header-img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+.equipment-header-img.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+.equipment-header-info {
+  flex: 1;
+  min-width: 0;
+}
+.equipment-header-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #f8fafc;
+}
+.equipment-header-price {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  margin: 0 0 4px;
+}
+.equipment-header-price strong {
+  color: #fbbf24;
+  font-weight: 700;
+}
+.equipment-header-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+.equipment-header-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  margin-bottom: 28px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}

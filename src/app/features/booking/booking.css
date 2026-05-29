@@ -460,6 +460,24 @@
   to { opacity: 1; }
 }
 
+.popup-warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(146, 64, 14, 0.2);
+}
+.popup-warning-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
 .popup-header {
   padding: 28px 28px 20px;
   text-align: center;

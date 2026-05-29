@@ -27,7 +27,7 @@ export class AdminRentalsComponent implements OnInit {
   statusList = [
     { value: 'PENDING', label: 'Chờ thanh toán' },
     { value: 'PAID', label: 'Đã thanh toán' },
-    { value: 'RETURNED', label: 'Đã trả' },
+    { value: 'COMPLETED', label: 'Đã trả' },
     { value: 'CANCELLED', label: 'Đã hủy' }
   ];
 

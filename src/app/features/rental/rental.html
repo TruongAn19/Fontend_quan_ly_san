@@ -8,7 +8,36 @@
 
   <div class="glass-card form-card">
     <h1 class="section-title">Thuê dụng cụ</h1>
-    
+
+    @if (equipmentDetail(); as eq) {
+      <div class="equipment-header">
+        @if (eq.imageUrl) {
+          <img class="equipment-header-img" [src]="eq.imageUrl" [alt]="eq.name" />
+        } @else {
+          <div class="equipment-header-img placeholder">🎾</div>
+        }
+        <div class="equipment-header-info">
+          <h2 class="equipment-header-name">{{ eq.name }}</h2>
+          @if (eq.rentalPricePerDay) {
+            <p class="equipment-header-price">
+              Giá thuê: <strong>{{ eq.rentalPricePerDay | number:'1.0-0' }}đ</strong> / ngày
+            </p>
+          } @else {
+            <p class="equipment-header-price">
+              Giá tham chiếu: <strong>{{ eq.price | number:'1.0-0' }}đ</strong>
+            </p>
+          }
+          @if (eq.description) {
+            <p class="equipment-header-desc">{{ eq.description }}</p>
+          }
+        </div>
+      </div>
+    } @else if (isLoading()) {
+      <div class="equipment-header-loading">
+        <span class="spinner"></span> Đang tải thông tin thiết bị...
+      </div>
+    }
+
     <form [formGroup]="rentalForm" (ngSubmit)="onSubmitRental()" class="premium-form">
       
       <div class="form-group">

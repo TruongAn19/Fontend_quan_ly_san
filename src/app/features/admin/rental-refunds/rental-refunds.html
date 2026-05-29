@@ -1,0 +1,93 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Hoàn cọc thuê thiết bị</h1>
+    <p class="subtitle">Xem các đơn thuê đã huỷ và xác nhận hoàn cọc cho khách hàng.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="tab() === 'PENDING_REFUND'" (click)="setTab('PENDING_REFUND')">Chờ hoàn cọc</button>
+    <button class="tab" [class.active]="tab() === 'REFUNDED'"       (click)="setTab('REFUNDED')">Đã hoàn cọc</button>
+    <button class="tab" [class.active]="tab() === 'ALL'"             (click)="setTab('ALL')">Tất cả</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Đang tải...</div>
+  } @else if (rentals().length === 0) {
+    <div class="empty">Không có dữ liệu.</div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Mã đơn</th>
+          <th>Thiết bị</th>
+          <th>Khách</th>
+          <th>Huỷ lúc</th>
+          <th>Số tiền hoàn</th>
+          <th>Trạng thái</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rentals(); track r.id) {
+          <tr>
+            <td class="mono">{{ r.rentalToolCode || '#' + r.id }}</td>
+            <td>
+              <div>{{ r.equipmentName || 'Thiết bị' }}</div>
+              <div class="muted">SL: {{ r.quantity }}</div>
+            </td>
+            <td>
+              <div>{{ r.fullName }}</div>
+              <div class="muted">{{ r.phone }}</div>
+            </td>
+            <td>{{ r.cancelledAt | date:'short' }}</td>
+            <td>{{ (r.depositAmount || 0) | number }}đ</td>
+            <td><span [class]="badgeClass(r.refundStatus)">{{ refundStatusLabel($any(r.refundStatus)) }}</span></td>
+            <td>
+              <button class="btn-primary" (click)="openDetail(r)">Chi tiết</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="pager">
+      <button class="page-btn" [disabled]="currentPage() === 0" (click)="changePage(currentPage() - 1)">‹</button>
+      <span class="page-info">Trang {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() + 1 >= totalPages()" (click)="changePage(currentPage() + 1)">›</button>
+    </div>
+  }
+
+  @if (modalRental(); as r) {
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Chi tiết hoàn cọc — {{ r.rentalToolCode || '#' + r.id }}</h3>
+          <button class="btn-close" (click)="closeDetail()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-row"><span class="label">Khách</span><span>{{ r.fullName }}</span></div>
+          <div class="info-row"><span class="label">SĐT</span><span>{{ r.phone }}</span></div>
+          <div class="info-row"><span class="label">Email</span><span>{{ r.email }}</span></div>
+          <div class="info-row"><span class="label">Thiết bị</span><span>{{ r.equipmentName }} × {{ r.quantity }}</span></div>
+          <div class="info-row"><span class="label">Ngày thuê</span><span>{{ r.rentalDate }}</span></div>
+          <div class="info-row"><span class="label">Tổng tiền đơn</span><span>{{ (r.rentalPrice || 0) | number }}đ</span></div>
+          <div class="info-row"><span class="label">Huỷ lúc</span><span>{{ r.cancelledAt | date:'short' }}</span></div>
+          <div class="info-row big"><span class="label">Số tiền cần hoàn</span><span class="amount">{{ (r.depositAmount || 0) | number }}đ</span></div>
+          <div class="info-row"><span class="label">Trạng thái</span><span [class]="badgeClass(r.refundStatus)">{{ refundStatusLabel($any(r.refundStatus)) }}</span></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeDetail()">Đóng</button>
+          @if (r.refundStatus === 'PENDING_REFUND') {
+            <button class="btn-success" (click)="confirmRefund()" [disabled]="isSubmitting()">
+              {{ isSubmitting() ? 'Đang xử lý...' : '✅ Đã hoàn cọc' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

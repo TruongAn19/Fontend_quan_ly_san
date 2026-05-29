@@ -34,18 +34,24 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of products()">
+          <ng-container *ngFor="let item of products()">
+          <tr>
             <td class="booking-code">#{{ item.id }}</td>
             <td>
               <div class="product-info-cell">
-                <span class="product-name">{{ item.name }}</span>
+                <span class="product-name">
+                  {{ item.name }}
+                  <span class="pitch-type-badge" [class.seven]="item.pitchType === 'SEVEN_ASIDE'">
+                    {{ pitchTypeLabel(item.pitchType) }}
+                  </span>
+                </span>
                 <small class="product-sale" *ngIf="item.sale > 0">Giảm giá {{ item.sale }}%</small>
               </div>
             </td>
             <td>
               <div class="price-cell">
                 <span class="main-price">{{ item.price | number }}đ</span>
-                <small class="sub-price" *ngIf="item.depositPrice">Cọc: {{ item.depositPrice | number }}đ</small>
+                <small class="sub-price" *ngIf="item.depositPrice">Cọc 50%: {{ item.depositPrice | number }}đ</small>
               </div>
             </td>
             <td>
@@ -56,11 +62,54 @@
             </td>
             <td class="text-right">
               <div class="action-buttons">
+                <button class="btn-icon-action" (click)="toggleSubPitches(item.id)" title="Quản lý sân con">
+                  {{ expandedProductId() === item.id ? '▾' : '▸' }}
+                </button>
                 <button class="btn-icon-action edit" (click)="openEditModal(item)" title="Chỉnh sửa">✏️</button>
                 <button class="btn-icon-action delete" (click)="deleteProduct(item.id)" title="Xóa sân">🗑️</button>
               </div>
             </td>
           </tr>
+          <tr *ngIf="expandedProductId() === item.id">
+            <td colspan="5">
+              <div class="sub-pitch-panel">
+                <div class="sub-pitch-panel-header">
+                  <strong>Danh sách sân con</strong>
+                  <button type="button" class="btn-create-sm" (click)="openCreateSubPitchModal()">+ Thêm sân con</button>
+                </div>
+                <div *ngIf="subPitchLoading()" class="loading-state">Đang tải...</div>
+                <table *ngIf="!subPitchLoading() && subPitches().length > 0" class="sub-pitch-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Tên</th>
+                      <th>Loại sân</th>
+                      <th class="text-right">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let sp of subPitches()">
+                      <td>#{{ sp.id }}</td>
+                      <td>{{ sp.name }}</td>
+                      <td>
+                        <span class="pitch-type-badge" [class.seven]="sp.pitchType === 'SEVEN_ASIDE'">
+                          {{ pitchTypeLabel(sp.pitchType) }}
+                        </span>
+                      </td>
+                      <td class="text-right">
+                        <button class="btn-icon-action edit" (click)="openEditSubPitchModal(sp)" title="Sửa">✏️</button>
+                        <button class="btn-icon-action delete" (click)="deleteSubPitch(sp.id)" title="Xóa">🗑️</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div *ngIf="!subPitchLoading() && subPitches().length === 0" class="empty-hint">
+                  Chưa có sân con nào.
+                </div>
+              </div>
+            </td>
+          </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
@@ -103,8 +152,9 @@
               <input type="number" formControlName="price" />
             </div>
             <div class="form-group">
-              <label>Tiền đặt cọc (VNĐ)</label>
-              <input type="number" formControlName="depositPrice" />
+              <label>Tiền đặt cọc (tự động — 50% giá sau giảm)</label>
+              <input type="text" [value]="(computedDeposit() | number:'1.0-0') + 'đ'" readonly />
+              <small class="hint-text">Đặt cọc 50% — thanh toán 50% còn lại tại sân</small>
             </div>
           </div>
 
@@ -113,6 +163,16 @@
               <label>Số lượng sân</label>
               <input type="number" formControlName="quantity" placeholder="Số sân con" />
             </div>
+            <div class="form-group">
+              <label>Loại sân</label>
+              <select formControlName="pitchType">
+                <option value="FIVE_ASIDE">Sân 5 người</option>
+                <option value="SEVEN_ASIDE">Sân 7 người</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
               <label>Khu vực</label>
               <input type="text" formControlName="address" placeholder="Hà Nội, TP.HCM..." />
@@ -149,6 +209,38 @@
             <button type="button" class="btn-cancel" (click)="closeModal()">Hủy bỏ</button>
             <button type="submit" class="btn-submit" [disabled]="productForm.invalid">
               {{ isEdit() ? 'Cập nhật' : 'Thêm mới' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (showSubPitchModal()) {
+  <div class="modal-overlay animate-fade-in">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ isEditSubPitch() ? 'Sửa sân con' : 'Thêm sân con' }}</h3>
+        <button class="btn-close" (click)="closeSubPitchModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="subPitchForm" (ngSubmit)="submitSubPitch()" class="premium-form">
+          <div class="form-group">
+            <label>Tên sân con</label>
+            <input type="text" formControlName="name" placeholder="Ví dụ: Sân A" />
+          </div>
+          <div class="form-group">
+            <label>Loại sân con</label>
+            <select formControlName="pitchType">
+              <option value="FIVE_ASIDE">Sân 5 người</option>
+              <option value="SEVEN_ASIDE">Sân 7 người</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeSubPitchModal()">Hủy</button>
+            <button type="submit" class="btn-submit" [disabled]="subPitchForm.invalid">
+              {{ isEditSubPitch() ? 'Cập nhật' : 'Thêm mới' }}
             </button>
           </div>
         </form>

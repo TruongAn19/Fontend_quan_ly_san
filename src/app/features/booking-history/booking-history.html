@@ -52,18 +52,17 @@
               <span class="status-badge" [class]="item.status?.toLowerCase()">
                 {{ getStatusLabel(item.status) }}
               </span>
+              @if (getStatusLabel(item.status) === 'Đã hủy' && item.refundStatus && item.refundStatus !== 'NONE') {
+                <span [class]="refundBadgeClass(item.refundStatus)">
+                  {{ item.refundStatus === 'REFUNDED' ? '🟢' : '🟡' }} {{ refundStatusLabel(item.refundStatus) }}
+                </span>
+              }
             </td>
             <td class="total-price" style="text-align: left">{{ item.totalPrice | number }}đ</td>
             <td style="text-align: left">
+              <a [routerLink]="['/booking-detail', item.id]" class="btn-view-small">Xem</a>
               @if (isCancellable(item.status)) {
-              <button class="btn-cancel-small" (click)="onCancelBooking(item.id)">Hủy</button>
-              } @else if (item.status === 'DA_HUY' || item.status === 'CANCELLED' || item.status === 'Đã hủy') {
-              <span class="cancelled-text">Đã hủy</span>
-              } @else if (item.status === 'DA_THANH_TOAN' || item.status === 'PAID' || item.status === 'Đã thanh toán')
-              {
-              <span class="paid-text">Đã thanh toán</span>
-              } @else {
-              <span class="other-text">{{ getStatusLabel(item.status) }}</span>
+                <button type="button" class="btn-cancel-small" (click)="onCancelBooking(item.id)">Hủy</button>
               }
             </td>
           </tr>
@@ -83,5 +82,57 @@
   </div>
   }
 
+  }
+
+  @if (showCancelModal(); as modal) {
+    <div class="modal-overlay" (click)="closeCancelModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Xác nhận huỷ đặt sân</h3>
+        @if (modal.loading && modal.refundAmount === undefined) {
+          <p class="modal-body"><span class="spinner"></span> Đang tải thông tin...</p>
+        } @else {
+          <p class="modal-body">
+            @if (modal.refundAmount !== undefined && modal.refundAmount !== null) {
+              Bạn sẽ được hoàn khoảng <strong>{{ modal.refundAmount | number }}đ</strong>.
+              <br />Xác nhận huỷ?
+            } @else {
+              Bạn có chắc chắn muốn huỷ lịch đặt sân này? Thao tác này không thể hoàn tác.
+            }
+          </p>
+        }
+        @if (cancelError()) {
+          <p class="modal-error">{{ cancelError() }}</p>
+        }
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeCancelModal()" [disabled]="modal.loading">
+            Đóng
+          </button>
+          <button type="button" class="btn-danger" (click)="confirmCancel()" [disabled]="modal.loading">
+            @if (modal.loading) { <span class="spinner"></span> Đang xử lý... } @else { Xác nhận }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (cancelResult(); as result) {
+    <div class="modal-overlay" (click)="dismissCancelResult()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Đã huỷ thành công</h3>
+        <p class="modal-body">
+          @if (result.refundAmount > 0) {
+            Số tiền cọc hoàn dự kiến: <strong>{{ result.refundAmount | number }}đ</strong>.
+            <br />Nếu chưa nhận sau 24h, vui lòng liên hệ
+            <strong>{{ result.contactHotline }}</strong>
+            @if (result.contactEmail) { / {{ result.contactEmail }} }.
+          } @else {
+            Không có khoản cọc nào cần hoàn.
+          }
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" (click)="dismissCancelResult()">Đóng</button>
+        </div>
+      </div>
+    </div>
   }
 </div>

@@ -84,7 +84,7 @@
             <label class="form-label">Sân thi đấu</label>
             <select class="form-input" (change)="onPitchChange($event)">
               @for (pitch of productDetail()!.courts; track pitch.id) {
-                <option [value]="pitch.id">{{ pitch.name }}</option>
+                <option [value]="pitch.id">{{ pitch.name }} — {{ pitchTypeLabel(pitch.pitchType) }}</option>
               }
             </select>
           </div>
@@ -174,13 +174,13 @@
 
       <!-- Ảnh sân -->
       <div class="field-thumb">
-        <img [src]="productDetail()!.product?.image || 'assets/img/default-pitch.png'"
-             [alt]="productDetail()!.product?.name">
+        <img [src]="productDetail()!.product.image || 'assets/img/default-pitch.png'"
+             [alt]="productDetail()!.product.name">
       </div>
 
       <div class="field-info">
-        <h4 class="field-name">{{ productDetail()!.product?.name }}</h4>
-        <p class="field-addr">📍 {{ productDetail()!.product?.address }}</p>
+        <h4 class="field-name">{{ productDetail()!.product.name }}</h4>
+        <p class="field-addr">📍 {{ productDetail()!.product.address }}</p>
       </div>
 
       <div class="divider"></div>
@@ -199,7 +199,7 @@
       <div class="price-block">
         <div class="price-row">
           <span class="price-label">Giá thuê sân</span>
-          <span class="price-val">{{ (productDetail()!.product?.price || 0) | number:'1.0-0' }}đ</span>
+          <span class="price-val">{{ (productDetail()!.product.price || 0) | number:'1.0-0' }}đ</span>
         </div>
         <div class="price-note">
           ⚡ Phụ phí +30% áp dụng cho giờ cao điểm (17h–22h) và cuối tuần. Giá chính xác hiện khi xác nhận.
@@ -250,6 +250,13 @@
   <div class="popup-overlay" (click)="cancelPopup()">
     <div class="popup-card" (click)="$event.stopPropagation()">
 
+      @if (estimateWarning()) {
+        <div class="popup-warning-banner" role="alert">
+          <span class="popup-warning-icon">⚠️</span>
+          <span>{{ estimateWarning() }}</span>
+        </div>
+      }
+
       <div class="popup-header">
         <span class="popup-icon">📋</span>
         <h2 class="popup-title">Xác nhận đặt sân</h2>
@@ -289,14 +296,14 @@
           </div>
 
           <div class="deposit-info">
-            <div class="deposit-header">💳 Bạn chỉ cần thanh toán cọc ngay bây giờ</div>
+            <div class="deposit-header">💳 Đặt cọc 50% — thanh toán 50% còn lại tại sân</div>
             <div class="deposit-row">
-              <span>Tiền cọc (qua VNPay)</span>
+              <span>Tiền cọc 50% (qua VNPay)</span>
               <span class="deposit-amount">{{ priceEstimate()!.depositPrice | number:'1.0-0' }}đ</span>
             </div>
             <div class="deposit-row remaining">
-              <span>Còn lại thanh toán tại sân</span>
-              <span>{{ priceEstimate()!.remainingPrice | number:'1.0-0' }}đ</span>
+              <span>50% còn lại — thanh toán tại sân</span>
+              <span>{{ (priceEstimate()!.totalPrice - priceEstimate()!.depositPrice) | number:'1.0-0' }}đ</span>
             </div>
           </div>
         </div>

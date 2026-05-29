@@ -1,0 +1,99 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Quản lý hoàn cọc</h1>
+    <p class="subtitle">Xem các đơn đã huỷ và xác nhận hoàn cọc cho khách hàng.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="tab() === 'PENDING_REFUND'" (click)="setTab('PENDING_REFUND')">Chờ hoàn cọc</button>
+    <button class="tab" [class.active]="tab() === 'REFUNDED'"       (click)="setTab('REFUNDED')">Đã hoàn cọc</button>
+    <button class="tab" [class.active]="tab() === 'ALL'"             (click)="setTab('ALL')">Tất cả</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Đang tải...</div>
+  } @else if (bookings().length === 0) {
+    <div class="empty">Không có dữ liệu.</div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Mã đơn</th>
+          <th>Khách</th>
+          <th>Sân / Giờ</th>
+          <th>Huỷ lúc</th>
+          <th>Số tiền hoàn</th>
+          <th>Trạng thái</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (b of bookings(); track b.id) {
+          <tr>
+            <td class="mono">{{ b.bookingCode || '#' + b.id }}</td>
+            <td>
+              <div>{{ b.receiverName || b.user?.fullName }}</div>
+              <div class="muted">{{ b.receiverPhone || b.user?.phone }}</div>
+            </td>
+            <td>
+              <div>{{ b.courtName }}</div>
+              <div class="muted">{{ b.bookingDate }} • {{ b.time }}</div>
+            </td>
+            <td>{{ b.cancelledAt | date:'short' }}</td>
+            <td>{{ (b.refundAmount || 0) | number }}đ</td>
+            <td><span [class]="badgeClass(b.refundStatus)">{{ refundStatusLabel(b.refundStatus) }}</span></td>
+            <td>
+              <button class="btn-primary" (click)="openDetail(b)">Chi tiết</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="pager">
+      <button class="page-btn" [disabled]="currentPage() === 0" (click)="changePage(currentPage() - 1)">‹</button>
+      <span class="page-info">Trang {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() + 1 >= totalPages()" (click)="changePage(currentPage() + 1)">›</button>
+    </div>
+  }
+
+  @if (modalBooking(); as b) {
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Chi tiết hoàn cọc — {{ b.bookingCode || '#' + b.id }}</h3>
+          <button class="btn-close" (click)="closeDetail()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-row"><span class="label">Khách</span><span>{{ b.receiverName || b.user?.fullName }}</span></div>
+          <div class="info-row"><span class="label">SĐT</span><span>{{ b.receiverPhone || b.user?.phone }}</span></div>
+          <div class="info-row"><span class="label">Email</span><span>{{ b.user?.email }}</span></div>
+          <div class="info-row"><span class="label">Sân</span><span>{{ b.courtName }} — {{ b.bookingDate }} • {{ b.time }}</span></div>
+          <div class="info-row"><span class="label">Loại</span><span>{{ b.bookingType === 'WEEKLY_RECURRING' ? 'Sân cố định' : 'Đặt một lần' }}</span></div>
+          <div class="info-row"><span class="label">Tổng tiền</span><span>{{ (b.totalPrice || 0) | number }}đ</span></div>
+          <div class="info-row"><span class="label">Tiền cọc</span><span>{{ (b.depositPrice || 0) | number }}đ</span></div>
+          @if (b.usedSessionsAtCancel != null && b.totalSessionsAtCancel != null && b.totalSessionsAtCancel > 0) {
+            <div class="info-row"><span class="label">Buổi đã dùng</span><span>{{ b.usedSessionsAtCancel }} / {{ b.totalSessionsAtCancel }}</span></div>
+          }
+          <div class="info-row big"><span class="label">Số tiền cần hoàn</span><span class="amount">{{ (b.refundAmount || 0) | number }}đ</span></div>
+          <div class="info-row"><span class="label">Trạng thái</span><span [class]="badgeClass(b.refundStatus)">{{ refundStatusLabel(b.refundStatus) }}</span></div>
+          @if (b.cancelReason) {
+            <div class="info-row"><span class="label">Lý do</span><span>{{ b.cancelReason }}</span></div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeDetail()">Đóng</button>
+          @if (b.refundStatus === 'PENDING_REFUND') {
+            <button class="btn-success" (click)="confirmRefund()" [disabled]="isSubmitting()">
+              {{ isSubmitting() ? 'Đang xử lý...' : '✅ Đã hoàn cọc' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

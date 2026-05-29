@@ -5,8 +5,11 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
 import {
   AvailableTimeDTO,
+  BookingHistoryItem,
   BookingHistoryResponse,
   BookingInfoResponse,
+  CancelBookingRequest,
+  CancelBookingResponse,
   EstimatePriceRequest,
   EstimatePriceResponse,
   HoldBookingRequest,
@@ -54,7 +57,16 @@ export class BookingService {
       `${environment.apiBaseUrl}/client/booking-history`, { params });
   }
 
-  cancelBooking(bookingId: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/${bookingId}`);
+  /**
+   * Spec-compliant cancel (CANCEL_BOOKING_FEATURE).
+   * Returns refund summary + contact info on success.
+   */
+  cancelBooking(bookingId: number, body?: CancelBookingRequest): Observable<ApiResponse<CancelBookingResponse>> {
+    return this.http.post<ApiResponse<CancelBookingResponse>>(
+      `${this.API_URL}/${bookingId}/cancel`, body ?? {});
+  }
+
+  getBookingById(bookingId: number): Observable<ApiResponse<BookingHistoryItem>> {
+    return this.http.get<ApiResponse<BookingHistoryItem>>(`${this.API_URL}/detail/${bookingId}`);
   }
 }

@@ -26,9 +26,96 @@ export class AdminProductsComponent implements OnInit {
   productForm!: FormGroup;
   selectedFile: File | null = null;
 
+  // Sub-pitch management panel
+  expandedProductId = signal<number | null>(null);
+  subPitches = signal<any[]>([]);
+  subPitchLoading = signal<boolean>(false);
+  showSubPitchModal = signal<boolean>(false);
+  isEditSubPitch = signal<boolean>(false);
+  selectedSubPitchId = signal<number | null>(null);
+  subPitchForm!: FormGroup;
+
   ngOnInit(): void {
     this.loadProducts();
     this.initForm();
+    this.subPitchForm = this.fb.group({
+      name: ['', [Validators.required]],
+      pitchType: ['FIVE_ASIDE', [Validators.required]]
+    });
+  }
+
+  toggleSubPitches(productId: number): void {
+    if (this.expandedProductId() === productId) {
+      this.expandedProductId.set(null);
+      this.subPitches.set([]);
+      return;
+    }
+    this.expandedProductId.set(productId);
+    this.subPitchLoading.set(true);
+    this.adminService.getSubPitches(productId).subscribe({
+      next: (res) => {
+        this.subPitchLoading.set(false);
+        this.subPitches.set(res.data || []);
+      },
+      error: () => {
+        this.subPitchLoading.set(false);
+        this.subPitches.set([]);
+      }
+    });
+  }
+
+  openCreateSubPitchModal(): void {
+    this.isEditSubPitch.set(false);
+    this.selectedSubPitchId.set(null);
+    this.subPitchForm.reset({ name: '', pitchType: 'FIVE_ASIDE' });
+    this.showSubPitchModal.set(true);
+  }
+
+  openEditSubPitchModal(sp: any): void {
+    this.isEditSubPitch.set(true);
+    this.selectedSubPitchId.set(sp.id);
+    this.subPitchForm.patchValue({ name: sp.name, pitchType: sp.pitchType || 'FIVE_ASIDE' });
+    this.showSubPitchModal.set(true);
+  }
+
+  closeSubPitchModal(): void {
+    this.showSubPitchModal.set(false);
+  }
+
+  submitSubPitch(): void {
+    if (this.subPitchForm.invalid) return;
+    const productId = this.expandedProductId();
+    if (productId == null) return;
+
+    const v = this.subPitchForm.value;
+    const req$ = this.isEditSubPitch()
+      ? this.adminService.updateSubPitch(this.selectedSubPitchId()!, v)
+      : this.adminService.createSubPitch({ productId, name: v.name, pitchType: v.pitchType });
+
+    req$.subscribe({
+      next: () => {
+        this.closeSubPitchModal();
+        this.adminService.getSubPitches(productId).subscribe({
+          next: (res) => this.subPitches.set(res.data || [])
+        });
+      },
+      error: (err) => this.errorMessage.set(err?.error?.message || 'Lưu sân con thất bại.')
+    });
+  }
+
+  deleteSubPitch(id: number): void {
+    if (!confirm('Xóa sân con này?')) return;
+    const productId = this.expandedProductId();
+    this.adminService.deleteSubPitch(id).subscribe({
+      next: () => {
+        if (productId != null) {
+          this.adminService.getSubPitches(productId).subscribe({
+            next: (res) => this.subPitches.set(res.data || [])
+          });
+        }
+      },
+      error: (err) => this.errorMessage.set(err?.error?.message || 'Xóa sân con thất bại.')
+    });
   }
 
   initForm(): void {
@@ -36,15 +123,27 @@ export class AdminProductsComponent implements OnInit {
       name: ['', [Validators.required]],
       detailDesc: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
-      depositPrice: [0, [Validators.required, Validators.min(0)]],
       address: ['', [Validators.required]],
       addressDetail: ['', [Validators.required]],
       shortDesc: ['', [Validators.required]],
       sale: [0, [Validators.min(0), Validators.max(100)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
+      pitchType: ['FIVE_ASIDE', [Validators.required]],
       subPitchNames: [''],
       image: ['']
     });
+  }
+
+  /**
+   * Deposit is auto-computed BE-side as price × (1 − sale/100) × 0.5.
+   * We mirror it here so the admin sees the live preview as they type.
+   */
+  computedDeposit(): number {
+    const v = this.productForm?.value;
+    if (!v) return 0;
+    const price = +(v.price ?? 0);
+    const sale = +(v.sale ?? 0);
+    return price * (1 - sale / 100) * 0.5;
   }
 
   loadProducts(): void {
@@ -75,7 +174,7 @@ export class AdminProductsComponent implements OnInit {
     this.isEdit.set(false);
     this.selectedProductId.set(null);
     this.selectedFile = null;
-    this.productForm.reset({ price: 0, depositPrice: 0, sale: 0, quantity: 1, subPitchNames: '', image: '' });
+    this.productForm.reset({ price: 0, sale: 0, quantity: 1, pitchType: 'FIVE_ASIDE', subPitchNames: '', image: '' });
     this.showModal.set(true);
   }
 
@@ -87,16 +186,20 @@ export class AdminProductsComponent implements OnInit {
       name: product.name,
       detailDesc: product.detailDesc,
       price: product.price,
-      depositPrice: product.depositPrice || 0,
       address: product.address,
       addressDetail: product.addressDetail || '',
       shortDesc: product.shortDesc || '',
       sale: product.sale || 0,
       quantity: product.quantity || 1,
+      pitchType: product.pitchType || 'FIVE_ASIDE',
       subPitchNames: product.subPitchNames || '',
       image: product.image || ''
     });
     this.showModal.set(true);
+  }
+
+  pitchTypeLabel(t: string | undefined | null): string {
+    return t === 'SEVEN_ASIDE' ? 'Sân 7 người' : 'Sân 5 người';
   }
 
   closeModal(): void {

@@ -4,10 +4,13 @@ export interface AvailableTimeDTO {
   available?: boolean;
 }
 
+export type PitchType = 'FIVE_ASIDE' | 'SEVEN_ASIDE';
+
 export interface SubPitchDTO {
   id: number;
   name?: string;
   description?: string;
+  pitchType?: PitchType;
 }
 
 export interface BookingProductInfo {
@@ -42,6 +45,12 @@ export interface HoldBookingResponse {
 }
 
 export type BookingType = 'ONE_TIME' | 'WEEKLY_RECURRING';
+
+/** Display label for a PitchType — used in select options and badges. */
+export function pitchTypeLabel(t: PitchType | undefined | null): string {
+  if (t === 'SEVEN_ASIDE') return 'Sân 7 người';
+  return 'Sân 5 người';
+}
 
 export interface PlaceBookingRequest {
   receiverName: string;
@@ -91,6 +100,8 @@ export interface BookingResponseDTO {
   paymentUrl?: string;
 }
 
+export type RefundStatus = 'NONE' | 'PENDING_REFUND' | 'REFUNDED' | 'NOT_APPLICABLE';
+
 export interface BookingHistoryItem {
   id: number;
   bookingCode?: string;
@@ -107,6 +118,13 @@ export interface BookingHistoryItem {
   pitchName?: string;
   time?: string;
   courtName?: string;
+  // CANCEL_BOOKING_FEATURE
+  refundStatus?: RefundStatus;
+  refundAmount?: number;
+  cancelledAt?: string;
+  usedSessionsAtCancel?: number;
+  totalSessionsAtCancel?: number;
+  cancelReason?: string;
 }
 
 export interface BookingHistoryResponse {
@@ -114,4 +132,30 @@ export interface BookingHistoryResponse {
   currentPage?: number;
   totalPages: number;
   totalElements?: number;
+}
+
+export interface CancelBookingRequest {
+  reason?: string;
+}
+
+export interface CancelBookingResponse {
+  bookingId: number;
+  status: string;
+  refundStatus: RefundStatus;
+  refundAmount: number;
+  usedSessions?: number;
+  totalSessions?: number;
+  cancelledAt: string;
+  contactHotline: string;
+  contactEmail: string;
+}
+
+/** Label for a refund status — used in badges and chips. */
+export function refundStatusLabel(s: RefundStatus | undefined | null): string {
+  switch (s) {
+    case 'PENDING_REFUND': return 'Chờ hoàn cọc';
+    case 'REFUNDED':       return 'Đã hoàn cọc';
+    case 'NOT_APPLICABLE': return 'Không hoàn cọc';
+    default:               return 'Không áp dụng';
+  }
 }

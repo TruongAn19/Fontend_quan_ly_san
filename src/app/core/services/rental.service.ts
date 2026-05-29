@@ -47,4 +47,8 @@ export class RentalService {
     const params = new HttpParams().set('page', page.toString()).set('size', '5');
     return this.http.get<ApiResponse<RentalHistoryResponse>>(`${this.API_URL}/client/rental-history`, { params });
   }
+
+  cancelRental(rentalId: number): Observable<ApiResponse<{ rentalToolId: number }>> {
+    return this.http.patch<ApiResponse<{ rentalToolId: number }>>(`${this.API_URL}/rentals/${rentalId}/cancel`, {});
+  }
 }

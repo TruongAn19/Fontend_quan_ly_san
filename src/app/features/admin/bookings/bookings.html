@@ -55,7 +55,7 @@
               </td>
               <td class="text-right">
                 <div class="action-dropdown">
-                  <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
+                  <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)" [disabled]="isStatusChangeDisabled(item.status)">
                     <option value="">-- Đổi trạng thái --</option>
                     <option *ngFor="let st of statusList" [value]="st" [selected]="getStatusLabel(item.status) === st">
                       {{ st }}

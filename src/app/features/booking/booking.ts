@@ -13,6 +13,7 @@ import {
   EstimatePriceRequest,
   EstimatePriceResponse,
   PlaceBookingRequest,
+  pitchTypeLabel,
 } from '../../core/models/booking.model';
 
 type TimerHandle = ReturnType<typeof setInterval>;
@@ -51,10 +52,14 @@ export class BookingComponent implements OnInit, OnDestroy {
   selectedDate = signal<string>('');
   selectedPitchId = signal<number | null>(null);
 
+  /** Template helper — label for a SubPitch's PitchType. */
+  readonly pitchTypeLabel = pitchTypeLabel;
+
   // Popup xác nhận
   showConfirmPopup = signal<boolean>(false);
   isEstimating = signal<boolean>(false);
   priceEstimate = signal<EstimatePriceResponse | null>(null);
+  estimateWarning = signal<string | null>(null);
   pendingPayload: PlaceBookingRequest | null = null;
 
   // Realtime slot conflict
@@ -149,9 +154,9 @@ export class BookingComponent implements OnInit, OnDestroy {
       if (isMySelectedSlot && !this.isHeld()) {
         this.showConflictToast(heldTimeName);
         this.bookingForm.patchValue({ availableTimeId: '' });
-        this.loadAvailableTimes({ autoSelectFirst: false });
+        this.loadAvailableTimes({ autoSelectFirst: false, resetBlocked: false });
       } else {
-        this.loadAvailableTimes({ autoSelectFirst: false });
+        this.loadAvailableTimes({ autoSelectFirst: false, resetBlocked: false });
       }
     });
   }
@@ -236,18 +241,26 @@ export class BookingComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadAvailableTimes(opts: { autoSelectFirst?: boolean } = { autoSelectFirst: true }): void {
+  loadAvailableTimes(opts: { autoSelectFirst?: boolean; resetBlocked?: boolean } = {}): void {
+    const { autoSelectFirst = true, resetBlocked = true } = opts;
     if (!this.selectedPitchId() || !this.selectedDate()) return;
 
     this.bookingService.getAvailableTimes(this.selectedDate(), this.selectedPitchId()!).subscribe({
       next: (res) => {
         if (res && res.data) {
           this.availableTimes.set(res.data);
+          // Server đã filter out held slots → list này là source of truth.
+          // Reset blockedTimeIds để không giữ entries stale (vd: slot đã free
+          // trong lúc SSE disconnect). KHÔNG reset khi call do SSE event vừa
+          // add slot vào set ngay trước đó — sẽ xoá mất overlay realtime.
+          if (resetBlocked) {
+            this.blockedTimeIds.set(new Set());
+          }
           if (res.data.length > 0) {
             const currentId = this.bookingForm.get('availableTimeId')?.value;
             const exists = res.data.some((t) => t.id === +currentId);
             if (!exists) {
-              const next = opts.autoSelectFirst ? res.data[0].id : '';
+              const next = autoSelectFirst ? res.data[0].id : '';
               this.bookingForm.patchValue({ availableTimeId: next });
             }
           } else {
@@ -390,12 +403,15 @@ export class BookingComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.isEstimating.set(false);
         this.priceEstimate.set(res.data);
+        this.estimateWarning.set(null);
         this.showConfirmPopup.set(true);
       },
       error: () => {
         this.isEstimating.set(false);
-        // Nếu estimate thất bại, vẫn cho tiếp tục
+        // Estimate fail nhưng vẫn cho tiếp tục — popup sẽ render warning banner
+        // để user biết phần thông tin giá đang thiếu trước khi confirm.
         this.priceEstimate.set(null);
+        this.estimateWarning.set('Không thể tải thông tin giá. Kiểm tra kỹ trước khi xác nhận.');
         this.showConfirmPopup.set(true);
       }
     });
@@ -404,11 +420,13 @@ export class BookingComponent implements OnInit, OnDestroy {
   cancelPopup(): void {
     this.showConfirmPopup.set(false);
     this.priceEstimate.set(null);
+    this.estimateWarning.set(null);
     this.pendingPayload = null;
   }
 
   confirmBooking(): void {
     this.showConfirmPopup.set(false);
+    this.estimateWarning.set(null);
     this.isPlacing.set(true);
 
     if (!this.pendingPayload) {

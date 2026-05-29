@@ -4,9 +4,12 @@ export type RentalPaymentMethod = 'VNPAY' | 'CASH';
 
 export type RentalStatus =
   | 'PENDING'
+  | 'DEPOSITED'
   | 'PAID'
   | 'COMPLETED'
   | 'CANCELLED';
+
+export type RentalRefundStatus = 'NONE' | 'PENDING_REFUND' | 'REFUNDED' | 'NOT_APPLICABLE';
 
 export interface CreateRentalRequest {
   fullName: string;
@@ -56,6 +59,9 @@ export interface RentalHistoryItem {
   /** Enriched on the BE in {@code RentalToolService.enrichDTO}. */
   bookingTime?: string;
   bookingId?: string | number | null;
+  refundStatus?: RentalRefundStatus | string;
+  depositAmount?: number;
+  cancelledAt?: string;
 }
 
 export interface RentalHistoryResponse {

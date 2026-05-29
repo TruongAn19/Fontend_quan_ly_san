@@ -2,19 +2,22 @@ import { Component, signal, inject, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './core/services/auth.service';
+import { NotificationService } from './core/services/notification.service';
 
 import { ChatbotComponent } from './shared/components/chatbot/chatbot';
+import { NotificationBellComponent } from './shared/components/notification-bell/notification-bell';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, ChatbotComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, ChatbotComponent, NotificationBellComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('fontend-do-an');
   authService = inject(AuthService);
+  private notifService = inject(NotificationService);
 
   isAdmin = computed(() => {
     const role = this.authService.role();
@@ -22,6 +25,7 @@ export class App {
   });
 
   onLogout(): void {
+    this.notifService.disconnect();
     this.authService.logout();
   }
 }

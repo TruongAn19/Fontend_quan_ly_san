@@ -337,3 +337,55 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.pitch-type-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #DBEAFE;
+  color: #1E40AF;
+  vertical-align: middle;
+}
+.pitch-type-badge.seven {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.sub-pitch-panel {
+  padding: 12px 16px;
+  background: #F9FAFB;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+.sub-pitch-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.btn-create-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  background: #10B981;
+  color: white;
+  cursor: pointer;
+}
+.sub-pitch-table {
+  width: 100%;
+  font-size: 13px;
+}
+.sub-pitch-table th, .sub-pitch-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #E5E7EB;
+}
+.empty-hint {
+  padding: 8px;
+  color: #6B7280;
+  font-style: italic;
+  font-size: 13px;
+}

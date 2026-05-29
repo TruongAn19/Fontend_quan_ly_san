@@ -62,6 +62,26 @@ export class RentalHistoryComponent implements OnInit {
     });
   }
 
+  onCancelRental(rentalId: number): void {
+    if (!confirm('Bạn có chắc muốn huỷ đơn thuê này?')) {
+      return;
+    }
+    this.isLoading.set(true);
+    this.rentalService.cancelRental(rentalId).subscribe({
+      next: (res) => {
+        const msg = res?.message ?? '';
+        if (msg && msg.toLowerCase().includes('hoàn')) {
+          alert(msg);
+        }
+        this.loadHistory();
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        alert(err.error?.message || 'Không thể huỷ đơn thuê.');
+      }
+    });
+  }
+
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
@@ -86,8 +106,8 @@ export class RentalHistoryComponent implements OnInit {
       case 'DA_HUY':
         return 'Đã hủy';
       case 'DEPOSITED':
-      case 'DA_DAT':
-        return 'Đã cọc';
+      case 'DA_DAT_COC':
+        return 'Đã đặt cọc';
       default: return status;
     }
   }

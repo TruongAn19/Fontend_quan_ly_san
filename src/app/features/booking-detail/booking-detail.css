@@ -1,0 +1,162 @@
+:host { display: block; padding: 24px; max-width: 960px; margin: 0 auto; }
+
+.detail-container { color: #111827; font-family: 'Inter', sans-serif; }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #6B7280;
+  cursor: pointer;
+  text-decoration: none;
+}
+.back-link:hover { color: #111827; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title { font-size: 22px; font-weight: 800; margin: 0; }
+
+.status-badge {
+  padding: 4px 12px;
+  background: #DBEAFE;
+  color: #1E40AF;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.status-badge.cancelled { background: #FEE2E2; color: #991B1B; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.info-card {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+}
+.card-title { font-size: 16px; font-weight: 700; margin: 0 0 12px; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #F3F4F6;
+  font-size: 14px;
+}
+.info-row:last-child { border-bottom: none; }
+.label { color: #6B7280; }
+.value { color: #111827; font-weight: 600; }
+
+.refund-card { border-color: #FCD34D; background: #FFFBEB; }
+
+.refund-badge {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.badge-success { background: #D1FAE5; color: #065F46; }
+.badge-warning { background: #FEF3C7; color: #92400E; }
+.badge-muted   { background: #E5E7EB; color: #4B5563; }
+
+.refund-done-banner {
+  margin-top: 12px;
+  padding: 12px;
+  background: #D1FAE5;
+  color: #065F46;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.refund-pending-banner {
+  margin-top: 12px;
+  padding: 12px;
+  background: #FEF3C7;
+  color: #92400E;
+  border-radius: 8px;
+}
+.refund-pending-banner ul { margin: 8px 0 0 16px; padding: 0; }
+
+.action-card {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: right;
+}
+.action-card.disabled { background: #F9FAFB; text-align: left; }
+.action-card .muted { color: #6B7280; font-size: 14px; margin: 0 0 12px; }
+
+.btn-danger {
+  background: #DC2626;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-danger:hover { background: #B91C1C; }
+.btn-danger:disabled { opacity: 0.6; cursor: wait; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 2000;
+}
+.modal-container {
+  background: white;
+  width: 480px;
+  max-width: 90vw;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #F3F4F6;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-title { margin: 0; font-size: 16px; font-weight: 700; }
+.btn-close {
+  background: none; border: none; font-size: 22px; cursor: pointer; color: #6B7280;
+}
+.modal-body { padding: 16px 20px; font-size: 14px; color: #374151; }
+.modal-body p { margin: 0 0 8px; }
+.reason-label { display:block; margin-top:8px; margin-bottom:4px; font-weight:600; }
+.reason-input {
+  width: 100%; resize: vertical;
+  border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px;
+  font-family: inherit; font-size: 13px;
+}
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #F3F4F6;
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.btn-cancel {
+  background: white; border: 1px solid #E5E7EB;
+  padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  font-weight: 600;
+}
+
+.error-alert {
+  background: #FEE2E2; color: #991B1B;
+  padding: 10px 14px; border-radius: 8px;
+  margin-bottom: 12px;
+}
+.loading-state { padding: 32px; text-align: center; color: #6B7280; }
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid #E5E7EB; border-top-color: #6B7280;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  vertical-align: -2px; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

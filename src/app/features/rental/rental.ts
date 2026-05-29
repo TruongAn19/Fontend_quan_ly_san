@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RentalService } from '../../core/services/rental.service';
+import { EquipmentService } from '../../core/services/equipment.service';
 import {
   CreateRentalRequest,
   RentalPaymentMethod,
   RentalType,
 } from '../../core/models/rental.model';
+import { EquipmentDetail } from '../../core/models/equipment.model';
 
 @Component({
   selector: 'app-rental',
@@ -21,8 +23,10 @@ export class RentalComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private rentalService = inject(RentalService);
+  private equipmentService = inject(EquipmentService);
 
   equipmentId = signal<number | null>(null);
+  equipmentDetail = signal<EquipmentDetail | null>(null);
   rentalForm!: FormGroup;
 
   isLoading = signal<boolean>(false);
@@ -34,11 +38,27 @@ export class RentalComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.equipmentId.set(+id);
+      const equipmentId = +id;
+      this.equipmentId.set(equipmentId);
       this.initForm();
+      this.loadEquipmentDetail(equipmentId);
     } else {
       this.errorMessage.set('Mã thiết bị không hợp lệ.');
     }
+  }
+
+  private loadEquipmentDetail(equipmentId: number): void {
+    this.isLoading.set(true);
+    this.equipmentService.getEquipmentById(equipmentId).subscribe({
+      next: (res) => {
+        this.isLoading.set(false);
+        this.equipmentDetail.set(res.data ?? null);
+      },
+      error: () => {
+        // Không chặn form — chỉ thiếu header thông tin thiết bị.
+        this.isLoading.set(false);
+      },
+    });
   }
 
   initForm(): void {

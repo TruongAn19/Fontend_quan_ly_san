@@ -63,6 +63,23 @@ export class AdminService {
     return this.http.delete<ApiResponse<null>>(`${this.API_URL}/products/${productId}`);
   }
 
+  getSubPitches(productId: number): Observable<ApiResponse<any[]>> {
+    const params = new HttpParams().set('productId', productId.toString());
+    return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/sub-pitches`, { params });
+  }
+
+  createSubPitch(payload: { productId: number; name: string; pitchType: string }): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/sub-pitches`, payload);
+  }
+
+  updateSubPitch(id: number, payload: { name?: string; pitchType?: string }): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.API_URL}/sub-pitches/${id}`, payload);
+  }
+
+  deleteSubPitch(id: number): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.API_URL}/sub-pitches/${id}`);
+  }
+
   getEquipments(page: number = 1): Observable<any> {
     const params = new HttpParams().set('page', page.toString());
     return this.http.get<any>(`${this.API_URL}/equipments`, { params });
@@ -96,5 +113,34 @@ export class AdminService {
 
   updateRentalStatus(rentalId: number, status: string): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}/status`, { status });
+  }
+
+  // ---- CANCEL_BOOKING_FEATURE — admin refund management ----
+
+  /**
+   * List bookings filtered by refund status (admin refund-requests page).
+   * Pass {@code status='PENDING_REFUND'|'REFUNDED'} or omit for all DA_HUY.
+   */
+  getRefundRequests(status?: 'PENDING_REFUND' | 'REFUNDED' | null, page = 0, size = 10): Observable<any> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (status) params = params.set('status', status);
+    return this.http.get<any>(`${this.API_URL}/bookings/refund-requests`, { params });
+  }
+
+  /** Mark a booking's deposit as refunded — fires REFUND_DONE notification BE-side. */
+  confirmRefund(bookingId: number): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.API_URL}/bookings/${bookingId}/refund`, {});
+  }
+
+  // ---- RentalTool refund management ----
+
+  getRentalRefunds(refundStatus?: 'PENDING_REFUND' | 'REFUNDED' | null, page = 0, size = 10): Observable<any> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (refundStatus) params = params.set('refundStatus', refundStatus);
+    return this.http.get<any>(`${this.API_URL}/rentals/refunds`, { params });
+  }
+
+  confirmRentalRefund(rentalId: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}/confirm-refund`, {});
   }
 }

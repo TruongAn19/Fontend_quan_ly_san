@@ -25,7 +25,7 @@ export class AdminBookingsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Chờ thanh toán', 'Đã đặt', 'Đã thanh toán', 'Đã hủy'];
+  statusList = ['Chờ thanh toán', 'Đã đặt cọc', 'Đã thanh toán', 'Đã hủy'];
 
   ngOnInit(): void {
     this.loadBookings();
@@ -69,16 +69,23 @@ export class AdminBookingsComponent implements OnInit {
   getStatusLabel(status: string): string {
     const mapping: any = {
       'CHO_THANH_TOAN': 'Chờ thanh toán',
-      'DA_DAT': 'Đã đặt',
+      'DA_DAT': 'Đã đặt cọc',
       'DA_THANH_TOAN': 'Đã thanh toán',
       'DA_HUY': 'Đã hủy',
       // Thêm dự phòng nếu backend trả về chính label
       'Chờ thanh toán': 'Chờ thanh toán',
-      'Đã đặt': 'Đã đặt',
+      'Đã đặt cọc': 'Đã đặt cọc',
+      'Đã đặt': 'Đã đặt cọc', // legacy label trước khi đổi tên
       'Đã thanh toán': 'Đã thanh toán',
       'Đã hủy': 'Đã hủy'
     };
     return mapping[status] || status;
+  }
+
+  isStatusChangeDisabled(status: string): boolean {
+    if (!status) return false;
+    const normalized = status.toUpperCase();
+    return normalized === 'DA_THANH_TOAN' || normalized === 'DA_HUY' || normalized === 'ĐÃ THANH TOÁN' || normalized === 'ĐÃ HỦY';
   }
 
   changePage(page: number): void {
