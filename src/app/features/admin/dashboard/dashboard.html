@@ -34,6 +34,32 @@
       </div>
     }
 
+    @if (bookingStats()) {
+      <div class="booking-stats-section animate-fade-in">
+        <h2 class="section-title">Thống kê đặt sân</h2>
+
+        <div class="stats-grid secondary">
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Tổng đơn (tháng)</h4>
+            <p class="stat-value">{{ bookingStats().totalBookings || 0 }}</p>
+          </div>
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Đã thanh toán</h4>
+            <p class="stat-value">{{ bookingStats().countByStatus['Đã thanh toán'] || 0 }}</p>
+          </div>
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Đã đặt cọc</h4>
+            <p class="stat-value">{{ bookingStats().countByStatus['Đã đặt cọc'] || 0 }}</p>
+          </div>
+          <div class="stat-card glass-card">
+            <h4 class="stat-label">Đã hủy</h4>
+            <p class="stat-value">{{ bookingStats().countByStatus['Đã hủy'] || 0 }}</p>
+          </div>
+        </div>
+
+      </div>
+    }
+
     @if (racketStats()) {
       <div class="racket-stats-section animate-fade-in">
         <h2 class="section-title">Thống kê thuê dụng cụ</h2>
@@ -53,14 +79,31 @@
           </div>
         </div>
 
-        <div class="chart-container glass-card">
-          <h4 class="chart-title">Top vợt được thuê nhiều nhất</h4>
-          <canvas baseChart
-                  [data]="barChartData"
-                  [options]="barChartOptions"
-                  [type]="barChartType">
-          </canvas>
-        </div>
+      </div>
+    }
+
+    @if (bookingStats() || racketStats()) {
+      <div class="charts-row">
+        @if (bookingStats()) {
+          <div class="chart-container glass-card">
+            <h4 class="chart-title">Số đơn đặt sân theo trạng thái</h4>
+            <canvas baseChart
+                    [data]="bookingChartData"
+                    [options]="barChartOptions"
+                    [type]="barChartType">
+            </canvas>
+          </div>
+        }
+        @if (racketStats()) {
+          <div class="chart-container glass-card">
+            <h4 class="chart-title">Top vợt được thuê nhiều nhất</h4>
+            <canvas baseChart
+                    [data]="barChartData"
+                    [options]="barChartOptions"
+                    [type]="barChartType">
+            </canvas>
+          </div>
+        }
       </div>
     }
 

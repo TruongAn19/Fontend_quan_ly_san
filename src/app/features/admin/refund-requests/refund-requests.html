@@ -1,0 +1,96 @@
+<div class="refund-container animate-fade-in">
+  <h1 class="page-title">Quản lý hoàn cọc</h1>
+
+  <div class="tabs">
+    @for (t of tabs; track t.key) {
+      <button class="tab-btn" [class.active]="activeTab() === t.key" (click)="selectTab(t.key)">
+        {{ t.label }}
+      </button>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert"><span>⚠️ {{ errorMessage() }}</span></div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state"><span class="spinner"></span> Đang tải...</div>
+  } @else if (items().length === 0) {
+    <div class="empty-state"><p>Không có yêu cầu hoàn cọc nào.</p></div>
+  } @else {
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Mã đặt</th>
+            <th>Khách hàng</th>
+            <th>SĐT</th>
+            <th>Số tiền hoàn</th>
+            <th>Ngày huỷ</th>
+            <th>Trạng thái</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.id) {
+            <tr>
+              <td><strong>{{ item.bookingCode }}</strong></td>
+              <td>{{ item.receiverName || item.user?.fullName || '-' }}</td>
+              <td>{{ item.receiverPhone || item.user?.phone || '-' }}</td>
+              <td class="amount">{{ item.refundAmount | number }} đ</td>
+              <td>{{ item.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="refund-badge" [class]="(item.refundStatus || '').toLowerCase()">
+                  {{ refundStatusText(item.refundStatus) }}
+                </span>
+              </td>
+              <td><button class="btn-detail" (click)="openDetail(item)">Chi tiết</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper">
+      <button class="page-btn" [disabled]="currentPage() === 0" (click)="changePage(currentPage() - 1)">Trang trước</button>
+      <span class="page-indicator">Trang {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+      <button class="page-btn" [disabled]="currentPage() + 1 >= totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
+    </div>
+  }
+
+  <!-- Modal chi tiết -->
+  @if (selected(); as s) {
+    <div class="modal-overlay" (click)="closeDetail()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3>Chi tiết hoàn cọc</h3>
+        <div class="info-row"><span>Mã đặt:</span><strong>{{ s.bookingCode }}</strong></div>
+        <div class="info-row"><span>Khách hàng:</span><strong>{{ s.receiverName || s.user?.fullName }}</strong></div>
+        <div class="info-row"><span>SĐT:</span><strong>{{ s.receiverPhone || s.user?.phone }}</strong></div>
+        <div class="info-row"><span>Email:</span><strong>{{ s.user?.email || '-' }}</strong></div>
+        <div class="info-row"><span>Ngày đặt:</span><strong>{{ s.bookingDate }}</strong></div>
+        <div class="info-row"><span>Khung giờ:</span><strong>{{ s.time }}</strong></div>
+        @if (s.totalSessionsAtCancel) {
+          <div class="info-row"><span>Buổi đã dùng:</span>
+            <strong>{{ s.usedSessionsAtCancel }} / {{ s.totalSessionsAtCancel }}</strong></div>
+        }
+        <div class="info-row"><span>Tổng cọc:</span><strong>{{ s.depositPrice | number }} đ</strong></div>
+        <div class="info-row highlight"><span>Số tiền cần hoàn:</span>
+          <strong>{{ s.refundAmount | number }} đ</strong></div>
+        <div class="info-row"><span>Trạng thái:</span>
+          <span class="refund-badge" [class]="(s.refundStatus || '').toLowerCase()">
+            {{ refundStatusText(s.refundStatus) }}
+          </span>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeDetail()" [disabled]="isConfirming()">Đóng</button>
+          @if (isPending(s)) {
+            <button class="btn-confirm" (click)="confirmRefund(s)" [disabled]="isConfirming()">
+              @if (isConfirming()) { <span class="spinner"></span> } @else { ✅ Đã hoàn cọc }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

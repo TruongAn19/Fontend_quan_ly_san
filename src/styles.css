@@ -1,1 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --bg-primary: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-ultra-light: rgba(0, 0, 0, 0.04);
+  
+  --hover-bg: rgba(0, 0, 0, 0.02);
+  --btn-bg: rgba(0, 0, 0, 0.03);
+  --btn-bg-hover: rgba(0, 0, 0, 0.06);
+}

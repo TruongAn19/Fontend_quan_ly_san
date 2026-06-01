@@ -1,8 +1,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   padding: 40px 20px;
 }
@@ -19,9 +19,10 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 24px;
   padding: 24px;
   margin-bottom: 32px;
@@ -41,13 +42,13 @@
 }
 
 .filter-group label {
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 0.85rem;
 }
 
 .filter-group input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
   padding: 10px 16px;
   border-radius: 12px;
   color: white;
@@ -81,13 +82,13 @@
 
 .premium-table th {
   padding: 16px;
-  color: #cbd5e1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .premium-table td {
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-ultra-light);
   white-space: nowrap;
 }
 
@@ -112,7 +113,7 @@
 
 .status-badge[data-status="Chờ bàn giao"] {
   background: rgba(22, 163, 74, 0.2);
-  color: #a5b4fc;
+  color: #16a34a;
 }
 
 .status-badge[data-status="Hủy bỏ"] {
@@ -121,8 +122,8 @@
 }
 
 .action-dropdown select {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
   padding: 8px 12px;
   border-radius: 8px;
   color: white;
@@ -141,9 +142,9 @@
 }
 
 .page-btn {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
   padding: 10px 20px;
   border-radius: 12px;
   cursor: pointer;
@@ -158,3 +159,6 @@
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+

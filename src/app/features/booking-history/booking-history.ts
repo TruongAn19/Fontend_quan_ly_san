@@ -1,11 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { BookingService } from '../../core/services/booking.service';
 
 @Component({
   selector: 'app-booking-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './booking-history.html',
   styleUrls: ['./booking-history.css']
 })
@@ -35,9 +36,9 @@ export class BookingHistoryComponent implements OnInit {
         this.isLoading.set(false);
         const rawData = res.data?.bookings || res.bookings || [];
         
-        // Chỉ lấy các đơn đã thanh toán, đã đặt cọc hoặc đã đặt
-        const valid = rawData.filter((b: any) => 
-          ['PAID', 'DA_THANH_TOAN', 'BOOKED', 'DA_DAT', 'DA_DAT_COC'].includes(b.status?.toUpperCase())
+        // Đơn hợp lệ + đơn đã huỷ (để user xem trạng thái hoàn cọc)
+        const valid = rawData.filter((b: any) =>
+          ['PAID', 'DA_THANH_TOAN', 'BOOKED', 'DA_DAT', 'DA_DAT_COC', 'DA_HUY', 'CANCELLED'].includes(b.status?.toUpperCase())
         );
         
         this.allValidBookings.set(valid);
@@ -85,6 +86,14 @@ export class BookingHistoryComponent implements OnInit {
         return 'Đã giữ sân';
       default:
         return status;
+    }
+  }
+
+  refundBadge(refundStatus: string): string {
+    switch ((refundStatus || '').toUpperCase()) {
+      case 'PENDING_REFUND': return '🟡 Chờ hoàn cọc';
+      case 'REFUNDED': return '🟢 Đã hoàn cọc';
+      default: return '';
     }
   }
 }

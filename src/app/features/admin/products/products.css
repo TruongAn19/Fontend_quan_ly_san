@@ -1,8 +1,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   padding: 40px 20px;
 }
@@ -41,9 +41,10 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 24px;
   padding: 24px;
   margin-bottom: 40px;
@@ -61,14 +62,14 @@
 
 .premium-table th {
   padding: 16px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .premium-table td {
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-ultra-light);
 }
 
 .actions-cell {
@@ -79,7 +80,7 @@
 .btn-edit {
   background: rgba(22, 163, 74, 0.1);
   border: 1px solid rgba(22, 163, 74, 0.2);
-  color: #a5b4fc;
+  color: #16a34a;
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
@@ -144,13 +145,13 @@
 }
 
 label {
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 input, textarea {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
   padding: 12px;
   border-radius: 12px;
   color: white;
@@ -173,8 +174,8 @@ input, textarea {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--btn-bg);
+  border: 1px solid var(--border-light);
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -189,9 +190,9 @@ input, textarea {
 }
 
 .page-btn {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--btn-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
   padding: 10px 20px;
   border-radius: 12px;
   cursor: pointer;
@@ -199,7 +200,7 @@ input, textarea {
 }
 
 .page-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--btn-bg-hover);
 }
 
 .page-btn:disabled {
@@ -208,7 +209,7 @@ input, textarea {
 }
 
 .page-indicator {
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -216,3 +217,6 @@ input, textarea {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+

@@ -29,6 +29,7 @@
               <th>Khung giờ</th>
               <th>Trạng thái</th>
               <th>Tổng tiền</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -41,8 +42,14 @@
                 <span class="status-badge" [class]="item.status?.toLowerCase()">
                   {{ getStatusText(item.status) }}
                 </span>
+                @if (refundBadge(item.refundStatus)) {
+                  <span class="refund-sub-badge">{{ refundBadge(item.refundStatus) }}</span>
+                }
               </td>
               <td class="total-price">{{ item.totalPrice | number }} VNĐ</td>
+              <td>
+                <a [routerLink]="['/booking-detail', item.id]" class="detail-link">Xem chi tiết</a>
+              </td>
             </tr>
           </tbody>
         </table>

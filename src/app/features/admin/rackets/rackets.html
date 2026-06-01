@@ -33,10 +33,10 @@
           <tr *ngFor="let item of rackets()">
             <td>{{ item.id }}</td>
             <td><strong>{{ item.name }}</strong></td>
-            <td>{{ item.brand }}</td>
+            <td>{{ item.factory }}</td>
             <td>{{ item.price | number }} VNĐ</td>
-            <td>{{ item.rentalPrice | number }} VNĐ</td>
-            <td>{{ item.conditionStatus }}</td>
+            <td>{{ item.rentalPricePerDay | number }} VNĐ</td>
+            <td>{{ item.status }}</td>
             <td class="actions-cell">
               <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
             </td>
@@ -65,8 +65,8 @@
           </div>
 
           <div class="form-group">
-            <label for="brand">Hãng</label>
-            <input type="text" id="brand" formControlName="brand" />
+            <label for="factory">Hãng</label>
+            <input type="text" id="factory" formControlName="factory" />
           </div>
 
           <div class="form-group">
@@ -75,16 +75,15 @@
           </div>
 
           <div class="form-group">
-            <label for="rentalPrice">Giá cho thuê (VNĐ)</label>
-            <input type="number" id="rentalPrice" formControlName="rentalPrice" />
+            <label for="rentalPricePerDay">Giá cho thuê (VNĐ)</label>
+            <input type="number" id="rentalPricePerDay" formControlName="rentalPricePerDay" />
           </div>
 
           <div class="form-group">
-            <label for="conditionStatus">Tình trạng</label>
-            <select id="conditionStatus" formControlName="conditionStatus">
-              <option value="Tốt">Tốt</option>
-              <option value="Cũ">Cũ</option>
-              <option value="Bảo trì">Bảo trì</option>
+            <label for="status">Tình trạng</label>
+            <select id="status" formControlName="status">
+              <option value="ACTIVE">Đang hoạt động</option>
+              <option value="INACTIVE">Ngừng cho thuê</option>
             </select>
           </div>
 

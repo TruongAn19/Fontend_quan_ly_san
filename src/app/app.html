@@ -16,6 +16,7 @@
           <a routerLink="/admin/rackets" routerLinkActive="active" class="nav-item">Vợt</a>
           <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Booking</a>
           <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Thuê đồ</a>
+          <a routerLink="/admin/refund-requests" routerLinkActive="active" class="nav-item">Hoàn cọc</a>
         } @else {
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">Trang chủ</a>
           <a routerLink="/products" routerLinkActive="active" class="nav-item">Sân Pickleball</a>
@@ -29,6 +30,7 @@
 
       <div class="nav-actions">
         @if (authService.isLoggedIn()) {
+          <app-notification-bell [forAdmin]="isAdmin()"></app-notification-bell>
           @if (!isAdmin()) {
             <a routerLink="/profile" class="btn-profile">
               Cá nhân

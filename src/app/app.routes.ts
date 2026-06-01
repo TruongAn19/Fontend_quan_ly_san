@@ -65,6 +65,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'booking-detail/:id',
+    loadComponent: () => import('./features/booking-detail/booking-detail').then(m => m.BookingDetailComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'rentals/:id',
     loadComponent: () => import('./features/rental/rental').then(m => m.RentalComponent),
     canActivate: [authGuard]
@@ -113,6 +118,11 @@ export const routes: Routes = [
   {
     path: 'admin/rentals',
     loadComponent: () => import('./features/admin/rentals/rentals').then(m => m.AdminRentalsComponent),
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/refund-requests',
+    loadComponent: () => import('./features/admin/refund-requests/refund-requests').then(m => m.RefundRequestsComponent),
     canActivate: [adminGuard]
   },
 

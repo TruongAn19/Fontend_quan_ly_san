@@ -1,0 +1,33 @@
+<div class="notification-bell">
+  <button class="bell-btn" (click)="toggleDropdown()" aria-label="Thông báo">
+    🔔
+    @if (unreadCount() > 0) {
+      <span class="bell-badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="bell-dropdown animate-fade-in">
+      <div class="bell-dropdown-header">
+        <span>Thông báo</span>
+        @if (unreadCount() > 0) {
+          <button class="mark-all-btn" (click)="markAllRead()">Đánh dấu đã đọc</button>
+        }
+      </div>
+
+      <div class="bell-list">
+        @if (notifications().length === 0) {
+          <div class="bell-empty">Chưa có thông báo nào.</div>
+        } @else {
+          @for (n of notifications(); track n.id) {
+            <div class="bell-item" [class.unread]="!n.isRead" (click)="onNotificationClick(n)">
+              <div class="bell-item-title">{{ n.title }}</div>
+              <div class="bell-item-msg">{{ n.message }}</div>
+              <div class="bell-item-time">{{ relativeTime(n.createdAt) }}</div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

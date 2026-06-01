@@ -1,7 +1,7 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f172a;
+  background: var(--bg-primary);
 }
 
 .app-wrapper {
@@ -11,9 +11,9 @@
 }
 
 .premium-navbar {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-ultra-light);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -36,7 +36,7 @@
 .logo-text {
   font-size: 1.5rem;
   font-weight: 800;
-  color: white;
+  color: var(--text-primary);
   letter-spacing: -0.05em;
 }
 
@@ -51,7 +51,7 @@
 
 .nav-item {
   text-decoration: none;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.95rem;
   transition: color 0.2s ease;
@@ -60,7 +60,7 @@
 }
 
 .nav-item:hover {
-  color: white;
+  color: var(--text-primary);
 }
 
 .nav-item.active {
@@ -85,7 +85,7 @@
 }
 
 .btn-login {
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 600;
   padding: 10px 20px;
@@ -94,8 +94,8 @@
 }
 
 .btn-login:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  background: var(--btn-bg);
 }
 
 .btn-primary {
@@ -114,9 +114,9 @@
 }
 
 .btn-profile {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--btn-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 600;
   padding: 10px 20px;
@@ -125,7 +125,7 @@
 }
 
 .btn-profile:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--btn-bg-hover);
 }
 
 .btn-logout {
@@ -146,3 +146,6 @@
 .app-main-content {
   flex: 1;
 }
+
+
+

@@ -1,8 +1,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   padding: 40px 20px;
 }
@@ -19,9 +19,10 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 24px;
   padding: 24px;
 }
@@ -38,14 +39,14 @@
 
 .premium-table th {
   padding: 16px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .premium-table td {
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-ultra-light);
 }
 
 .role-badge {
@@ -79,7 +80,7 @@
 .btn-edit {
   background: rgba(22, 163, 74, 0.1);
   border: 1px solid rgba(22, 163, 74, 0.2);
-  color: #a5b4fc;
+  color: #16a34a;
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
@@ -137,8 +138,8 @@
 }
 
 select {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
   padding: 12px;
   border-radius: 12px;
   color: white;
@@ -164,8 +165,8 @@ select option {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--btn-bg);
+  border: 1px solid var(--border-light);
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -176,3 +177,6 @@ select option {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+

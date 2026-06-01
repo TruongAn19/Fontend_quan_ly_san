@@ -34,10 +34,10 @@ export class AdminRacketsComponent implements OnInit {
   initForm(): void {
     this.racketForm = this.fb.group({
       name: ['', [Validators.required]],
-      brand: ['', [Validators.required]],
+      factory: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
-      conditionStatus: ['Tốt', [Validators.required]],
-      rentalPrice: [0, [Validators.required, Validators.min(0)]]
+      status: ['ACTIVE', [Validators.required]],
+      rentalPricePerDay: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -69,7 +69,7 @@ export class AdminRacketsComponent implements OnInit {
     this.isEdit.set(false);
     this.selectedRacketId.set(null);
     this.selectedFile = null;
-    this.racketForm.reset({ price: 0, conditionStatus: 'Tốt', rentalPrice: 0 });
+    this.racketForm.reset({ price: 0, status: 'ACTIVE', rentalPricePerDay: 0 });
     this.showModal.set(true);
   }
 
@@ -79,10 +79,10 @@ export class AdminRacketsComponent implements OnInit {
     this.selectedFile = null;
     this.racketForm.patchValue({
       name: racket.name,
-      brand: racket.brand,
+      factory: racket.factory,
       price: racket.price,
-      conditionStatus: racket.conditionStatus || 'Tốt',
-      rentalPrice: racket.rentalPrice || 0
+      status: racket.status || 'ACTIVE',
+      rentalPricePerDay: racket.rentalPricePerDay || 0
     });
     this.showModal.set(true);
   }

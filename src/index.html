@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <title>Hệ thống quản lý sân Pickleball</title>
     <base href="/" />
+    <script>
+      // sockjs-client expects Node's `global`; ES module imports are hoisted and
+      // run before main.ts, so this must be defined here before any module loads.
+      window.global = window;
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link

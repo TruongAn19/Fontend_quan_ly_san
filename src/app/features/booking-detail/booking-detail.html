@@ -1,0 +1,157 @@
+<div class="detail-container animate-fade-in">
+
+  <div class="detail-topbar">
+    <a routerLink="/booking-history" class="back-link">← Lịch sử đặt sân</a>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert"><span>⚠️ {{ errorMessage() }}</span></div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state"><span class="spinner"></span> Đang tải...</div>
+  } @else if (booking(); as b) {
+
+    <div class="glass-card detail-card">
+      <div class="detail-header">
+        <h1>Chi tiết đặt sân</h1>
+        <span class="status-badge" [class]="statusOf().toLowerCase()">{{ statusText() }}</span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-row"><span>Mã đặt:</span><strong>{{ b.bookingCode }}</strong></div>
+        <div class="info-row"><span>Sân:</span><strong>{{ b.courtName || 'Sân Pickleball' }}</strong></div>
+        <div class="info-row"><span>Ngày bắt đầu:</span><strong>{{ b.bookingDate }}</strong></div>
+        <div class="info-row"><span>Khung giờ:</span><strong>{{ b.time }}</strong></div>
+        <div class="info-row"><span>Loại đặt:</span><strong>{{ isWeekly() ? 'Đặt tháng (định kỳ)' : 'Đặt lẻ' }}</strong></div>
+      </div>
+
+      <!-- Danh sách buổi (WEEKLY) -->
+      @if (isWeekly()) {
+        <div class="section">
+          <h2 class="section-title">Các buổi đã đặt ({{ bookingDetails().length }})</h2>
+          <div class="table-responsive">
+            <table class="premium-table">
+              <thead>
+                <tr><th>Ngày</th><th>Sân phụ</th><th>Giờ</th><th>Giá</th></tr>
+              </thead>
+              <tbody>
+                @for (d of bookingDetails(); track d.id) {
+                  <tr>
+                    <td>{{ d.date }}</td>
+                    <td>{{ d.subCourtName || '-' }}</td>
+                    <td>{{ d.availableTime }}</td>
+                    <td>{{ d.price | number }} đ</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- Vợt thuê -->
+      @if (rentalTools().length > 0) {
+        <div class="section">
+          <h2 class="section-title">Vợt thuê kèm</h2>
+          <div class="table-responsive">
+            <table class="premium-table">
+              <thead>
+                <tr><th>Vợt</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Trạng thái</th></tr>
+              </thead>
+              <tbody>
+                @for (rt of rentalTools(); track rt.id) {
+                  <tr>
+                    <td>Vợt #{{ rt.racketId }}</td>
+                    <td>{{ rt.quantity }}</td>
+                    <td>{{ rentalUnitPrice(rt) | number }} đ</td>
+                    <td>{{ rt.rentalPrice | number }} đ</td>
+                    <td>{{ (rt.status || '').toUpperCase() === 'CANCELLED' ? 'Đã huỷ' : 'Đã thuê' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- Tổng kết -->
+      <div class="summary-box">
+        <div class="summary-item"><span>Tiền sân (cọc):</span><strong>{{ courtDeposit() | number }} đ</strong></div>
+        @if (rentalTotal() > 0) {
+          <div class="summary-item"><span>Tiền vợt:</span><strong>{{ rentalTotal() | number }} đ</strong></div>
+        }
+        <div class="summary-item total"><span>Tổng cọc:</span><strong>{{ b.depositPrice | number }} đ</strong></div>
+        <div class="summary-item"><span>Tổng tiền sân:</span><strong>{{ b.totalPrice | number }} đ</strong></div>
+      </div>
+
+      <!-- Khối Đã huỷ + hoàn cọc -->
+      @if (isCancelled()) {
+        <div class="cancelled-block">
+          <h2 class="section-title">Thông tin huỷ</h2>
+          <div class="info-row">
+            <span>Trạng thái hoàn cọc:</span>
+            <span class="refund-badge" [class]="(b.refundStatus || '').toLowerCase()">
+              {{ refundStatusText(b.refundStatus) }}
+            </span>
+          </div>
+          <div class="info-row"><span>Số tiền hoàn:</span><strong>{{ refundAmount() | number }} đ</strong></div>
+          @if (b.totalSessionsAtCancel) {
+            <div class="info-row"><span>Buổi đã dùng:</span>
+              <strong>{{ b.usedSessionsAtCancel }} / {{ b.totalSessionsAtCancel }}</strong>
+            </div>
+          }
+          @if ((b.refundStatus || '').toUpperCase() === 'PENDING_REFUND') {
+            <p class="contact-note">
+              Nếu chưa nhận được hoàn tiền, vui lòng liên hệ:<br />
+              📞 Hotline: <strong>{{ contactHotline() }}</strong><br />
+              ✉️ Email: <strong>{{ contactEmail() }}</strong>
+            </p>
+          }
+        </div>
+      }
+
+      <!-- Nút huỷ -->
+      @if (canCancel()) {
+        <div class="action-bar">
+          @if (within2h()) {
+            <button class="btn-cancel" disabled
+                    title="Không thể huỷ trong vòng 2 tiếng trước giờ bắt đầu">
+              Huỷ đặt sân
+            </button>
+            <span class="hint">Không thể huỷ trong vòng 2 tiếng trước giờ bắt đầu.</span>
+          } @else {
+            <button class="btn-cancel" (click)="openCancelModal()">Huỷ đặt sân</button>
+          }
+        </div>
+      }
+    </div>
+
+  } @else {
+    <div class="empty-state"><p>Không tìm thấy đơn đặt sân.</p></div>
+  }
+
+  <!-- Modal xác nhận huỷ -->
+  @if (showCancelModal()) {
+    <div class="modal-overlay" (click)="closeCancelModal()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3>Xác nhận huỷ đặt sân</h3>
+        <p>Bạn có chắc chắn muốn huỷ lịch đặt sân này không?</p>
+        <div class="modal-refund">
+          <div><span>Số tiền cọc dự kiến hoàn:</span>
+            <strong>{{ cancelPreview().refund | number }} đ</strong></div>
+          @if (isWeekly()) {
+            <div><span>Đã sử dụng:</span>
+              <strong>{{ cancelPreview().used }} / {{ cancelPreview().total }} buổi</strong></div>
+          }
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeCancelModal()" [disabled]="isCancelling()">Đóng</button>
+          <button class="btn-cancel" (click)="confirmCancel()" [disabled]="isCancelling()">
+            @if (isCancelling()) { <span class="spinner"></span> } @else { Xác nhận huỷ }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

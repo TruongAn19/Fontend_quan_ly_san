@@ -20,6 +20,11 @@ export class BookingService {
     return this.http.get<any>(`${this.API_URL}/${productId}/info`);
   }
 
+  /** Danh sách vợt của sân còn cho thuê theo booking (bundled rental). */
+  getRacketsByProduct(productId: number): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/products/${productId}/rackets`);
+  }
+
   getAvailableTimes(date: string, courtId: number): Observable<ApiResponse<any[]>> {
     const params = new HttpParams().set('date', date).set('courtId', courtId.toString());
     return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/available-times`, { params });
@@ -36,5 +41,15 @@ export class BookingService {
   getBookingHistory(page: number = 0, size: number = 5): Observable<any> {
     const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
     return this.http.get<any>(`${environment.apiBaseUrl}/client/booking-history`, { params });
+  }
+
+  /** Huỷ đặt sân (Nhóm 2). Trả về refund summary. */
+  cancelBooking(id: number, reason?: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/${id}/cancel`, { reason });
+  }
+
+  /** Chi tiết 1 booking (kèm rentalTools) từ booking-history. */
+  getBookingDetail(id: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${environment.apiBaseUrl}/client/booking-history/${id}`);
   }
 }

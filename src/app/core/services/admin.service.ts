@@ -25,6 +25,11 @@ export class AdminService {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/racket-statistics`);
   }
 
+  getBookingStats(startDate: string, endDate: string): Observable<ApiResponse<any>> {
+    const params = new HttpParams().set('startDate', startDate).set('endDate', endDate);
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/booking-statistics`, { params });
+  }
+
   getUsers(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/users`);
   }
@@ -96,5 +101,16 @@ export class AdminService {
 
   updateRentalStatus(rentalId: number, status: string): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}/status`, { status });
+  }
+
+  // --- Nhóm 5: Refund management ---
+  getRefundRequests(status?: string, page = 0, size = 10): Observable<any> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (status) params = params.set('status', status);
+    return this.http.get<any>(`${this.API_URL}/refund-requests`, { params });
+  }
+
+  confirmRefund(bookingId: number): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.API_URL}/bookings/${bookingId}/refund`, {});
   }
 }

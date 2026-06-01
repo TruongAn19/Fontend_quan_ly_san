@@ -127,6 +127,43 @@
             </div>
           </div>
         }
+
+        <!-- Bundled rental: chỉ hiển thị cho ONE_TIME -->
+        @if (isOneTime()) {
+          <div class="rental-section animate-fade-in mt-3">
+            <label class="rental-toggle">
+              <input type="checkbox" [checked]="rentRackets()" (change)="toggleRentRackets()" />
+              <span>🏸 Thuê vợt của sân này</span>
+            </label>
+
+            @if (rentRackets()) {
+              @if (isLoadingRackets()) {
+                <p class="empty-times">Đang tải danh sách vợt...</p>
+              } @else if (availableRackets().length === 0) {
+                <p class="empty-times">Sân này hiện không có vợt cho thuê.</p>
+              } @else {
+                <div class="rental-list">
+                  @for (racket of availableRackets(); track racket.id) {
+                    <div class="rental-item">
+                      <div class="rental-item-info">
+                        <strong>{{ racket.name }}</strong>
+                        <span>{{ racket.rentalPricePerPlay | number }}đ / buổi</span>
+                        <small>Còn lại: {{ racket.bookingStockQuantity }}</small>
+                      </div>
+                      <div class="rental-qty">
+                        <button type="button" class="qty-btn" (click)="decRacket(racket)"
+                                [disabled]="getRacketQty(racket.id) <= 0">−</button>
+                        <span class="qty-value">{{ getRacketQty(racket.id) }}</span>
+                        <button type="button" class="qty-btn" (click)="incRacket(racket)"
+                                [disabled]="getRacketQty(racket.id) >= racket.bookingStockQuantity">+</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        }
       </div>
 
       <!-- Column 3: Payment & Summary -->
@@ -156,9 +193,19 @@
                 <strong>{{ est.totalPrice | number }}đ</strong>
               </div>
               <div class="summary-item deposit">
-                <span>Cọc:</span>
+                <span>Cọc sân:</span>
                 <strong>{{ est.depositPrice | number }}đ</strong>
               </div>
+              @if (rentRackets() && rentalTotal() > 0) {
+                <div class="summary-item rental">
+                  <span>Tiền vợt:</span>
+                  <strong>{{ rentalTotal() | number }}đ</strong>
+                </div>
+                <div class="summary-item deposit total-deposit">
+                  <span>Tổng cọc:</span>
+                  <strong>{{ totalDeposit() | number }}đ</strong>
+                </div>
+              }
             </div>
           }
 

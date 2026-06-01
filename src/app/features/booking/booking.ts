@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,6 +41,30 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   selectedDate = signal<string>('');
   selectedCourtId = signal<number | null>(null);
+
+  // --- Bundled rental (thuê vợt kèm khi đặt sân) ---
+  rentRackets = signal<boolean>(false);
+  racketsLoaded = signal<boolean>(false);
+  isLoadingRackets = signal<boolean>(false);
+  availableRackets = signal<any[]>([]);
+  // racketId -> số lượng đã chọn
+  racketQty = signal<Record<number, number>>({});
+
+  /** Tổng tiền thuê vợt = sum(rentalPricePerPlay * quantity). */
+  rentalTotal = computed(() => {
+    const qty = this.racketQty();
+    return this.availableRackets().reduce((sum, r) => {
+      const q = qty[r.id] || 0;
+      return sum + (r.rentalPricePerPlay || 0) * q;
+    }, 0);
+  });
+
+  /** Tổng cọc hiển thị = cọc sân + tiền vợt (chỉ ONE_TIME mới có tiền vợt). */
+  totalDeposit = computed(() => {
+    const est = this.priceEstimate();
+    const courtDeposit = est?.depositPrice || 0;
+    return courtDeposit + (this.rentRackets() ? this.rentalTotal() : 0);
+  });
 
   weekDays = [
     { label: 'T2', value: 1 },
@@ -102,6 +126,10 @@ export class BookingComponent implements OnInit, OnDestroy {
 
     this.bookingForm.valueChanges.subscribe(() => {
       this.calculatePriceEstimate();
+      // Đặt tháng không hỗ trợ thuê vợt — tự động reset khi rời ONE_TIME
+      if (this.bookingForm.get('bookingType')?.value !== 'ONE_TIME' && this.rentRackets()) {
+        this.resetRackets();
+      }
     });
   }
 
@@ -131,6 +159,70 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   isDaySelected(day: number): boolean {
     return this.selectedDays.includes(day);
+  }
+
+  // --- Bundled rental methods ---
+  isOneTime(): boolean {
+    return this.bookingForm?.get('bookingType')?.value === 'ONE_TIME';
+  }
+
+  /** Reset lựa chọn vợt (gọi khi tắt toggle hoặc chuyển sang đặt tháng). */
+  private resetRackets(): void {
+    this.rentRackets.set(false);
+    this.racketQty.set({});
+  }
+
+  toggleRentRackets(): void {
+    const next = !this.rentRackets();
+    this.rentRackets.set(next);
+    if (next) {
+      if (!this.racketsLoaded()) {
+        this.loadRackets();
+      }
+    } else {
+      this.racketQty.set({});
+    }
+  }
+
+  loadRackets(): void {
+    const pid = this.productId();
+    if (!pid) return;
+    this.isLoadingRackets.set(true);
+    this.bookingService.getRacketsByProduct(pid).subscribe({
+      next: (res) => {
+        this.isLoadingRackets.set(false);
+        this.availableRackets.set(res?.data || []);
+        this.racketsLoaded.set(true);
+      },
+      error: () => {
+        this.isLoadingRackets.set(false);
+        this.showError('Không thể tải danh sách vợt của sân.');
+      }
+    });
+  }
+
+  getRacketQty(racketId: number): number {
+    return this.racketQty()[racketId] || 0;
+  }
+
+  incRacket(racket: any): void {
+    const current = this.getRacketQty(racket.id);
+    if (current >= racket.bookingStockQuantity) return;
+    this.racketQty.update(q => ({ ...q, [racket.id]: current + 1 }));
+  }
+
+  decRacket(racket: any): void {
+    const current = this.getRacketQty(racket.id);
+    if (current <= 0) return;
+    this.racketQty.update(q => ({ ...q, [racket.id]: current - 1 }));
+  }
+
+  /** Payload rackets gửi lên BE: chỉ những vợt có quantity > 0. */
+  selectedRacketItems(): { racketId: number; quantity: number }[] {
+    const qty = this.racketQty();
+    return Object.keys(qty)
+      .map(id => ({ racketId: +id, quantity: qty[+id] }))
+      .filter(item => item.quantity > 0);
   }
 
   calculatePriceEstimate(): void {
@@ -324,7 +416,7 @@ export class BookingComponent implements OnInit, OnDestroy {
       recurringEndDate = this.toLocalDateString(startDate);
     }
 
-    const payload = {
+    const payload: any = {
       ...this.bookingForm.value,
       selectedDays: this.selectedDays,
       productId: this.productId(),
@@ -333,6 +425,14 @@ export class BookingComponent implements OnInit, OnDestroy {
       availableTimeId: +this.bookingForm.get('availableTimeId')?.value,
       recurringEndDate: recurringEndDate
     };
+
+    // Bundled rental — chỉ gửi khi bật toggle, đang ONE_TIME và có chọn vợt
+    if (type === 'ONE_TIME' && this.rentRackets()) {
+      const items = this.selectedRacketItems();
+      if (items.length > 0) {
+        payload.rackets = items;
+      }
+    }
 
     this.bookingService.placeBooking(payload).subscribe({
       next: (res) => {

@@ -1,8 +1,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f172a;
-  color: #f8fafc;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   padding: 40px 20px;
 }
@@ -40,9 +40,10 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 32px;
   padding: 40px;
 }
@@ -51,19 +52,20 @@
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 12px;
-  color: #f8fafc;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
 .product-address {
   font-size: 1.125rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
   margin-bottom: 32px;
 }
 
 .price-box-group {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 32px;
@@ -79,12 +81,12 @@
 }
 
 .price-item .label {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
 .price-item .value {
-  color: #f1f5f9;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 1.1rem;
 }
@@ -103,11 +105,11 @@
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 12px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .block-desc {
-  color: #94a3b8;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -119,13 +121,13 @@
 }
 
 .date-picker-wrapper label {
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
 .date-picker-wrapper input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 8px 12px;
   color: white;
@@ -152,7 +154,7 @@
   align-items: center;
   gap: 12px;
   padding: 60px 0;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 1.125rem;
 }
 
@@ -219,3 +221,6 @@
   font-size: 0.875rem;
   text-align: center;
 }
+
+
+
