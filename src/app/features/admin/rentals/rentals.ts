@@ -19,6 +19,7 @@ export class AdminRentalsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  confirmingId = signal<number | null>(null);
 
   searchForm: FormGroup = this.fb.group({
     search: ['']
@@ -58,6 +59,23 @@ export class AdminRentalsComponent implements OnInit {
     this.adminService.updateRentalStatus(rentalId, status).subscribe({
       next: () => this.loadRentals(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
+    });
+  }
+
+  /** Admin xác nhận đã hoàn cọc cho đơn đã huỷ đang chờ hoàn (CANCELLED + PENDING_REFUND). */
+  confirmRefund(item: any): void {
+    if (item.refundStatus !== 'PENDING_REFUND') return;
+    this.confirmingId.set(item.id);
+    this.errorMessage.set(null);
+    this.adminService.confirmRentalRefund(item.id).subscribe({
+      next: () => {
+        this.confirmingId.set(null);
+        this.loadRentals();
+      },
+      error: (err) => {
+        this.confirmingId.set(null);
+        this.errorMessage.set(err.error?.message || 'Xác nhận hoàn cọc thất bại.');
+      }
     });
   }
 

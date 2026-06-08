@@ -163,6 +163,28 @@
   background: #1e1b4b;
 }
 
+.btn-refund {
+  background: rgba(34, 197, 94, 0.85);
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.btn-refund:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 1);
+}
+
+.btn-refund:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .pagination-wrapper {
   display: flex;
   justify-content: center;

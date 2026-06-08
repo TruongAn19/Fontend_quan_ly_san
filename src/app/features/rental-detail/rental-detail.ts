@@ -18,6 +18,8 @@ export class RentalDetailComponent implements OnInit {
   booking = signal<any>(null);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  isCancelling = signal<boolean>(false);
+  successMessage = signal<string | null>(null);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -43,6 +45,38 @@ export class RentalDetailComponent implements OnInit {
       error: (err) => {
         this.isLoading.set(false);
         this.errorMessage.set(err?.error?.message ?? 'Không thể tải chi tiết đơn thuê.');
+      }
+    });
+  }
+
+  canCancel(): boolean {
+    const s = this.rental()?.status;
+    return s === 'PENDING' || s === 'IN_USE';
+  }
+
+  cancelRental(): void {
+    const r = this.rental();
+    if (!r || !this.canCancel()) return;
+    if (!confirm('Bạn có chắc muốn hủy đơn thuê vợt này?')) return;
+
+    this.isCancelling.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.rentalService.cancelRental(r.id).subscribe({
+      next: (res) => {
+        this.isCancelling.set(false);
+        // Flip badge ngay sang "Đã hủy"
+        this.rental.set({ ...r, status: res?.data?.status ?? 'CANCELLED' });
+        this.successMessage.set(res?.message ?? 'Đã hủy đơn thuê thành công.');
+      },
+      error: (err) => {
+        this.isCancelling.set(false);
+        if (err?.status === 403) {
+          this.errorMessage.set('Bạn không có quyền hủy đơn thuê này.');
+        } else {
+          // 409 (đơn đã hoàn thành), 404... → message từ backend
+          this.errorMessage.set(err?.error?.message ?? 'Không thể hủy đơn thuê. Vui lòng thử lại.');
+        }
       }
     });
   }

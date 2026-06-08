@@ -20,6 +20,10 @@ export class RentalService {
     return this.http.post<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}/pay`, payload);
   }
 
+  cancelRental(id: number): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/rentals/${id}/cancel`, {});
+  }
+
   vnpayCallback(params: any): Observable<ApiResponse<any>> {
     let httpParams = new HttpParams();
     Object.keys(params).forEach(key => {

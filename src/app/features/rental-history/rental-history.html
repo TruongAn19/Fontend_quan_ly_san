@@ -7,6 +7,12 @@
     </div>
   }
 
+  @if (successMessage()) {
+    <div class="success-alert">
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
   @if (isLoading()) {
     <div class="loading-state">
       <span class="spinner"></span> Đang tải lịch sử...
@@ -56,7 +62,14 @@
                   </span>
                 </td>
                 <td>
-                  <a class="detail-link" [routerLink]="['/rental-detail', item.id]">Xem chi tiết</a>
+                  <div class="action-cell">
+                    <a class="detail-link" [routerLink]="['/rental-detail', item.id]">Xem chi tiết</a>
+                    @if (canCancel(item)) {
+                      <button class="btn-cancel-sm" [disabled]="cancellingId() === item.id" (click)="cancelRental(item)">
+                        {{ cancellingId() === item.id ? 'Đang hủy...' : 'Hủy' }}
+                      </button>
+                    }
+                  </div>
                 </td>
               </tr>
             }

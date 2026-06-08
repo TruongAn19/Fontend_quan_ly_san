@@ -61,7 +61,11 @@
               </td>
               <td>
                 <div class="action-dropdown">
-                  @if (isStatusLocked(item.status)) {
+                  @if (item.status === 'CANCELLED' && item.refundStatus === 'PENDING_REFUND') {
+                    <button class="btn-refund" [disabled]="confirmingId() === item.id" (click)="confirmRefund(item)">
+                      {{ confirmingId() === item.id ? 'Đang xử lý...' : '✅ Đã hoàn cọc' }}
+                    </button>
+                  } @else if (isStatusLocked(item.status)) {
                     <span class="locked-hint" title="Đơn đã đóng, không thể đổi trạng thái">🔒 Đã khoá</span>
                   } @else {
                     <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">

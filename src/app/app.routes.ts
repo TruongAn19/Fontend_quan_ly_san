@@ -130,6 +130,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/admin/refund-requests/refund-requests').then(m => m.AdminRefundRequestsComponent),
     canActivate: [adminGuard]
   },
+  {
+    path: 'admin/rental-refunds',
+    loadComponent: () => import('./features/admin/rental-refunds/rental-refunds').then(m => m.AdminRentalRefundsComponent),
+    canActivate: [adminGuard]
+  },
 
   {
     path: '**',

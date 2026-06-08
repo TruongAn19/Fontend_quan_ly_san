@@ -105,4 +105,14 @@ export class AdminService {
   updateRentalStatus(rentalId: number, status: string): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}/status`, { status });
   }
+
+  // Lấy nhiều rental rồi filter FE theo refundStatus (mirror cách refund-requests làm với booking).
+  getRentalRefunds(): Observable<any> {
+    const params = new HttpParams().set('page', '0').set('size', '100');
+    return this.http.get<any>(`${this.API_URL}/rentals`, { params });
+  }
+
+  confirmRentalRefund(rentalId: number): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}/refund`, {});
+  }
 }

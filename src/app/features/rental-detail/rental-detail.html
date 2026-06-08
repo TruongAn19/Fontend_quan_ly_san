@@ -6,6 +6,10 @@
     <div class="error-alert"><span>{{ errorMessage() }}</span></div>
   }
 
+  @if (successMessage()) {
+    <div class="success-alert"><span>{{ successMessage() }}</span></div>
+  }
+
   @if (isLoading()) {
     <div class="loading-state"><span class="spinner"></span> Đang tải chi tiết...</div>
   } @else if (rental()) {
@@ -29,6 +33,15 @@
           <span class="status-badge" [class]="rental().status?.toLowerCase()">{{ statusLabel(rental().status) }}</span>
         </div>
       </div>
+
+      @if (canCancel()) {
+        <div class="detail-actions">
+          <button class="btn-cancel" [disabled]="isCancelling()" (click)="cancelRental()">
+            @if (isCancelling()) { <span class="spinner"></span> Đang hủy... }
+            @else { Hủy đơn thuê }
+          </button>
+        </div>
+      }
     </div>
 
     @if (rental().type === 'ON_SITE' && booking()) {

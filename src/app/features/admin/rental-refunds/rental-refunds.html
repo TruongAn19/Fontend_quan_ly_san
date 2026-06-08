@@ -1,0 +1,117 @@
+<div class="admin-refunds animate-fade-in">
+  <h1 class="page-title">Hoàn cọc thuê thiết bị</h1>
+
+  @if (errorMessage()) {
+    <div class="error-alert"><span>{{ errorMessage() }}</span></div>
+  }
+
+  <div class="filter-tabs">
+    <button class="tab-btn" [class.active]="filterStatus() === 'PENDING_REFUND'"
+            (click)="changeFilter('PENDING_REFUND')">
+      ⏳ Chờ hoàn cọc
+    </button>
+    <button class="tab-btn" [class.active]="filterStatus() === 'REFUNDED'"
+            (click)="changeFilter('REFUNDED')">
+      ✅ Đã hoàn cọc
+    </button>
+    <button class="tab-btn" [class.active]="filterStatus() === 'ALL'"
+            (click)="changeFilter('ALL')">
+      Tất cả
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state"><span class="spinner"></span> Đang tải...</div>
+  } @else if (rentals().length === 0) {
+    <div class="empty-state">Không có yêu cầu hoàn cọc nào.</div>
+  } @else {
+    <div class="table-responsive glass-card">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách</th>
+            <th>SĐT</th>
+            <th>Vợt</th>
+            <th>Ngày huỷ</th>
+            <th>Tiền hoàn</th>
+            <th>Trạng thái hoàn</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of rentals(); track r.id) {
+            <tr>
+              <td><strong>{{ r.rentalToolCode || r.id }}</strong></td>
+              <td>{{ r.fullName || '—' }}</td>
+              <td>{{ r.phone || '—' }}</td>
+              <td>{{ r.racketName || ('Vợt #' + r.racketId) }}</td>
+              <td>{{ r.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="refund-amount">{{ (r.rentalPrice ?? 0) | number }} VNĐ</td>
+              <td>
+                <span class="refund-badge" [class]="r.refundStatus?.toLowerCase()">
+                  {{ refundStatusLabel(r.refundStatus) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-detail" (click)="openDetail(r)">Xem chi tiết</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Detail modal -->
+  @if (selected()) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h2 class="modal-title">Chi tiết yêu cầu hoàn cọc</h2>
+
+        <div class="detail-grid">
+          <div class="detail-row"><span class="label">Mã đơn:</span><strong>{{ selected().rentalToolCode || selected().id }}</strong></div>
+          <div class="detail-row"><span class="label">Khách hàng:</span><span>{{ selected().fullName || '—' }}</span></div>
+          <div class="detail-row"><span class="label">Số điện thoại:</span>
+            <a [href]="'tel:' + selected().phone">{{ selected().phone || '—' }}</a>
+          </div>
+          <div class="detail-row"><span class="label">Email:</span>
+            <a [href]="'mailto:' + selected().email">{{ selected().email || '—' }}</a>
+          </div>
+          <div class="detail-row"><span class="label">Vợt:</span><span>{{ selected().racketName || ('Vợt #' + selected().racketId) }}</span></div>
+          <div class="detail-row"><span class="label">Hình thức:</span><span>{{ typeLabel(selected().type) }}</span></div>
+          @if (selected().type === 'DAILY') {
+            <div class="detail-row"><span class="label">Ngày thuê:</span><span>{{ selected().rentalDate }}</span></div>
+            <div class="detail-row"><span class="label">Số ngày:</span><span>{{ selected().quantityDay }} ngày</span></div>
+          }
+          <div class="detail-row"><span class="label">Số lượng:</span><span>{{ selected().quantity }}</span></div>
+          <div class="detail-row"><span class="label">Thời điểm huỷ:</span>
+            <span>{{ selected().cancelledAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-row highlight">
+            <span class="label">Số tiền cần hoàn:</span>
+            <strong class="amount">{{ (selected().rentalPrice ?? 0) | number }} VNĐ</strong>
+          </div>
+          <div class="detail-row"><span class="label">Trạng thái hoàn:</span>
+            <span class="refund-badge" [class]="selected().refundStatus?.toLowerCase()">
+              {{ refundStatusLabel(selected().refundStatus) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="closeDetail()" [disabled]="isConfirming()">Đóng</button>
+          @if (selected().refundStatus === 'PENDING_REFUND') {
+            <button class="btn-success" (click)="confirmRefund()" [disabled]="isConfirming()">
+              @if (isConfirming()) {
+                <span class="spinner"></span> Đang xử lý...
+              } @else {
+                ✅ Đã hoàn cọc
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
