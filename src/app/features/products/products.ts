@@ -65,7 +65,7 @@ export class ProductsComponent implements OnInit {
         
         const mappedData = rawData.map((item: any) => ({
           ...item,
-          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/resources/images/product/${item.image}`) : 'assets/img/default-pitch.png',
+          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `/resources/images/product/${item.image}`) : 'assets/img/default-pitch.png',
           pricePerHour: item.pricePerHour || item.price
         }));
 

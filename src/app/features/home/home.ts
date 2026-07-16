@@ -38,28 +38,28 @@ export class HomeComponent implements OnInit {
           if (data.products) {
             data.products = data.products.map((p: any) => ({
               ...p,
-              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:8080/resources/images/product/${p.image}`) : 'assets/img/default-pitch.png',
+              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `/resources/images/product/${p.image}`) : 'assets/img/default-pitch.png',
               pricePerHour: p.pricePerHour || p.price
             }));
           }
           if (data.equipments) {
             data.equipments = data.equipments.map((r: any) => ({
               ...r,
-              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `http://localhost:8080/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
+              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
               rentalPrice: r.rentalPricePerDay || r.rentalPricePerPlay || r.price
             }));
           }
           if (data.topProducts) {
             data.topProducts = data.topProducts.map((p: any) => ({
               ...p,
-              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:8080/resources/images/product/${p.image}`) : 'assets/img/default-pitch.png',
+              imageUrl: p.image ? (p.image.startsWith('http') ? p.image : `/resources/images/product/${p.image}`) : 'assets/img/default-pitch.png',
               pricePerHour: p.pricePerHour || p.price
             }));
           }
           if (data.topEquipments) {
             data.topEquipments = data.topEquipments.map((r: any) => ({
               ...r,
-              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `http://localhost:8080/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
+              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
               rentalPrice: r.rentalPricePerDay || r.rentalPricePerPlay || r.price
             }));
           }

@@ -1,10 +1,13 @@
+const origin = window.location.origin;
+const wsOrigin = origin.replace(/^http/, 'ws');
+
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://localhost:8080/api/v1',
-  wsBaseUrl: 'ws://localhost:8080/ws',
-  stompSockJsUrl: 'http://localhost:8080/ws',
-  sseBaseUrl: 'http://localhost:8080/api/v1/ntfy-sse',
-  vnpayReturnUrl: 'http://localhost:4200/payment/result',
+  apiBaseUrl: '/api/v1',
+  wsBaseUrl: `${wsOrigin}/ws`,
+  stompSockJsUrl: `${origin}/ws`,
+  sseBaseUrl: '/api/v1/ntfy-sse',
+  vnpayReturnUrl: `${origin}/payments/vnpay-callback`,
   features: {
     enableRealtimeChat: false,
     enableRealtimeNotifications: false

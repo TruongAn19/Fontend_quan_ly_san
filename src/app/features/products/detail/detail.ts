@@ -38,7 +38,7 @@ export class ProductDetailComponent implements OnInit {
         this.isLoading.set(false);
         const data = res?.data || res;
         if (data && data.product) {
-          data.product.imageUrl = data.product.image ? (data.product.image.startsWith('http') ? data.product.image : `http://localhost:8080/resources/images/product/${data.product.image}`) : 'assets/img/default-pitch.png';
+          data.product.imageUrl = data.product.image ? (data.product.image.startsWith('http') ? data.product.image : `/resources/images/product/${data.product.image}`) : 'assets/img/default-pitch.png';
           data.product.pricePerHour = data.product.pricePerHour || data.product.price;
         }
         this.productDetail.set(data);
