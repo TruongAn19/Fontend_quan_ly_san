@@ -31,6 +31,7 @@
               <button class="btn-view" (click)="openDetailModal(user)">Xem</button>
               <button class="btn-edit" (click)="openEditModal(user)">Sửa</button>
               <button class="btn-role" (click)="openRoleModal(user)">Đổi quyền</button>
+              <button class="btn-password" (click)="openPasswordModal(user)">Đổi mật khẩu</button>
               <button class="btn-delete" (click)="deleteUser(user)">Xóa</button>
             </td>
           </tr>
@@ -40,6 +41,16 @@
         </tbody>
       </table>
     </div>
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <span>Tổng: {{ totalElements() }} người dùng</span>
+        <div class="pagination-actions">
+          <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0">Trước</button>
+          <span>Trang {{ currentPage() + 1 }} / {{ totalPages() }}</span>
+          <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() + 1 >= totalPages()">Sau</button>
+        </div>
+      </div>
+    }
   }
 
   @if (modalMode() === 'create' || modalMode() === 'edit') {
@@ -102,6 +113,33 @@
           <div class="modal-actions">
             <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
             <button type="submit" class="btn-primary" [disabled]="roleForm.invalid || isSaving()">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+  @if (modalMode() === 'password' && selectedUser()) {
+    <div class="modal-overlay">
+      <div class="modal-content glass-card">
+        <h3>Đổi mật khẩu</h3>
+        <p>Người dùng: <strong>{{ selectedUser().fullName }}</strong></p>
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="form-group">
+            <label for="newPassword">Mật khẩu mới</label>
+            <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password">
+            @if (passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid) {
+              <span class="validation-error">Mật khẩu phải có từ 6 đến 72 ký tự.</span>
+            }
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Xác nhận mật khẩu</label>
+            <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password">
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid || isSaving()">
+              {{ isSaving() ? 'Đang lưu...' : 'Đổi mật khẩu' }}
+            </button>
           </div>
         </form>
       </div>

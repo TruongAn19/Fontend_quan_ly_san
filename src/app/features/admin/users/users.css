@@ -84,7 +84,7 @@
   flex-wrap: wrap;
 }
 
-.btn-edit, .btn-view, .btn-role {
+.btn-edit, .btn-view, .btn-role, .btn-password {
   background: rgba(99, 102, 241, 0.1);
   border: 1px solid rgba(99, 102, 241, 0.2);
   color: #a5b4fc;
@@ -94,7 +94,7 @@
   transition: all 0.2s;
 }
 
-.btn-edit:hover, .btn-view:hover, .btn-role:hover {
+.btn-edit:hover, .btn-view:hover, .btn-role:hover, .btn-password:hover {
   background: #6366f1;
   color: white;
 }
@@ -189,6 +189,40 @@ select option {
   color: #94a3b8;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  color: #94a3b8;
+}
+
+.pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination button {
+  padding: 8px 14px;
+  color: #e2e8f0;
+  background: rgba(99, 102, 241, .15);
+  border: 1px solid rgba(99, 102, 241, .3);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.validation-error {
+  color: #fca5a5;
+  font-size: .8rem;
+}
+
 button:disabled {
   opacity: .55;
   cursor: not-allowed;
@@ -197,6 +231,7 @@ button:disabled {
 @media (max-width: 640px) {
   .form-grid { grid-template-columns: 1fr; }
   .page-header { align-items: flex-start; gap: 16px; flex-direction: column; }
+  .pagination { align-items: flex-start; flex-direction: column; }
 }
 
 .modal-actions {

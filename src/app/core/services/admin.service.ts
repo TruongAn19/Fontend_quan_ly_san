@@ -25,8 +25,9 @@ export class AdminService {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/racket-statistics`);
   }
 
-  getUsers(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.API_URL}/users`);
+  getUsers(page: number = 0, size: number = 10): Observable<ApiResponse<any>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/users`, { params });
   }
 
   createUser(payload: FormData): Observable<ApiResponse<any>> {
@@ -43,6 +44,10 @@ export class AdminService {
 
   updateUserRole(userId: number, role: string): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(`${this.API_URL}/users/${userId}/role`, { role });
+  }
+
+  changeUserPassword(userId: number, newPassword: string): Observable<ApiResponse<null>> {
+    return this.http.put<ApiResponse<null>>(`${this.API_URL}/users/${userId}/password`, { newPassword });
   }
 
   getProducts(page: number = 1, search: string = ''): Observable<any> {

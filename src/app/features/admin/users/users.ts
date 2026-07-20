@@ -18,8 +18,12 @@ export class AdminUsersComponent implements OnInit {
   isLoading = signal(false);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
+  currentPage = signal(0);
+  totalPages = signal(0);
+  totalElements = signal(0);
+  readonly pageSize = 10;
   selectedUser = signal<any | null>(null);
-  modalMode = signal<'create' | 'edit' | 'detail' | 'role' | null>(null);
+  modalMode = signal<'create' | 'edit' | 'detail' | 'role' | 'password' | null>(null);
 
   userForm: FormGroup = this.fb.group({
     fullName: ['', Validators.required],
@@ -34,6 +38,11 @@ export class AdminUsersComponent implements OnInit {
     role: ['', Validators.required]
   });
 
+  passwordForm: FormGroup = this.fb.group({
+    newPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(72)]],
+    confirmPassword: ['', Validators.required]
+  });
+
   ngOnInit(): void {
     this.loadUsers();
   }
@@ -41,9 +50,12 @@ export class AdminUsersComponent implements OnInit {
   loadUsers(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.adminService.getUsers().subscribe({
+    this.adminService.getUsers(this.currentPage(), this.pageSize).subscribe({
       next: (res) => {
-        this.users.set(res.data || []);
+        const pageData = res.data;
+        this.users.set(pageData?.content || []);
+        this.totalPages.set(pageData?.totalPages || 0);
+        this.totalElements.set(pageData?.totalElements || 0);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -51,6 +63,12 @@ export class AdminUsersComponent implements OnInit {
         this.errorMessage.set(err.error?.message || 'Không thể tải danh sách người dùng.');
       }
     });
+  }
+
+  goToPage(page: number): void {
+    if (page < 0 || page >= this.totalPages() || page === this.currentPage()) return;
+    this.currentPage.set(page);
+    this.loadUsers();
   }
 
   openCreateModal(): void {
@@ -87,6 +105,12 @@ export class AdminUsersComponent implements OnInit {
     this.selectedUser.set(user);
     this.roleForm.patchValue({ role: user.roleName });
     this.modalMode.set('role');
+  }
+
+  openPasswordModal(user: any): void {
+    this.selectedUser.set(user);
+    this.passwordForm.reset();
+    this.modalMode.set('password');
   }
 
   closeModal(): void {
@@ -144,6 +168,30 @@ export class AdminUsersComponent implements OnInit {
       error: (err) => {
         this.isSaving.set(false);
         this.errorMessage.set(err.error?.message || 'Cập nhật quyền thất bại.');
+      }
+    });
+  }
+
+  changePassword(): void {
+    if (this.passwordForm.invalid || !this.selectedUser() || this.isSaving()) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    const { newPassword, confirmPassword } = this.passwordForm.value;
+    if (newPassword !== confirmPassword) {
+      this.errorMessage.set('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+    this.isSaving.set(true);
+    this.errorMessage.set(null);
+    this.adminService.changeUserPassword(this.selectedUser().id, newPassword).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.closeModal();
+      },
+      error: (err) => {
+        this.isSaving.set(false);
+        this.errorMessage.set(err.error?.message || 'Đổi mật khẩu thất bại.');
       }
     });
   }

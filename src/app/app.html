@@ -20,7 +20,7 @@
       </nav>
 
       <div class="sidebar-actions">
-        @if (authService.isLoggedIn()) {
+        @if (isAdmin()) {
           <app-notification-bell [forAdmin]="true"></app-notification-bell>
           <button class="btn-logout" (click)="onLogout()">Đăng xuất</button>
         }
