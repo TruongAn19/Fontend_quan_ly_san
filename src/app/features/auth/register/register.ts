@@ -27,6 +27,7 @@ export class RegisterComponent {
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  showSuccessPopup = signal<boolean>(false);
 
   passwordMatchValidator(g: FormGroup) {
     const pass = g.get('password')?.value;
@@ -46,12 +47,17 @@ export class RegisterComponent {
     this.authService.register(this.registerForm.value).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/login']);
+        this.showSuccessPopup.set(true);
       },
       error: (err) => {
         this.isLoading.set(false);
         this.errorMessage.set(err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại!');
       }
     });
+  }
+
+  goToLogin(): void {
+    this.showSuccessPopup.set(false);
+    this.router.navigate(['/login']);
   }
 }

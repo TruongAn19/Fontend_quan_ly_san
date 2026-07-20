@@ -1,5 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 
@@ -11,16 +11,27 @@ import { AdminService } from '../../../core/services/admin.service';
   styleUrls: ['./users.css']
 })
 export class AdminUsersComponent implements OnInit {
-  private adminService = inject(AdminService);
-  private fb = inject(FormBuilder);
+  private readonly adminService = inject(AdminService);
+  private readonly fb = inject(FormBuilder);
 
   users = signal<any[]>([]);
-  isLoading = signal<boolean>(false);
+  isLoading = signal(false);
+  isSaving = signal(false);
   errorMessage = signal<string | null>(null);
-
   selectedUser = signal<any | null>(null);
+  modalMode = signal<'create' | 'edit' | 'detail' | 'role' | null>(null);
+
+  userForm: FormGroup = this.fb.group({
+    fullName: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    password: [''],
+    phone: ['', Validators.required],
+    address: [''],
+    role: ['USER', Validators.required]
+  });
+
   roleForm: FormGroup = this.fb.group({
-    role: ['', [Validators.required]]
+    role: ['', Validators.required]
   });
 
   ngOnInit(): void {
@@ -29,50 +40,119 @@ export class AdminUsersComponent implements OnInit {
 
   loadUsers(): void {
     this.isLoading.set(true);
+    this.errorMessage.set(null);
     this.adminService.getUsers().subscribe({
       next: (res) => {
+        this.users.set(res.data || []);
         this.isLoading.set(false);
-        this.users.set(res.data || res || []);
       },
-      error: () => {
+      error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Không thể tải danh sách người dùng.');
+        this.errorMessage.set(err.error?.message || 'Không thể tải danh sách người dùng.');
       }
     });
+  }
+
+  openCreateModal(): void {
+    this.selectedUser.set(null);
+    this.userForm.reset({ role: 'USER' });
+    this.userForm.get('email')?.enable();
+    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(3)]);
+    this.userForm.get('password')?.updateValueAndValidity();
+    this.modalMode.set('create');
+  }
+
+  openEditModal(user: any): void {
+    this.selectedUser.set(user);
+    this.userForm.reset({
+      fullName: user.fullName,
+      email: user.email,
+      password: '',
+      phone: user.phone,
+      address: user.address,
+      role: user.roleName
+    });
+    this.userForm.get('email')?.disable();
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.get('password')?.updateValueAndValidity();
+    this.modalMode.set('edit');
+  }
+
+  openDetailModal(user: any): void {
+    this.selectedUser.set(user);
+    this.modalMode.set('detail');
   }
 
   openRoleModal(user: any): void {
     this.selectedUser.set(user);
     this.roleForm.patchValue({ role: user.roleName });
+    this.modalMode.set('role');
   }
 
-  closeRoleModal(): void {
+  closeModal(): void {
+    this.modalMode.set(null);
     this.selectedUser.set(null);
   }
 
-  onUpdateRole(): void {
-    if (this.roleForm.invalid || !this.selectedUser()) return;
+  saveUser(): void {
+    if (this.userForm.invalid || this.isSaving()) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
 
-    const userId = this.selectedUser().id;
-    const newRole = this.roleForm.get('role')?.value;
+    const mode = this.modalMode();
+    const value = this.userForm.getRawValue();
+    const user = {
+      fullName: value.fullName,
+      email: value.email,
+      password: mode === 'create' ? value.password : 'unchanged',
+      phone: value.phone,
+      address: value.address,
+      role: { name: value.role }
+    };
+    const payload = new FormData();
+    payload.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
 
-    this.adminService.updateUserRole(userId, newRole).subscribe({
+    this.isSaving.set(true);
+    this.errorMessage.set(null);
+    const request$ = mode === 'create'
+      ? this.adminService.createUser(payload)
+      : this.adminService.updateUser(this.selectedUser().id, payload);
+
+    request$.subscribe({
       next: () => {
-        this.closeRoleModal();
+        this.isSaving.set(false);
+        this.closeModal();
         this.loadUsers();
       },
       error: (err) => {
+        this.isSaving.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể lưu người dùng.');
+      }
+    });
+  }
+
+  updateRole(): void {
+    if (this.roleForm.invalid || !this.selectedUser() || this.isSaving()) return;
+    this.isSaving.set(true);
+    this.adminService.updateUserRole(this.selectedUser().id, this.roleForm.value.role).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.closeModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.isSaving.set(false);
         this.errorMessage.set(err.error?.message || 'Cập nhật quyền thất bại.');
       }
     });
   }
 
-  deleteUser(userId: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-      this.adminService.deleteUser(userId).subscribe({
-        next: () => this.loadUsers(),
-        error: (err) => this.errorMessage.set(err.error?.message || 'Xóa người dùng thất bại.')
-      });
-    }
+  deleteUser(user: any): void {
+    if (!confirm(`Bạn có chắc chắn muốn xóa người dùng "${user.fullName}"?`)) return;
+    this.adminService.deleteUser(user.id).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => this.errorMessage.set(err.error?.message || 'Xóa người dùng thất bại.')
+    });
   }
 }

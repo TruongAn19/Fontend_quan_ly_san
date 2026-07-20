@@ -1,28 +1,22 @@
 <div class="admin-users animate-fade-in">
-  <h1 class="page-title">Quản lý Người dùng</h1>
+  <div class="page-header">
+    <h1 class="page-title">Quản lý người dùng</h1>
+    <button class="btn-primary" (click)="openCreateModal()">+ Thêm người dùng</button>
+  </div>
 
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+    <div class="error-alert">{{ errorMessage() }}</div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tải danh sách...
-    </div>
+    <div class="loading-state"><span class="spinner"></span> Đang tải danh sách...</div>
   } @else {
-
     <div class="table-responsive glass-card">
       <table class="premium-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Họ Tên</th>
-            <th>Email</th>
-            <th>Số điện thoại</th>
-            <th>Vai trò</th>
-            <th>Hành động</th>
+            <th>ID</th><th>Họ tên</th><th>Email</th><th>Số điện thoại</th>
+            <th>Hạng</th><th>Vai trò</th><th>Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -31,45 +25,86 @@
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.phone }}</td>
-            <td>
-              <span class="role-badge" [class]="user.roleName?.toLowerCase()">
-                {{ user.roleName || '—' }}
-              </span>
-            </td>
+            <td>{{ user.memberLevel || 'NORMAL' }}</td>
+            <td><span class="role-badge" [class]="user.roleName?.toLowerCase()">{{ user.roleName || '—' }}</span></td>
             <td class="actions-cell">
-              <button class="btn-edit" (click)="openRoleModal(user)">Đổi Quyền</button>
-              <button class="btn-delete" (click)="deleteUser(user.id)">Xóa</button>
+              <button class="btn-view" (click)="openDetailModal(user)">Xem</button>
+              <button class="btn-edit" (click)="openEditModal(user)">Sửa</button>
+              <button class="btn-role" (click)="openRoleModal(user)">Đổi quyền</button>
+              <button class="btn-delete" (click)="deleteUser(user)">Xóa</button>
             </td>
           </tr>
+          @if (!users().length) {
+            <tr><td colspan="7" class="empty-state">Chưa có người dùng.</td></tr>
+          }
         </tbody>
       </table>
     </div>
-
   }
 
-  @if (selectedUser()) {
-    <div class="modal-overlay animate-fade-in">
+  @if (modalMode() === 'create' || modalMode() === 'edit') {
+    <div class="modal-overlay">
       <div class="modal-content glass-card">
-        <h3>Thay đổi quyền người dùng</h3>
-        <p>Người dùng: <strong>{{ selectedUser().fullName }}</strong></p>
-        
-        <form [formGroup]="roleForm" (ngSubmit)="onUpdateRole()">
-          <div class="form-group">
-            <label for="role">Chọn vai trò</label>
-            <select id="role" formControlName="role">
-              <option value="USER">USER</option>
-              <option value="STAFF">STAFF</option>
-              <option value="ADMIN">ADMIN</option>
-            </select>
+        <h3>{{ modalMode() === 'create' ? 'Thêm người dùng' : 'Chỉnh sửa người dùng' }}</h3>
+        <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+          <div class="form-grid">
+            <div class="form-group"><label>Họ tên</label><input formControlName="fullName"></div>
+            <div class="form-group"><label>Email</label><input type="email" formControlName="email"></div>
+            @if (modalMode() === 'create') {
+              <div class="form-group"><label>Mật khẩu</label><input type="password" formControlName="password"></div>
+            }
+            <div class="form-group"><label>Số điện thoại</label><input formControlName="phone"></div>
+            <div class="form-group"><label>Địa chỉ</label><input formControlName="address"></div>
+            <div class="form-group">
+              <label>Vai trò</label>
+              <select formControlName="role"><option>USER</option><option>STAFF</option><option>ADMIN</option></select>
+            </div>
           </div>
-
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" (click)="closeRoleModal()">Hủy</button>
-            <button type="submit" class="btn-primary" [disabled]="roleForm.invalid">Cập nhật</button>
+            <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn-primary" [disabled]="userForm.invalid || isSaving()">
+              {{ isSaving() ? 'Đang lưu...' : 'Lưu' }}
+            </button>
           </div>
         </form>
       </div>
     </div>
   }
 
+  @if (modalMode() === 'detail' && selectedUser()) {
+    <div class="modal-overlay">
+      <div class="modal-content glass-card">
+        <h3>Chi tiết người dùng</h3>
+        <div class="detail-list">
+          <p><span>ID</span><strong>{{ selectedUser().id }}</strong></p>
+          <p><span>Họ tên</span><strong>{{ selectedUser().fullName }}</strong></p>
+          <p><span>Email</span><strong>{{ selectedUser().email }}</strong></p>
+          <p><span>Số điện thoại</span><strong>{{ selectedUser().phone }}</strong></p>
+          <p><span>Địa chỉ</span><strong>{{ selectedUser().address || '—' }}</strong></p>
+          <p><span>Hạng</span><strong>{{ selectedUser().memberLevel || 'NORMAL' }}</strong></p>
+          <p><span>Vai trò</span><strong>{{ selectedUser().roleName }}</strong></p>
+        </div>
+        <div class="modal-actions"><button class="btn-secondary" (click)="closeModal()">Đóng</button></div>
+      </div>
+    </div>
+  }
+
+  @if (modalMode() === 'role' && selectedUser()) {
+    <div class="modal-overlay">
+      <div class="modal-content glass-card">
+        <h3>Thay đổi quyền người dùng</h3>
+        <p>Người dùng: <strong>{{ selectedUser().fullName }}</strong></p>
+        <form [formGroup]="roleForm" (ngSubmit)="updateRole()">
+          <div class="form-group">
+            <label>Vai trò</label>
+            <select formControlName="role"><option>USER</option><option>STAFF</option><option>ADMIN</option></select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn-primary" [disabled]="roleForm.invalid || isSaving()">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 </div>
