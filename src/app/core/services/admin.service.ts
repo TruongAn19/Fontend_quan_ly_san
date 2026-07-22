@@ -21,8 +21,12 @@ export class AdminService {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/products/statistics/revenue`, { params });
   }
 
-  getRacketStats(): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.API_URL}/racket-statistics`);
+  getRacketStats(startDate?: string, endDate?: string, courtId?: number | null): Observable<ApiResponse<any>> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    if (courtId != null) params = params.set('courtId', courtId);
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/racket-statistics`, { params });
   }
 
   getUsers(page: number = 0, size: number = 10): Observable<ApiResponse<any>> {

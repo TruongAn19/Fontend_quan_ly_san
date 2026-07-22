@@ -15,36 +15,89 @@
     
     @if (stats()) {
       <div class="stats-grid">
-        <div class="stat-card glass-card">
-          <h3 class="stat-label">Người dùng</h3>
-          <p class="stat-value">{{ stats().countUser || 0 }}</p>
+        <div class="stat-card overview-card users-card">
+          <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M16 20v-1.5a4.5 4.5 0 0 0-4.5-4.5h-3A4.5 4.5 0 0 0 4 18.5V20M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7-1a3 3 0 1 0 0-6m1 9.5a4 4 0 0 1 3 3.87V20"/></svg></span>
+          <div><h3 class="stat-label">Tổng người dùng</h3><p class="stat-value">{{ stats().countUser || 0 }}</p><small>Tài khoản trong hệ thống</small></div>
         </div>
-        <div class="stat-card glass-card">
-          <h3 class="stat-label">Sản phẩm / Sân</h3>
-          <p class="stat-value">{{ stats().countProduct || 0 }}</p>
+        <div class="stat-card overview-card courts-card">
+          <span class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          <div><h3 class="stat-label">Tổng số sân</h3><p class="stat-value">{{ stats().countProduct || 0 }}</p><small>Sân đang quản lý</small></div>
+        </div>
+        <div class="stat-card overview-card rackets-card">
+          <span class="stat-icon"><svg viewBox="0 0 24 24"><ellipse cx="9" cy="8" rx="5" ry="6"/><path d="m12.5 12.5 7 7m-9-5 4-4M18 18l2-2"/></svg></span>
+          <div><h3 class="stat-label">Tổng số vợt</h3><p class="stat-value">{{ totalRackets() }}</p><small>Vợt hiện có trong kho</small></div>
         </div>
       </div>
     }
 
+    @if (revenue()) {
+      <section class="revenue-section">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">DOANH THU ĐẶT SÂN</p>
+            <h2 class="section-title revenue-title">Theo tháng</h2>
+          </div>
+          <label class="month-picker">
+            <span>Chọn tháng</span>
+            <input type="month" [value]="selectedMonth()" (change)="onMonthChange($event)" />
+          </label>
+        </div>
+
+        <div class="revenue-summary glass-card">
+          <span>Tổng doanh thu sân tháng {{ selectedMonth().slice(5) }}/{{ selectedMonth().slice(0, 4) }}</span>
+          <strong>{{ totalCourtRevenue() | number }} VNĐ</strong>
+        </div>
+
+        <div class="revenue-chart glass-card">
+          @for (item of courtRevenueEntries(); track item.name) {
+            <div class="revenue-row">
+              <div class="revenue-meta"><strong>{{ item.name }}</strong><span>{{ item.value | number }} VNĐ</span></div>
+              <div class="bar-track"><div class="bar-value" [style.width.%]="revenueBarWidth(item.value)"></div></div>
+            </div>
+          } @empty {
+            <div class="empty-revenue">Tháng này chưa có doanh thu sân đã thanh toán.</div>
+          }
+        </div>
+      </section>
+    }
+
     @if (racketStats()) {
-      <div class="racket-stats-section">
-        <h2 class="section-title">Thống kê thuê dụng cụ</h2>
-        
-        <div class="stats-grid secondary">
-          <div class="stat-card glass-card">
-            <h4 class="stat-label">Tổng số vợt</h4>
-            <p class="stat-value">{{ racketStats().totalRackets || 0 }}</p>
-          </div>
-          <div class="stat-card glass-card">
-            <h4 class="stat-label">Đang cho thuê</h4>
-            <p class="stat-value">{{ racketStats().currentlyRented || 0 }}</p>
-          </div>
-          <div class="stat-card glass-card">
-            <h4 class="stat-label">Doanh thu tháng này</h4>
-            <p class="stat-value">{{ (racketStats().monthlyRevenue || 0) | number }} VNĐ</p>
+      <section class="racket-report">
+        <div class="section-heading">
+          <div><p class="section-kicker racket-kicker">THIẾT BỊ CHO THUÊ</p><h2 class="section-title revenue-title">Hiệu quả thuê vợt</h2><span class="renting-now">{{ racketStats().currentlyRented || 0 }} vợt đang được thuê hôm nay</span></div>
+          <div class="racket-filters">
+            <label><span>Sân</span><select (change)="onRacketCourtChange($event)"><option value="">Tất cả sân</option>@for (court of racketStats().listProduct || []; track court.id) { <option [value]="court.id">{{ court.name }}</option> }</select></label>
+            <label><span>Tháng báo cáo</span><input type="month" [value]="racketMonth()" (change)="onRacketMonthChange($event)" /></label>
           </div>
         </div>
-      </div>
+
+        <div class="racket-kpi-grid">
+          <article class="racket-kpi orders-kpi"><span>Tổng đơn thuê</span><strong>{{ racketStats().monthlyOrders || 0 }}</strong><div class="kpi-breakdown"><small>Theo ngày <b>{{ racketStats().daily?.orders || 0 }}</b></small><small>Kèm sân <b>{{ racketStats().onSite?.orders || 0 }}</b></small></div></article>
+          <article class="racket-kpi rentals-kpi"><span>Tổng số vợt đã thuê</span><strong>{{ racketStats().monthlyQuantity || 0 }}</strong><div class="kpi-breakdown"><small>Theo ngày <b>{{ racketStats().daily?.quantity || 0 }}</b></small><small>Kèm sân <b>{{ racketStats().onSite?.quantity || 0 }}</b></small></div></article>
+          <article class="racket-kpi revenue-kpi"><span>Tổng doanh thu vợt</span><strong>{{ (racketStats().monthlyRevenue || 0) | number }} VNĐ</strong><div class="kpi-breakdown"><small>Theo ngày <b>{{ (racketStats().daily?.revenue || 0) | number }}</b></small><small>Kèm sân <b>{{ (racketStats().onSite?.revenue || 0) | number }}</b></small></div></article>
+        </div>
+
+        <div class="racket-insights">
+          <div class="trend-card glass-card">
+            <div class="card-heading"><div><h3>Doanh thu 6 tháng</h3><p>Đơn thuê đã hoàn tất</p></div></div>
+            <div class="trend-list">
+              @for (item of racketTrend(); track item.month) {
+                <div class="trend-row"><span class="trend-month">T{{ item.month.slice(5) }}/{{ item.month.slice(2, 4) }}</span><div class="trend-track"><div class="trend-value daily-trend" [style.width.%]="racketTrendWidth(item.dailyRevenue)"></div><div class="trend-value onsite-trend" [style.width.%]="racketTrendWidth(item.onSiteRevenue)"></div></div><div class="trend-number"><strong>{{ item.revenue | number }}</strong><small>{{ item.orders }} đơn</small></div></div>
+              }
+            </div>
+            <div class="trend-legend"><span><i class="daily-dot"></i>Theo ngày</span><span><i class="onsite-dot"></i>Kèm sân</span></div>
+          </div>
+
+          <div class="ranking-card glass-card">
+            <div class="card-heading"><div><h3>Top vợt được thuê</h3><p>Trong tháng đã chọn</p></div></div>
+            <div class="ranking-list">
+              @for (racket of racketStats().topRackets || []; track racket.id; let rank = $index) {
+                <div class="ranking-item"><span class="rank">{{ rank + 1 }}</span><div><strong>{{ racket.name }}</strong><small>{{ racket.factory }}</small></div><b>{{ racket.rentalStock }} lượt</b></div>
+              } @empty { <div class="empty-revenue">Chưa có lượt thuê trong tháng này.</div> }
+            </div>
+          </div>
+        </div>
+      </section>
     }
 
   }
