@@ -60,7 +60,11 @@
                 </span>
               </td>
               <td>
-                <div class="action-dropdown">
+                <div class="rental-actions">
+                  <button type="button" class="btn-detail icon-button" title="Xem chi tiết" aria-label="Xem chi tiết" (click)="openDetailModal(item)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.4 12s3.5-6 9.6-6 9.6 6 9.6 6-3.5 6-9.6 6-9.6-6-9.6-6Z"/><circle cx="12" cy="12" r="2.8"/></svg>
+                  </button>
+                  <div class="action-dropdown">
                   @if (item.status === 'CANCELLED' && item.refundStatus === 'PENDING_REFUND') {
                     <button class="btn-refund" [disabled]="confirmingId() === item.id" (click)="confirmRefund(item)">
                       {{ confirmingId() === item.id ? 'Đang xử lý...' : '✅ Đã hoàn cọc' }}
@@ -75,6 +79,7 @@
                       }
                     </select>
                   }
+                  </div>
                 </div>
               </td>
             </tr>
@@ -89,5 +94,47 @@
       <button class="page-btn" [disabled]="currentPage() + 1 >= totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
     </div>
 
+  }
+
+  @if (selectedDetail(); as detail) {
+    <div class="modal-overlay" (click)="closeDetailModal()">
+      <section class="detail-modal glass-card" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <p class="modal-kicker">Thông tin đơn thuê</p>
+            <h2>{{ detail.rentalTool?.rentalToolCode || ('Đơn #' + detail.rentalTool?.id) }}</h2>
+          </div>
+          <button type="button" class="btn-close" aria-label="Đóng" (click)="closeDetailModal()">×</button>
+        </header>
+        <div class="detail-body">
+          @if (detail.racket?.image) {
+            <img class="detail-image" [src]="detail.racket.image" [alt]="detail.racket.name || detail.rentalTool?.racketName" />
+          }
+          <div class="detail-grid">
+            <div><span>Người thuê</span><strong>{{ detail.rentalTool?.fullName || 'Khách vãng lai' }}</strong></div>
+            <div><span>Số điện thoại</span><strong>{{ detail.rentalTool?.phone || '—' }}</strong></div>
+            <div><span>Email</span><strong>{{ detail.rentalTool?.email || '—' }}</strong></div>
+            <div><span>Vợt</span><strong>{{ detail.rentalTool?.racketName || detail.racket?.name || '—' }}</strong></div>
+            <div><span>Hãng</span><strong>{{ detail.racket?.factory || '—' }}</strong></div>
+            <div><span>Hình thức</span><strong>{{ typeLabel(detail.rentalTool?.type) }}</strong></div>
+            <div><span>Ngày thuê</span><strong>{{ detail.rentalTool?.rentalDate || '—' }}</strong></div>
+            <div><span>Số lượng</span><strong>{{ detail.rentalTool?.quantity ?? '—' }}</strong></div>
+            @if (detail.rentalTool?.type === 'DAILY') {
+              <div><span>Số ngày thuê</span><strong>{{ detail.rentalTool?.quantityDay ?? '—' }}</strong></div>
+            }
+            @if (detail.rentalTool?.bookingCode) {
+              <div><span>Mã đặt sân</span><strong>{{ detail.rentalTool.bookingCode }}</strong></div>
+            }
+            <div><span>Đơn giá</span><strong>{{ detail.rentalTool?.price | number }} VNĐ</strong></div>
+            <div><span>Tổng chi phí</span><strong class="price-value">{{ detail.rentalTool?.rentalPrice | number }} VNĐ</strong></div>
+            <div><span>Trạng thái</span><strong>{{ statusLabel(detail.rentalTool?.status) }}</strong></div>
+            <div><span>Hoàn cọc</span><strong>{{ detail.rentalTool?.refundStatus || '—' }}</strong></div>
+            @if (detail.rentalTool?.cancelledAt) {
+              <div class="detail-wide"><span>Thời điểm hủy</span><strong>{{ detail.rentalTool.cancelledAt }}</strong></div>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
   }
 </div>

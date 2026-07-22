@@ -21,12 +21,13 @@ export class AdminRacketsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  selectedDetail = signal<any | null>(null);
+  isLoadingDetail = signal<boolean>(false);
 
   showModal = signal<boolean>(false);
   isEdit = signal<boolean>(false);
   selectedRacketId = signal<number | null>(null);
   racketForm!: FormGroup;
-  selectedFile: File | null = null;
 
   ngOnInit(): void {
     this.initForm();
@@ -44,9 +45,9 @@ export class AdminRacketsComponent implements OnInit {
       rentalPricePerDay: [0, [Validators.required, Validators.min(0)]],
       rentalPricePerPlay: [0, [Validators.required, Validators.min(0)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
-      bookingStockQuantity: [0, [Validators.required, Validators.min(0)]],
       available: [true],
-      productId: [null, [Validators.required]]
+      productId: [null, [Validators.required]],
+      image: ['']
     });
   }
 
@@ -107,16 +108,9 @@ export class AdminRacketsComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-    }
-  }
-
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedRacketId.set(null);
-    this.selectedFile = null;
     this.racketForm.reset({
       name: '',
       factory: '',
@@ -124,9 +118,9 @@ export class AdminRacketsComponent implements OnInit {
       rentalPricePerDay: 0,
       rentalPricePerPlay: 0,
       quantity: 1,
-      bookingStockQuantity: 0,
       available: true,
-      productId: null
+      productId: null,
+      image: ''
     });
     this.showModal.set(true);
   }
@@ -134,23 +128,49 @@ export class AdminRacketsComponent implements OnInit {
   openEditModal(racket: any): void {
     this.isEdit.set(true);
     this.selectedRacketId.set(racket.id);
-    this.selectedFile = null;
     this.racketForm.patchValue({
       name: racket.name,
       factory: racket.factory,
       price: racket.price,
       rentalPricePerDay: racket.rentalPricePerDay ?? 0,
       rentalPricePerPlay: racket.rentalPricePerPlay ?? 0,
-      quantity: racket.quantity ?? 1,
-      bookingStockQuantity: racket.bookingStockQuantity ?? 0,
+      quantity: racket.targetQuantity ?? racket.quantity ?? 1,
       available: racket.available ?? true,
-      productId: racket.product?.id ?? null
+      productId: racket.product?.id ?? null,
+      image: racket.image || ''
     });
     this.showModal.set(true);
   }
 
   closeModal(): void {
     this.showModal.set(false);
+  }
+
+  openDetailModal(racket: any): void {
+    this.isLoadingDetail.set(true);
+    this.errorMessage.set(null);
+    this.adminService.getRacketDetail(racket.id).subscribe({
+      next: (res) => {
+        this.selectedDetail.set(res?.data || racket);
+        this.isLoadingDetail.set(false);
+      },
+      error: (err) => {
+        this.isLoadingDetail.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết vợt.');
+      }
+    });
+  }
+
+  closeDetailModal(): void {
+    this.selectedDetail.set(null);
+  }
+
+  deleteRacket(racket: any): void {
+    if (!confirm(`Bạn có chắc chắn muốn ngừng sử dụng vợt "${racket.name}"?`)) return;
+    this.adminService.deleteRacket(racket.id).subscribe({
+      next: () => this.loadRackets(),
+      error: (err) => this.errorMessage.set(err.error?.message || 'Xóa vợt thất bại.')
+    });
   }
 
   onSubmit(): void {
@@ -169,10 +189,6 @@ export class AdminRacketsComponent implements OnInit {
       'racket',
       new Blob([JSON.stringify(payload)], { type: 'application/json' })
     );
-
-    if (this.selectedFile) {
-      formData.append('racketImg', this.selectedFile);
-    }
 
     const request = this.isEdit()
       ? this.adminService.updateRacket(this.selectedRacketId()!, formData)

@@ -81,6 +81,18 @@ export class AdminService {
     return this.http.put<ApiResponse<any>>(`${this.API_URL}/rackets/${racketId}`, payload);
   }
 
+  getRacketDetail(racketId: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/rackets/${racketId}`);
+  }
+
+  getProductDetail(productId: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/products/${productId}`);
+  }
+
+  deleteRacket(racketId: number): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.API_URL}/rackets/${racketId}`);
+  }
+
   getBookings(filters: any = {}): Observable<any> {
     let params = new HttpParams();
     Object.keys(filters).forEach(key => {
@@ -105,6 +117,10 @@ export class AdminService {
     let params = new HttpParams().set('page', page.toString()).set('size', '5');
     if (search) params = params.set('search', search);
     return this.http.get<any>(`${this.API_URL}/rentals`, { params });
+  }
+
+  getRentalDetail(rentalId: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/rentals/${rentalId}`);
   }
 
   updateRentalStatus(rentalId: number, status: string): Observable<ApiResponse<any>> {

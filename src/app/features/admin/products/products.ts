@@ -23,8 +23,9 @@ export class AdminProductsComponent implements OnInit {
   showModal = signal<boolean>(false);
   isEdit = signal<boolean>(false);
   selectedProductId = signal<number | null>(null);
+  selectedDetail = signal<any | null>(null);
+  isLoadingDetail = signal<boolean>(false);
   productForm!: FormGroup;
-  selectedFile: File | null = null;
 
   ngOnInit(): void {
     this.loadProducts();
@@ -64,16 +65,9 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-    }
-  }
-
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedProductId.set(null);
-    this.selectedFile = null;
     this.productForm.reset({ price: 0, sale: 0, quantity: 1, subCourtNames: '', image: '' });
     this.showModal.set(true);
   }
@@ -81,7 +75,6 @@ export class AdminProductsComponent implements OnInit {
   openEditModal(product: any): void {
     this.isEdit.set(true);
     this.selectedProductId.set(product.id);
-    this.selectedFile = null;
     this.productForm.patchValue({
       name: product.name,
       detailDesc: product.detailDesc,
@@ -101,6 +94,24 @@ export class AdminProductsComponent implements OnInit {
     this.showModal.set(false);
   }
 
+  openDetailModal(product: any): void {
+    this.isLoadingDetail.set(true);
+    this.adminService.getProductDetail(product.id).subscribe({
+      next: (res) => {
+        this.selectedDetail.set(res?.data || product);
+        this.isLoadingDetail.set(false);
+      },
+      error: (err) => {
+        this.isLoadingDetail.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết sân.')
+      }
+    });
+  }
+
+  closeDetailModal(): void {
+    this.selectedDetail.set(null);
+  }
+
   onSubmit(): void {
     if (this.productForm.invalid) return;
 
@@ -111,10 +122,6 @@ export class AdminProductsComponent implements OnInit {
       'product',
       new Blob([JSON.stringify(formValue)], { type: 'application/json' })
     );
-
-    if (this.selectedFile) {
-      formData.append('productImg', this.selectedFile);
-    }
 
     const request = this.isEdit() 
       ? this.adminService.updateProduct(this.selectedProductId()!, formData)

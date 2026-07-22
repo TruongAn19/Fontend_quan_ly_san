@@ -55,7 +55,11 @@
                 </span>
               </td>
               <td>
-                <div class="action-dropdown">
+                <div class="booking-actions">
+                  <button type="button" class="btn-detail icon-button" title="Xem chi tiết" aria-label="Xem chi tiết" (click)="openDetailModal(item)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.4 12s3.5-6 9.6-6 9.6 6 9.6 6-3.5 6-9.6 6-9.6-6-9.6-6Z"/><circle cx="12" cy="12" r="2.8"/></svg>
+                  </button>
+                  <div class="action-dropdown">
                   @if (isStatusLocked(item.status)) {
                     <span class="locked-hint" title="Đơn đã đóng, không thể đổi trạng thái">🔒 Đã khoá</span>
                   } @else {
@@ -66,6 +70,7 @@
                       }
                     </select>
                   }
+                  </div>
                 </div>
               </td>
             </tr>
@@ -80,5 +85,48 @@
       <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
     </div>
 
+  }
+
+  @if (selectedDetail(); as detail) {
+    <div class="modal-overlay" (click)="closeDetailModal()">
+      <section class="detail-modal glass-card" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div><p class="modal-kicker">Chi tiết đặt sân</p><h2>{{ detail.booking?.bookingCode || ('Booking #' + detail.booking?.id) }}</h2></div>
+          <button type="button" class="btn-close" aria-label="Đóng" (click)="closeDetailModal()">×</button>
+        </header>
+        <div class="detail-body">
+          <div class="detail-grid">
+            <div><span>Khách hàng</span><strong>{{ detail.booking?.receiverName || detail.booking?.user?.fullName || '—' }}</strong></div>
+            <div><span>Số điện thoại</span><strong>{{ detail.booking?.receiverPhone || detail.booking?.user?.phone || '—' }}</strong></div>
+            <div class="detail-wide"><span>Địa chỉ</span><strong>{{ detail.booking?.receiverAddress || '—' }}</strong></div>
+            <div><span>Loại đặt sân</span><strong>{{ detail.booking?.bookingType || '—' }}</strong></div>
+            <div><span>Trạng thái</span><strong>{{ statusLabel(detail.booking?.status) }}</strong></div>
+            <div><span>Tổng tiền</span><strong class="price-value">{{ detail.booking?.totalPrice | number }} VNĐ</strong></div>
+            <div><span>Tiền cọc</span><strong>{{ detail.booking?.depositPrice | number }} VNĐ</strong></div>
+            @if (detail.booking?.recurringEndDate) { <div><span>Ngày kết thúc định kỳ</span><strong>{{ detail.booking.recurringEndDate }}</strong></div> }
+          </div>
+
+          <h3 class="section-title">Lịch sân đã đặt</h3>
+          <div class="slot-list">
+            @for (slot of detail.booking?.bookingDetails || []; track slot.id) {
+              <article class="slot-item">
+                <strong>{{ slot.productName }} · {{ slot.subCourtName }}</strong>
+                <span>{{ slot.date }} — {{ slot.availableTime }}</span>
+                <span>{{ slot.price | number }} VNĐ</span>
+              </article>
+            } @empty { <p class="empty-detail">Không có thông tin lịch sân.</p> }
+          </div>
+
+          @if (detail.rentalTools?.length) {
+            <h3 class="section-title">Vợt thuê kèm</h3>
+            <div class="slot-list">
+              @for (rental of detail.rentalTools; track rental.id) {
+                <article class="slot-item"><strong>{{ rental.racket?.name || rental.racketName || 'Vợt' }}</strong><span>Số lượng: {{ rental.quantity }}</span><span>{{ rental.rentalPrice | number }} VNĐ</span></article>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    </div>
   }
 </div>

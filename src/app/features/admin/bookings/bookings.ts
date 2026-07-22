@@ -19,6 +19,8 @@ export class AdminBookingsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  selectedDetail = signal<any | null>(null);
+  isLoadingDetail = signal<boolean>(false);
 
   filterForm: FormGroup = this.fb.group({
     date: [''],
@@ -71,6 +73,25 @@ export class AdminBookingsComponent implements OnInit {
       this.currentPage.set(page);
       this.loadBookings();
     }
+  }
+
+  openDetailModal(item: any): void {
+    this.isLoadingDetail.set(true);
+    this.errorMessage.set(null);
+    this.adminService.getBookingDetail(item.id).subscribe({
+      next: (res) => {
+        this.selectedDetail.set(res?.data || { booking: item, rentalTools: [] });
+        this.isLoadingDetail.set(false);
+      },
+      error: (err) => {
+        this.isLoadingDetail.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết đơn đặt sân.');
+      }
+    });
+  }
+
+  closeDetailModal(): void {
+    this.selectedDetail.set(null);
   }
 
   statusLabel(status: string | null | undefined): string {

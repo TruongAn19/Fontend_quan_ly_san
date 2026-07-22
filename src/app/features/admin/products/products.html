@@ -38,8 +38,11 @@
              <td>{{ item.address }}</td>
              <td>{{ item.addressDetail }}</td>
             <td class="actions-cell">
-              <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
-              <button class="btn-delete" (click)="deleteProduct(item.id)">Xóa</button>
+              <button class="btn-detail icon-button" type="button" title="Xem chi tiết" aria-label="Xem chi tiết" (click)="openDetailModal(item)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.4 12s3.5-6 9.6-6 9.6 6 9.6 6-3.5 6-9.6 6-9.6-6-9.6-6Z"/><circle cx="12" cy="12" r="2.8"/></svg>
+              </button>
+              <button class="btn-edit icon-button" type="button" title="Sửa" aria-label="Sửa" (click)="openEditModal(item)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-.8 4.8L8 20 19 9l-4-4L4 16Z"/><path d="m13.8 6.2 4 4"/></svg></button>
+              <button class="btn-delete icon-button" type="button" title="Xóa" aria-label="Xóa" (click)="deleteProduct(item.id)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/></svg></button>
             </td>
           </tr>
         </tbody>
@@ -57,10 +60,17 @@
   @if (showModal()) {
     <div class="modal-overlay animate-fade-in">
       <div class="modal-content glass-card">
-        <h3>{{ isEdit() ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h3>
+        <div class="modal-header">
+          <div>
+            <span class="modal-eyebrow">QUẢN LÝ SÂN</span>
+            <h3>{{ isEdit() ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h3>
+          </div>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Đóng popup">&times;</button>
+        </div>
         
         <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="premium-form">
-          <div class="form-group">
+          <div class="modal-body">
+          <div class="form-group form-group-wide">
             <label for="name">Tên sản phẩm/Sân</label>
             <input type="text" id="name" formControlName="name" />
           </div>
@@ -77,39 +87,40 @@
 
           <div class="form-group">
             <label for="quantity">Số lượng sân (Hệ thống tự sinh tên "Sân 1", "Sân 2"...)</label>
-            <input type="number" id="quantity" formControlName="quantity" />
+            <input type="number" id="quantity" formControlName="quantity" min="1" />
           </div>
 
-          <div class="form-group">
-            <label for="subCourtNames">Hoặc nhập tên các sân con (cách nhau dấu phẩy, vd: Sân A, Sân B)</label>
-            <input type="text" id="subCourtNames" formControlName="subCourtNames" placeholder="Sân A, Sân B, Sân C..." />
-          </div>
+          @if (!isEdit()) {
+            <div class="form-group form-group-wide">
+              <label for="subCourtNames">Tên sân con (cách nhau bằng dấu phẩy)</label>
+              <input type="text" id="subCourtNames" formControlName="subCourtNames" placeholder="Sân A, Sân B, Sân C..." />
+            </div>
+          }
 
           <div class="form-group">
             <label for="address">Khu vực (Hà Nội, TP.HCM...)</label>
             <input type="text" id="address" formControlName="address" />
           </div>
 
-          <div class="form-group">
+          <div class="form-group form-group-wide">
             <label for="addressDetail">Địa chỉ chi tiết</label>
             <input type="text" id="addressDetail" formControlName="addressDetail" />
           </div>
 
-          <div class="form-group">
+          <div class="form-group form-group-wide">
             <label for="detailDesc">Mô tả chi tiết (Hiển thị dưới ảnh)</label>
             <textarea id="detailDesc" formControlName="detailDesc" rows="3"></textarea>
           </div>
 
-          <div class="form-group">
+          <div class="form-group form-group-wide">
             <label for="shortDesc">Mô tả ngắn (Hiển thị phần thông tin bên phải)</label>
             <textarea id="shortDesc" formControlName="shortDesc" rows="2"></textarea>
           </div>
 
-          <div class="form-group">
-            <label for="image">Hình ảnh (Nhập link URL hoặc tải file ảnh lên)</label>
+          <div class="form-group form-group-wide">
+            <label for="image">Link hình ảnh</label>
             <input type="text" id="image" formControlName="image" placeholder="https://example.com/image.jpg" />
-            <span style="font-size: 0.8rem; color: #94a3b8; margin: 4px 0;">Hoặc tải lên từ máy tính:</span>
-            <input type="file" id="productImg" (change)="onFileSelected($event)" accept="image/*" />
+          </div>
           </div>
 
           <div class="modal-actions">
@@ -117,6 +128,31 @@
             <button type="submit" class="btn-primary" [disabled]="productForm.invalid">Lưu</button>
           </div>
         </form>
+      </div>
+    </div>
+  }
+
+  @if (selectedDetail(); as product) {
+    <div class="modal-overlay animate-fade-in">
+      <div class="detail-modal glass-card">
+        <div class="modal-header">
+          <div><span class="modal-eyebrow">THÔNG TIN SÂN</span><h3>{{ product.name }}</h3></div>
+          <button type="button" class="btn-close" (click)="closeDetailModal()" aria-label="Đóng popup">&times;</button>
+        </div>
+        <div class="detail-body">
+          @if (product.image) { <img class="detail-image" [src]="product.image" [alt]="product.name" /> }
+          <div class="detail-grid">
+            <div><span>Giá thuê</span><strong>{{ product.price | number }} VNĐ</strong></div>
+            <div><span>Khuyến mãi</span><strong>{{ product.sale || 0 }}%</strong></div>
+            <div><span>Số sân hoạt động</span><strong>{{ product.quantity }}</strong></div>
+            <div><span>Trạng thái</span><strong>{{ product.status || 'ACTIVE' }}</strong></div>
+            <div class="detail-wide"><span>Khu vực</span><strong>{{ product.address || '—' }}</strong></div>
+            <div class="detail-wide"><span>Địa chỉ chi tiết</span><strong>{{ product.addressDetail || '—' }}</strong></div>
+            <div class="detail-wide"><span>Mô tả ngắn</span><p>{{ product.shortDesc || '—' }}</p></div>
+            <div class="detail-wide"><span>Mô tả chi tiết</span><p>{{ product.detailDesc || '—' }}</p></div>
+          </div>
+        </div>
+        <div class="modal-actions"><button class="btn-secondary" (click)="closeDetailModal()">Đóng</button></div>
       </div>
     </div>
   }

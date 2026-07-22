@@ -42,12 +42,19 @@
               <td>{{ item.price | number }} VNĐ</td>
               <td>{{ item.rentalPricePerDay | number }} VNĐ</td>
               <td>{{ item.rentalPricePerPlay | number }} VNĐ</td>
-              <td>{{ item.quantity }}</td>
+              <td>
+                {{ item.targetQuantity ?? item.quantity }}
+                @if (item.pendingRetirementQuantity > 0) {
+                  <small class="pending-retirement">{{ item.pendingRetirementQuantity }} chờ loại</small>
+                }
+              </td>
               <td>{{ item.bookingStockQuantity }}</td>
               <td>{{ item.product?.name || '—' }}</td>
               <td>{{ item.available ? 'Khả dụng' : 'Tạm ngưng' }}</td>
               <td class="actions-cell">
-                <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
+                <button class="btn-detail icon-button" type="button" title="Xem chi tiết" aria-label="Xem chi tiết" (click)="openDetailModal(item)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.4 12s3.5-6 9.6-6 9.6 6 9.6 6-3.5 6-9.6 6-9.6-6-9.6-6Z"/><circle cx="12" cy="12" r="2.8"/></svg></button>
+                <button class="btn-edit icon-button" type="button" title="Sửa" aria-label="Sửa" (click)="openEditModal(item)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-.8 4.8L8 20 19 9l-4-4L4 16Z"/><path d="m13.8 6.2 4 4"/></svg></button>
+                <button class="btn-delete icon-button" type="button" title="Xóa" aria-label="Xóa" (click)="deleteRacket(item)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/></svg></button>
               </td>
             </tr>
           }
@@ -66,9 +73,16 @@
   @if (showModal()) {
     <div class="modal-overlay animate-fade-in">
       <div class="modal-content glass-card">
-        <h3>{{ isEdit() ? 'Sửa thông tin vợt' : 'Thêm vợt mới' }}</h3>
+        <div class="modal-header">
+          <div>
+            <span class="modal-eyebrow">QUẢN LÝ THIẾT BỊ</span>
+            <h3>{{ isEdit() ? 'Sửa thông tin vợt' : 'Thêm vợt mới' }}</h3>
+          </div>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Đóng popup">&times;</button>
+        </div>
 
         <form [formGroup]="racketForm" (ngSubmit)="onSubmit()" class="premium-form">
+          <div class="modal-body">
           <div class="form-group">
             <label for="name">Tên vợt</label>
             <input type="text" id="name" formControlName="name" />
@@ -109,21 +123,17 @@
             <input type="number" id="quantity" formControlName="quantity" min="1" />
           </div>
 
-          <div class="form-group">
-            <label for="bookingStockQuantity">Số lượng khả dụng cho booking</label>
-            <input type="number" id="bookingStockQuantity" formControlName="bookingStockQuantity" min="0" />
-          </div>
-
-          <div class="form-group checkbox-group">
+          <div class="form-group checkbox-group form-group-wide">
             <label>
               <input type="checkbox" formControlName="available" />
               Đang cho thuê
             </label>
           </div>
 
-          <div class="form-group">
-            <label for="racketImg">Hình ảnh</label>
-            <input type="file" id="racketImg" (change)="onFileSelected($event)" accept="image/*" />
+          <div class="form-group form-group-wide">
+            <label for="image">Link hình ảnh</label>
+            <input type="text" id="image" formControlName="image" placeholder="https://example.com/racket.jpg" />
+          </div>
           </div>
 
           <div class="modal-actions">
@@ -135,4 +145,28 @@
     </div>
   }
 
+  @if (selectedDetail(); as racket) {
+    <div class="modal-overlay animate-fade-in" (click)="closeDetailModal()">
+      <section class="racket-detail-modal glass-card" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div><span class="modal-eyebrow">THÔNG TIN THIẾT BỊ</span><h3>{{ racket.name }}</h3></div>
+          <button type="button" class="btn-close" aria-label="Đóng popup" (click)="closeDetailModal()">&times;</button>
+        </header>
+        <div class="racket-detail-body">
+          @if (racket.image) { <img class="racket-detail-image" [src]="racket.image" [alt]="racket.name" /> }
+          <div class="detail-grid">
+            <div><span>Hãng</span><strong>{{ racket.factory || '—' }}</strong></div>
+            <div><span>Sân</span><strong>{{ racket.product?.name || '—' }}</strong></div>
+            <div><span>Giá trị vợt</span><strong>{{ racket.price | number }} VNĐ</strong></div>
+            <div><span>Thuê theo ngày</span><strong>{{ racket.rentalPricePerDay | number }} VNĐ</strong></div>
+            <div><span>Thuê theo lượt</span><strong>{{ racket.rentalPricePerPlay | number }} VNĐ</strong></div>
+            <div><span>Trạng thái</span><strong>{{ racket.available ? 'Khả dụng' : 'Tạm ngưng' }}</strong></div>
+            <div><span>Số lượng mục tiêu</span><strong>{{ racket.targetQuantity ?? racket.quantity }}</strong></div>
+            <div><span>Số lượng có thể đặt</span><strong>{{ racket.bookingStockQuantity ?? racket.quantity }}</strong></div>
+            <div><span>Đang chờ loại khỏi kho</span><strong>{{ racket.pendingRetirementQuantity || 0 }}</strong></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  }
 </div>

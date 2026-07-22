@@ -20,6 +20,8 @@ export class AdminRentalsComponent implements OnInit {
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
   confirmingId = signal<number | null>(null);
+  selectedDetail = signal<any | null>(null);
+  isLoadingDetail = signal<boolean>(false);
 
   searchForm: FormGroup = this.fb.group({
     search: ['']
@@ -84,6 +86,25 @@ export class AdminRentalsComponent implements OnInit {
       this.currentPage.set(page);
       this.loadRentals();
     }
+  }
+
+  openDetailModal(item: any): void {
+    this.isLoadingDetail.set(true);
+    this.errorMessage.set(null);
+    this.adminService.getRentalDetail(item.id).subscribe({
+      next: (res) => {
+        this.selectedDetail.set(res?.data || { rentalTool: item });
+        this.isLoadingDetail.set(false);
+      },
+      error: (err) => {
+        this.isLoadingDetail.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết đơn thuê.');
+      }
+    });
+  }
+
+  closeDetailModal(): void {
+    this.selectedDetail.set(null);
   }
 
   statusLabel(status: string | null | undefined): string {
