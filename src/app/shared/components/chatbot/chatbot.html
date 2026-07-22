@@ -23,9 +23,11 @@
 
             <div class="chat-messages" #scrollContainer>
                 @for (msg of messages(); track $index) {
-                    <div class="message" [ngClass]="msg.role">
-                        <div class="message-content" [innerHTML]="msg.content"></div>
-                    </div>
+                    @if (msg.content) {
+                        <div class="message" [ngClass]="msg.role">
+                            <div class="message-content" [innerHTML]="msg.content"></div>
+                        </div>
+                    }
                 }
                 
                 @if (isProcessing()) {
@@ -38,13 +40,15 @@
             </div>
 
             <!-- Suggestions -->
-            <div class="suggestions">
-                @for (suggest of suggestions(); track suggest) {
-                    <div class="suggestion-chip" (click)="sendPreset(suggest)">
-                        {{ suggest }}
-                    </div>
-                }
-            </div>
+            @if (!hasUserMessage()) {
+                <div class="suggestions">
+                    @for (suggest of suggestions(); track suggest) {
+                        <div class="suggestion-chip" (click)="sendPreset(suggest)">
+                            {{ suggest }}
+                        </div>
+                    }
+                </div>
+            }
 
             <!-- Input Area -->
             <form (submit)="sendMessage($event)" class="chat-input-area">

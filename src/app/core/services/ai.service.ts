@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -9,63 +8,79 @@ import { environment } from '../../../environments/environment';
 export class AIService {
   private apiUrl = `${environment.apiBaseUrl}/ai/chat`;
 
-  constructor(private http: HttpClient) {}
-
   /**
    * Send a message and get a streaming response
    */
   chatStream(message: string, chatId: string = 'default'): Observable<string> {
-    const resultSubject = new Subject<string>();
-    
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+    return new Observable<string>(subscriber => {
+      const controller = new AbortController();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const token = localStorage.getItem('accessToken');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    fetch(this.apiUrl, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({ message, chatId }),
-    }).then(response => {
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (!reader) {
-        resultSubject.error('Cannot read response body');
-        return;
-      }
-
-      const push = () => {
-        reader.read().then(({ done, value }) => {
-          if (done) {
-            resultSubject.complete();
-            return;
-          }
-          const chunk = decoder.decode(value, { stream: true });
-          // SSE format often prefix with 'data:'
-          const lines = chunk.split('\n');
-          lines.forEach(line => {
-            if (line.startsWith('data:')) {
-              // Extract the data content without trimming to preserve spaces
-              const content = line.substring(5);
-              if (content) {
-                resultSubject.next(content);
-              }
-            } else if (line !== '') {
-              resultSubject.next(line);
-            }
+      const run = async () => {
+        try {
+          const response = await fetch(this.apiUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ message, chatId }),
+            signal: controller.signal
           });
-          push();
-        });
-      };
-      push();
-    }).catch(err => {
-      resultSubject.error(err);
-    });
 
-    return resultSubject.asObservable();
+          if (!response.ok) {
+            let errorMessage = `Yêu cầu AI thất bại (HTTP ${response.status}).`;
+            try {
+              const errorBody = await response.json();
+              errorMessage = errorBody?.message || errorMessage;
+            } catch {
+              const text = await response.text();
+              if (text) errorMessage = text;
+            }
+            throw new Error(errorMessage);
+          }
+
+          if (!response.body) throw new Error('Phản hồi AI không có nội dung.');
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          let finished = false;
+
+          const emitEvent = (eventBlock: string) => {
+            const data = eventBlock
+              .split(/\r?\n/)
+              .filter(line => line.startsWith('data:'))
+              .map(line => line.slice(5).replace(/^ /, ''))
+              .join('\n');
+            if (!data) return;
+            if (data === '[DONE]') {
+              finished = true;
+              return;
+            }
+            subscriber.next(data);
+          };
+
+          while (!finished) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const events = buffer.split(/\r?\n\r?\n/);
+            buffer = events.pop() || '';
+            events.forEach(emitEvent);
+          }
+
+          buffer += decoder.decode();
+          if (buffer.trim() && !finished) emitEvent(buffer);
+          subscriber.complete();
+        } catch (error) {
+          if (!controller.signal.aborted) subscriber.error(error);
+        }
+      };
+
+      void run();
+      return () => {
+        controller.abort();
+      };
+    });
   }
 }

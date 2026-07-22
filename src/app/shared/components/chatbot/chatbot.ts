@@ -31,6 +31,7 @@ export class ChatbotComponent {
   messages = signal<Message[]>([
     { role: 'assistant', content: 'Chào mừng bạn đến với hệ thống đặt sân cầu lông! Tôi là trợ lý AI Antigravity, tôi có thể giúp gì cho bạn?' }
   ]);
+  hasUserMessage = computed(() => this.messages().some(message => message.role === 'user'));
 
   private isAdmin = computed(() => {
     const role = this.authService.role();
