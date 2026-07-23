@@ -75,9 +75,20 @@ export class BookingDetailComponent implements OnInit {
     const map: Record<string, string> = {
       PENDING_REFUND: 'Chờ hoàn cọc',
       REFUNDED: 'Đã hoàn cọc',
-      NOT_APPLICABLE: 'Không hoàn cọc',
+      NOT_APPLICABLE: 'Không áp dụng',
     };
     return map[status] ?? status;
+  }
+
+  rentalStatusLabel(status: string | null | undefined): string {
+    if (!status) return '—';
+    const map: Record<string, string> = {
+      PENDING: 'Chờ bàn giao',
+      IN_USE: 'Đang thuê',
+      COMPLETED: 'Đã trả',
+      CANCELLED: 'Hủy bỏ',
+    };
+    return map[status] ?? 'Không xác định';
   }
 
   rentalTotal(): number {

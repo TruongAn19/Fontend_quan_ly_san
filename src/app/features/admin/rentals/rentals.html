@@ -74,7 +74,7 @@
                   } @else {
                     <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
                       <option value="">-- Đổi trạng thái --</option>
-                      @for (st of statusList; track st) {
+                      @for (st of availableStatuses(item.status); track st) {
                         <option [value]="st">{{ st }}</option>
                       }
                     </select>
@@ -128,7 +128,7 @@
             <div><span>Đơn giá</span><strong>{{ detail.rentalTool?.price | number }} VNĐ</strong></div>
             <div><span>Tổng chi phí</span><strong class="price-value">{{ detail.rentalTool?.rentalPrice | number }} VNĐ</strong></div>
             <div><span>Trạng thái</span><strong>{{ statusLabel(detail.rentalTool?.status) }}</strong></div>
-            <div><span>Hoàn cọc</span><strong>{{ detail.rentalTool?.refundStatus || '—' }}</strong></div>
+            <div><span>Hoàn cọc</span><strong>{{ refundStatusLabel(detail.rentalTool?.refundStatus) }}</strong></div>
             @if (detail.rentalTool?.cancelledAt) {
               <div class="detail-wide"><span>Thời điểm hủy</span><strong>{{ detail.rentalTool.cancelledAt }}</strong></div>
             }

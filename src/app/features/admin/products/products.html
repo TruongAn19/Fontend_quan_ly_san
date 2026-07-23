@@ -145,7 +145,7 @@
             <div><span>Giá thuê</span><strong>{{ product.price | number }} VNĐ</strong></div>
             <div><span>Khuyến mãi</span><strong>{{ product.sale || 0 }}%</strong></div>
             <div><span>Số sân hoạt động</span><strong>{{ product.quantity }}</strong></div>
-            <div><span>Trạng thái</span><strong>{{ product.status || 'ACTIVE' }}</strong></div>
+            <div><span>Trạng thái</span><strong>{{ productStatusLabel(product.status) }}</strong></div>
             <div class="detail-wide"><span>Khu vực</span><strong>{{ product.address || '—' }}</strong></div>
             <div class="detail-wide"><span>Địa chỉ chi tiết</span><strong>{{ product.addressDetail || '—' }}</strong></div>
             <div class="detail-wide"><span>Mô tả ngắn</span><p>{{ product.shortDesc || '—' }}</p></div>

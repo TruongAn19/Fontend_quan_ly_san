@@ -94,7 +94,7 @@ export class AdminRefundRequestsComponent implements OnInit {
     const map: Record<string, string> = {
       PENDING_REFUND: 'Chờ hoàn cọc',
       REFUNDED: 'Đã hoàn cọc',
-      NOT_APPLICABLE: 'Không hoàn cọc',
+      NOT_APPLICABLE: 'Không áp dụng',
     };
     return map[s ?? ''] ?? s ?? '';
   }

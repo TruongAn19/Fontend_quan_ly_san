@@ -121,7 +121,7 @@
                 <td>{{ rt.quantity }}</td>
                 <td>{{ rt.rentalPrice | number }} VNĐ</td>
                 <td class="total-cell">{{ rt.price | number }} VNĐ</td>
-                <td>{{ rt.status }}</td>
+                <td>{{ rentalStatusLabel(rt.status) }}</td>
               </tr>
             }
           </tbody>

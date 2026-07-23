@@ -27,8 +27,6 @@ export class AdminBookingsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Đang giữ chỗ', 'Đặt cọc', 'Đã thanh toán', 'Đã hủy', 'Đang sử dụng', 'Đã kết thúc'];
-
   ngOnInit(): void {
     this.loadBookings();
   }
@@ -103,6 +101,13 @@ export class AdminBookingsComponent implements OnInit {
       DA_HUY: 'Đã hủy',
     };
     return map[status] ?? status;
+  }
+
+  /** Chỉ hiển thị những bước chuyển trạng thái hợp lệ của đơn đặt sân. */
+  availableStatuses(status: string | null | undefined): string[] {
+    if (status === 'CHO_THANH_TOAN') return ['Đặt cọc', 'Đã hủy'];
+    if (status === 'DA_DAT') return ['Đã thanh toán', 'Đã hủy'];
+    return [];
   }
 
   /** Booking đã ở trạng thái "đóng" (đã thanh toán hoặc đã hủy) — không cho phép đổi nữa. */

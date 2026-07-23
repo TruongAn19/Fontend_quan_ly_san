@@ -27,8 +27,6 @@ export class AdminRentalsComponent implements OnInit {
     search: ['']
   });
 
-  statusList = ['Chờ bàn giao', 'Đang thuê', 'Đã trả', 'Hủy bỏ'];
-
   ngOnInit(): void {
     this.loadRentals();
   }
@@ -118,6 +116,13 @@ export class AdminRentalsComponent implements OnInit {
     return map[status] ?? status;
   }
 
+  /** Chỉ hiển thị những bước chuyển trạng thái hợp lệ của đơn thuê dụng cụ. */
+  availableStatuses(status: string | null | undefined): string[] {
+    if (status === 'PENDING') return ['Đang thuê', 'Hủy bỏ'];
+    if (status === 'IN_USE') return ['Đã trả', 'Hủy bỏ'];
+    return [];
+  }
+
   typeLabel(type: string | null | undefined): string {
     if (!type) return '';
     const map: Record<string, string> = {
@@ -125,6 +130,16 @@ export class AdminRentalsComponent implements OnInit {
       ON_SITE: 'Thuê kèm theo sân',
     };
     return map[type] ?? type;
+  }
+
+  refundStatusLabel(status: string | null | undefined): string {
+    if (!status) return '—';
+    const map: Record<string, string> = {
+      PENDING_REFUND: 'Chờ hoàn cọc',
+      REFUNDED: 'Đã hoàn cọc',
+      NOT_APPLICABLE: 'Không áp dụng',
+    };
+    return map[status] ?? 'Không xác định';
   }
 
   /** Đơn thuê đã đóng (đã trả hoặc đã hủy) — không cho phép đổi nữa. */

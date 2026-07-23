@@ -84,10 +84,10 @@ export class RentalDetailComponent implements OnInit {
   statusLabel(status: string | null | undefined): string {
     if (!status) return '';
     const map: Record<string, string> = {
-      PENDING: 'Chờ xử lý',
+      PENDING: 'Chờ bàn giao',
       IN_USE: 'Đang thuê',
-      COMPLETED: 'Hoàn thành',
-      CANCELLED: 'Đã hủy',
+      COMPLETED: 'Đã trả',
+      CANCELLED: 'Hủy bỏ',
     };
     return map[status] ?? status;
   }

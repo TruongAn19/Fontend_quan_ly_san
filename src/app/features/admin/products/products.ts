@@ -112,6 +112,15 @@ export class AdminProductsComponent implements OnInit {
     this.selectedDetail.set(null);
   }
 
+  productStatusLabel(status: string | null | undefined): string {
+    if (!status) return 'Đang hoạt động';
+    const map: Record<string, string> = {
+      ACTIVE: 'Đang hoạt động',
+      DELETED: 'Đã xóa',
+    };
+    return map[status] ?? 'Không xác định';
+  }
+
   onSubmit(): void {
     if (this.productForm.invalid) return;
 
