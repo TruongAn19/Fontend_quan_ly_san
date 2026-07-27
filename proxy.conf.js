@@ -1,4 +1,4 @@
-const target = process.env.BACKEND_URL || 'http://localhost:8081';
+const target = process.env.BACKEND_URL || 'http://localhost:8080';
 
 module.exports = {
   '/api': {

@@ -32,24 +32,10 @@
 
       <div class="filter-group">
         <p class="filter-subtitle">Khu vực</p>
-        <div class="checkbox-list">
-          <label class="checkbox-item">
-            <input type="checkbox" (change)="onAddressChange('Quận 1', $event)"> 
-            <span class="checkbox-text">Quận 1 <small>(24)</small></span>
-          </label>
-          <label class="checkbox-item">
-            <input type="checkbox" (change)="onAddressChange('Quận 7', $event)"> 
-            <span class="checkbox-text">Quận 7 <small>(42)</small></span>
-          </label>
-          <label class="checkbox-item">
-            <input type="checkbox" (change)="onAddressChange('Thủ Đức', $event)"> 
-            <span class="checkbox-text">Thủ Đức <small>(12)</small></span>
-          </label>
-          <label class="checkbox-item">
-            <input type="checkbox" (change)="onAddressChange('Tân Bình', $event)"> 
-            <span class="checkbox-text">Tân Bình <small>(32)</small></span>
-          </label>
-        </div>
+        <input type="text"
+               class="search-input"
+               placeholder="Nhập khu vực"
+               formControlName="address">
       </div>
 
       <div class="filter-group">
@@ -68,14 +54,6 @@
         </div>
       </div>
 
-      <div class="filter-group">
-        <p class="filter-subtitle">Loại sân</p>
-        <div class="type-tags">
-          <span class="type-tag active">5 người</span>
-          <span class="type-tag">7 người</span>
-        </div>
-      </div>
-
       <button class="btn-apply-filters" (click)="applyFilters()">Áp dụng bộ lọc</button>
 
     </aside>
@@ -87,10 +65,10 @@
         <span class="results-count">Hiển thị {{ products().length }} trong {{ totalProductCount() }} sân</span>
         <div class="sort-box">
           <span style="font-size: 13px; color: #6B7280; margin-right: 8px;">Sắp xếp:</span>
-          <select class="sort-dropdown">
-            <option>Phổ biến nhất</option>
-            <option>Giá thấp đến cao</option>
-            <option>Giá cao đến thấp</option>
+          <select class="sort-dropdown" [value]="filterForm.get('sort')?.value" (change)="onSortChange($event)">
+            <option value="">Mặc định</option>
+            <option value="pricePerHour,asc">Giá thấp đến cao</option>
+            <option value="pricePerHour,desc">Giá cao đến thấp</option>
           </select>
         </div>
       </div>
@@ -105,15 +83,11 @@
             <a [routerLink]="['/products/detail', item.id]" class="product-card">
               <div class="product-image">
                 <img [src]="item.imageUrl || 'assets/img/default-pitch.png'" [alt]="item.name">
-                <div class="card-badge">Phổ biến</div>
               </div>
               <div class="product-info">
                 <h4 class="product-name">{{ item.name }}</h4>
                 <div class="product-meta">
                   <span class="product-addr">📍 {{ item.address }}</span>
-                  <div class="product-rating">
-                    <span class="star">⭐</span> 4.8 <small>(120)</small>
-                  </div>
                 </div>
                 <div class="product-footer">
                   <div class="price-box">

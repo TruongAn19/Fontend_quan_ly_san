@@ -11,6 +11,7 @@ interface EquipmentResponse {
   name: string;
   price: number;
   rentalPricePerDay?: number;
+  rentalPricePerPlay?: number;
   factory?: string;
   image?: string;
 }
@@ -34,6 +35,8 @@ export class EquipmentService {
               name: res.data.name,
               price: res.data.price,
               rentalPricePerDay: res.data.rentalPricePerDay,
+              rentalPricePerPlay: res.data.rentalPricePerPlay,
+              factory: res.data.factory,
               imageUrl: res.data.image,
             }
           : (res.data as unknown as EquipmentDetail),

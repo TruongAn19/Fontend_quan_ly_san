@@ -3,6 +3,8 @@ export interface Equipment {
   name: string;
   factory?: string;
   price: number;
+  rentalPricePerDay?: number;
+  rentalPricePerPlay?: number;
   imageUrl?: string;
 }
 
@@ -16,6 +18,8 @@ export interface EquipmentDetail {
   name: string;
   price: number;
   rentalPricePerDay?: number;
+  rentalPricePerPlay?: number;
+  factory?: string;
   description?: string;
   imageUrl?: string;
 }

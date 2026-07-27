@@ -65,7 +65,7 @@ export class AdminDashboardComponent implements OnInit {
         const maxVal = Math.max(...dailyArr.map(d => d.value), 1);
         const daily = dailyArr.map(d => ({
           ...d,
-          percent: Math.max((d.value / maxVal) * 100, 5) // Min 5% height for visibility
+          percent: (d.value / maxVal) * 100
         }));
 
         this.revenue.set({ daily });

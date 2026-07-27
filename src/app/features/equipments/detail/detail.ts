@@ -45,7 +45,6 @@ export class EquipmentDetailComponent implements OnInit {
         const data = res?.data || res;
         if (data) {
           data.imageUrl = data.image ? (data.image.startsWith('http') ? data.image : `/resources/images/equipment/${data.image}`) : 'assets/img/default-equipment.png';
-          data.rentalPrice = data.rentalPricePerDay || data.rentalPricePerPlay || data.price;
         }
         this.equipmentDetail.set(data);
       },

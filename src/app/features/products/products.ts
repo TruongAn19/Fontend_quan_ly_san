@@ -22,17 +22,6 @@ export class ProductsComponent implements OnInit {
     sort: ['']
   });
 
-  selectedAddresses: string[] = [];
-
-  onAddressChange(addr: string, event: any): void {
-    if (event.target.checked) {
-      this.selectedAddresses.push(addr);
-    } else {
-      this.selectedAddresses = this.selectedAddresses.filter(a => a !== addr);
-    }
-    this.filterForm.patchValue({ address: this.selectedAddresses.join(', ') });
-  }
-
   products = signal<any[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
@@ -98,7 +87,12 @@ export class ProductsComponent implements OnInit {
       price: 2000000,
       sort: ''
     });
-    this.selectedAddresses = [];
+    this.applyFilters();
+  }
+
+  onSortChange(event: Event): void {
+    const sort = (event.target as HTMLSelectElement).value;
+    this.filterForm.patchValue({ sort });
     this.applyFilters();
   }
 

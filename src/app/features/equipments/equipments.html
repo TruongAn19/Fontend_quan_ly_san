@@ -7,12 +7,7 @@
         
         <div class="form-group">
           <label for="factory">Hãng sản xuất</label>
-          <select id="factory" formControlName="factory">
-            <option value="">Tất cả</option>
-            <option value="Yonex">Yonex</option>
-            <option value="Victor">Victor</option>
-            <option value="Li-Ning">Li-Ning</option>
-          </select>
+          <input id="factory" type="text" formControlName="factory" placeholder="Nhập hãng sản xuất">
         </div>
 
         <div class="form-group">
@@ -74,10 +69,24 @@
                 <span class="price-label">Giá mua:</span>
                 <span class="price-value">{{ equipment.price | number }} VNĐ</span>
               </div>
-              <div class="price-row rental">
-                <span class="price-label">Giá thuê:</span>
-                <span class="price-value">{{ equipment.rentalPrice | number }} VNĐ / Buổi</span>
-              </div>
+              @if (equipment.rentalPricePerDay > 0) {
+                <div class="price-row rental">
+                  <span class="price-label">Thuê theo ngày:</span>
+                  <span class="price-value">{{ equipment.rentalPricePerDay | number }} VNĐ / ngày</span>
+                </div>
+              }
+              @if (equipment.rentalPricePerPlay > 0) {
+                <div class="price-row rental">
+                  <span class="price-label">Thuê tại sân:</span>
+                  <span class="price-value">{{ equipment.rentalPricePerPlay | number }} VNĐ / buổi</span>
+                </div>
+              }
+              @if (!(equipment.rentalPricePerDay > 0) && !(equipment.rentalPricePerPlay > 0)) {
+                <div class="price-row rental">
+                  <span class="price-label">Giá thuê:</span>
+                  <span class="price-value">Chưa có giá thuê</span>
+                </div>
+              }
             </div>
             <a [routerLink]="['/equipments/detail', equipment.id]" class="btn-detail">Xem chi tiết</a>
           </div>

@@ -9,10 +9,6 @@ export const environment = {
   stompSockJsUrl: `${origin}/ws`,
   sseBaseUrl: '/api/v1/ntfy-sse',
   vnpayReturnUrl: `${origin}/payments/vnpay-callback`,
-  contact: {
-    hotline: '0123456789',
-    email: 'admin@badmintonhub.vn'
-  },
   features: {
     enableRealtimeChat: false,
     enableRealtimeNotifications: true

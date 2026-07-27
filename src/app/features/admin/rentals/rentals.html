@@ -38,8 +38,8 @@
           <tbody>
             <tr *ngFor="let item of rentals()">
               <td class="booking-code">#{{ item.id }}</td>
-              <td><strong>{{ item.fullName || 'Khách vãng lai' }}</strong></td>
-              <td>{{ item.equipmentName || 'Thiết bị' }}</td>
+              <td><strong>{{ item.fullName || 'Không có tên khách' }}</strong></td>
+              <td>{{ item.equipmentName || 'Không có tên thiết bị' }}</td>
               <td>{{ item.rentalDate }}</td>
               <td class="total-price">{{ item.rentalPrice | number }}đ</td>
               <td>

@@ -45,8 +45,7 @@ export class HomeComponent implements OnInit {
           if (data.equipments) {
             data.equipments = data.equipments.map((r: any) => ({
               ...r,
-              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
-              rentalPrice: r.rentalPricePerDay || r.rentalPricePerPlay || r.price
+              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png'
             }));
           }
           if (data.topProducts) {
@@ -59,8 +58,7 @@ export class HomeComponent implements OnInit {
           if (data.topEquipments) {
             data.topEquipments = data.topEquipments.map((r: any) => ({
               ...r,
-              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png',
-              rentalPrice: r.rentalPricePerDay || r.rentalPricePerPlay || r.price
+              imageUrl: r.image ? (r.image.startsWith('http') ? r.image : `/resources/images/equipment/${r.image}`) : 'assets/img/default-equipment.png'
             }));
           }
         }

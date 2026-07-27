@@ -43,7 +43,7 @@
             <td class="booking-code">{{ item.bookingCode }}</td>
             <td>
               <div class="pitch-info">
-                <span class="pitch-name">{{ item.pitchName || 'Sân bóng đá' }}</span>
+                <span class="pitch-name">{{ item.courtName || 'Không có tên sân' }}</span>
               </div>
             </td>
             <td>{{ item.bookingDate }}</td>
@@ -122,9 +122,17 @@
         <p class="modal-body">
           @if (result.refundAmount > 0) {
             Số tiền cọc hoàn dự kiến: <strong>{{ result.refundAmount | number }}đ</strong>.
-            <br />Nếu chưa nhận sau 24h, vui lòng liên hệ
-            <strong>{{ result.contactHotline }}</strong>
-            @if (result.contactEmail) { / {{ result.contactEmail }} }.
+            <br />Vui lòng liên hệ quản trị viên nếu cần hỗ trợ.
+            @if (result.contactHotline || result.contactEmail) {
+              <br />
+              @if (result.contactHotline) {
+                Hotline: <strong>{{ result.contactHotline }}</strong>
+              }
+              @if (result.contactHotline && result.contactEmail) { / }
+              @if (result.contactEmail) {
+                Email: <strong>{{ result.contactEmail }}</strong>
+              }
+            }
           } @else {
             Không có khoản cọc nào cần hoàn.
           }

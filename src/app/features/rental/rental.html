@@ -14,17 +14,18 @@
         @if (eq.imageUrl) {
           <img class="equipment-header-img" [src]="eq.imageUrl" [alt]="eq.name" />
         } @else {
-          <div class="equipment-header-img placeholder">🎾</div>
+          <div class="equipment-header-img placeholder">🧰</div>
         }
         <div class="equipment-header-info">
           <h2 class="equipment-header-name">{{ eq.name }}</h2>
           @if (eq.rentalPricePerDay) {
             <p class="equipment-header-price">
-              Giá thuê: <strong>{{ eq.rentalPricePerDay | number:'1.0-0' }}đ</strong> / ngày
+              Thuê theo ngày: <strong>{{ eq.rentalPricePerDay | number:'1.0-0' }}đ</strong> / ngày
             </p>
-          } @else {
+          }
+          @if (eq.rentalPricePerPlay) {
             <p class="equipment-header-price">
-              Giá tham chiếu: <strong>{{ eq.price | number:'1.0-0' }}đ</strong>
+              Thuê tại sân: <strong>{{ eq.rentalPricePerPlay | number:'1.0-0' }}đ</strong> / buổi
             </p>
           }
           @if (eq.description) {
@@ -97,7 +98,7 @@
 
       <div class="deposit-notice animate-fade-in">
         <i class="fas fa-info-circle"></i>
-        <p>Lưu ý: Hệ thống sẽ thu phí đặt cọc bằng giá trị gốc của thiết bị để đảm bảo an toàn thiết bị. Số tiền này sẽ được đối soát khi trả đồ.</p>
+        <p>Số tiền thanh toán được tính theo hình thức thuê, số lượng và số ngày thuê của đơn.</p>
       </div>
 
       <button type="submit" class="btn-submit" [disabled]="isCreating() || isPaying()">

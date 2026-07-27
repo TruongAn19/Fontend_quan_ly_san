@@ -58,12 +58,18 @@
           } @else if (b.refundStatus === 'PENDING_REFUND') {
             <div class="refund-pending-banner">
               <strong>Đang chờ admin xử lý.</strong>
-              <p>Nếu chưa nhận được hoàn tiền, vui lòng liên hệ:</p>
+              <p>Vui lòng liên hệ quản trị viên nếu cần hỗ trợ.</p>
               @if (lastCancelResponse(); as r) {
-                <ul>
-                  <li>Hotline: <a [href]="'tel:' + r.contactHotline">{{ r.contactHotline }}</a></li>
-                  <li>Email: <a [href]="'mailto:' + r.contactEmail">{{ r.contactEmail }}</a></li>
-                </ul>
+                @if (r.contactHotline || r.contactEmail) {
+                  <ul>
+                    @if (r.contactHotline) {
+                      <li>Hotline: <a [href]="'tel:' + r.contactHotline">{{ r.contactHotline }}</a></li>
+                    }
+                    @if (r.contactEmail) {
+                      <li>Email: <a [href]="'mailto:' + r.contactEmail">{{ r.contactEmail }}</a></li>
+                    }
+                  </ul>
+                }
               }
             </div>
           }

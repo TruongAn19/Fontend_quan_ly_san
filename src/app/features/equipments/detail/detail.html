@@ -34,10 +34,24 @@
               <span class="label">Giá mua:</span>
               <span class="value">{{ equipmentDetail().price | number }} VNĐ</span>
             </div>
-            <div class="price-item rental">
-              <span class="label">Giá thuê:</span>
-              <span class="value main">{{ equipmentDetail().rentalPrice | number }} VNĐ / Buổi</span>
-            </div>
+            @if (equipmentDetail().rentalPricePerDay > 0) {
+              <div class="price-item rental">
+                <span class="label">Thuê theo ngày:</span>
+                <span class="value main">{{ equipmentDetail().rentalPricePerDay | number }} VNĐ / ngày</span>
+              </div>
+            }
+            @if (equipmentDetail().rentalPricePerPlay > 0) {
+              <div class="price-item rental">
+                <span class="label">Thuê tại sân:</span>
+                <span class="value main">{{ equipmentDetail().rentalPricePerPlay | number }} VNĐ / buổi</span>
+              </div>
+            }
+            @if (!(equipmentDetail().rentalPricePerDay > 0) && !(equipmentDetail().rentalPricePerPlay > 0)) {
+              <div class="price-item rental">
+                <span class="label">Giá thuê:</span>
+                <span class="value main">Chưa có giá thuê</span>
+              </div>
+            }
           </div>
 
           <div class="detail-block">
