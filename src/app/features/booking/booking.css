@@ -2,8 +2,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: #0f1117;
-  color: #E5E7EB;
+  background: var(--canvas);
+  color: var(--ink);
 }
 
 /* ===== CONTAINER ===== */
@@ -12,6 +12,23 @@
   margin: 0 auto;
   padding: 36px 40px 60px;
 }
+
+/* Light, high-contrast booking surface.  Kept at the end to preserve all layout rules above. */
+.booking-container { color: var(--ink); }
+.page-title { color: var(--ink) !important; }
+.page-subtitle { color: var(--muted) !important; }
+.stepper-row, .booking-card, .form-card, .summary-card, .slot-card, .info-card {
+  background: var(--surface) !important; border-color: var(--line) !important; box-shadow: var(--shadow);
+}
+.step-item { color: var(--muted) !important; }
+.step-item.active { color: var(--ink) !important; }
+.step-num, .step-line { background: #edf2f7 !important; border-color: var(--line) !important; color: var(--muted) !important; }
+.step-item.active .step-num, .step-line.filled { background: var(--brand) !important; border-color: var(--brand) !important; color: #fff !important; }
+.form-label, .section-title, .card-title, .summary-title { color: var(--ink) !important; }
+.form-input, .form-select, .form-textarea { background: #fff !important; border-color: var(--line) !important; color: var(--ink) !important; }
+.back-link { color: var(--brand-strong) !important; }
+.btn-primary, .btn-confirm, .btn-next, .btn-place-booking { background: var(--brand) !important; color: #fff !important; border-color: var(--brand) !important; }
+.btn-primary:hover, .btn-confirm:hover, .btn-next:hover, .btn-place-booking:hover { background: var(--brand-strong) !important; }
 
 @media (max-width: 768px) {
   .booking-container { padding: 20px 16px 40px; }
