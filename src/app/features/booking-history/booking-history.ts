@@ -73,6 +73,7 @@ export class BookingHistoryComponent implements OnInit {
     switch (status.toUpperCase()) {
       case 'DA_THANH_TOAN':
       case 'PAID':
+        return 'Đã thanh toán';
       case 'DA_DAT_COC':
         return 'Đã đặt cọc';
       case 'CHO_THANH_TOAN':

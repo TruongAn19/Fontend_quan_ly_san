@@ -4,6 +4,7 @@ export interface UserResponseDTO {
   email: string;
   phone?: string;
   address?: string;
-  avatarUrl?: string;
-  role: string;
+  avatar?: string;
+  roleName: string;
+  active: boolean;
 }

@@ -24,10 +24,11 @@
 
       <div class="avatar-section">
         <div class="avatar-wrapper">
-          <!-- Sử dụng ảnh mặc định cố định -->
-          <img
-            src="https://thumbs.dreamstime.com/z/default-avatar-profile-icon-social-media-user-image-gray-blank-silhouette-vector-illustration-305503988.jpg?w=768"
-            alt="Avatar" class="avatar-img static-avatar" />
+          @if (profileData()?.avatar) {
+            <img [src]="avatarUrl()" alt="Ảnh đại diện" class="avatar-img" />
+          } @else {
+            <div class="avatar-placeholder" aria-label="Chưa có ảnh đại diện">{{ profileData()?.fullName?.charAt(0) || 'U' }}</div>
+          }
         </div>
       </div>
 
@@ -40,8 +41,9 @@
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" formControlName="email"
+          <input type="email" id="email" formControlName="email" readonly
             [class.invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" />
+          <span class="field-note">Email là định danh tài khoản và không thể thay đổi tại đây.</span>
         </div>
 
         <div class="form-group">

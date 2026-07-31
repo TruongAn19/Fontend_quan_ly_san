@@ -1,29 +1,31 @@
-<div class="app-wrapper">
+<div class="app-wrapper" [class.admin-mode]="isAdmin()">
   
-  <!-- Premium Navbar -->
-  <nav class="premium-navbar animate-fade-in">
+  <nav class="premium-navbar">
     <div class="nav-container">
-      
-      <a routerLink="/" class="nav-logo">
-        <span class="logo-text">Pickleball<span class="accent">Hub</span></span>
+      <a [routerLink]="isAdmin() ? '/admin/dashboard' : '/'" class="nav-logo">
+        <span class="logo-mark" aria-hidden="true"><span></span></span>
+        <span class="brand-copy">
+          <span class="logo-text">Pickleball<span class="accent">Hub</span></span>
+          <span class="brand-caption">Đặt sân & thuê vợt</span>
+        </span>
       </a>
 
       <div class="nav-links">
         @if (isAdmin()) {
-          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
-          <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">Users</a>
-          <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">Sản phẩm</a>
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">Tổng quan</a>
+          <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">Người dùng</a>
+          <a routerLink="/admin/products" routerLinkActive="active" class="nav-item">Sân</a>
           <a routerLink="/admin/rackets" routerLinkActive="active" class="nav-item">Vợt</a>
-          <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Booking</a>
-          <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Thuê đồ</a>
+          <a routerLink="/admin/bookings" routerLinkActive="active" class="nav-item">Đặt sân</a>
+          <a routerLink="/admin/rentals" routerLinkActive="active" class="nav-item">Thuê vợt</a>
           <a routerLink="/admin/refund-requests" routerLinkActive="active" class="nav-item">Hoàn cọc</a>
         } @else {
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">Trang chủ</a>
           <a routerLink="/products" routerLinkActive="active" class="nav-item">Sân Pickleball</a>
-          <a routerLink="/rackets" routerLinkActive="active" class="nav-item">Thuê Vợt</a>
+          <a routerLink="/rackets" routerLinkActive="active" class="nav-item">Thuê vợt</a>
           @if (authService.isLoggedIn()) {
-            <a routerLink="/booking-history" routerLinkActive="active" class="nav-item">Lịch sử đặt sân</a>
-            <a routerLink="/rental-history" routerLinkActive="active" class="nav-item">Lịch sử thuê vợt</a>
+            <a routerLink="/booking-history" routerLinkActive="active" class="nav-item">Lịch đặt sân</a>
+            <a routerLink="/rental-history" routerLinkActive="active" class="nav-item">Đơn thuê vợt</a>
           }
         }
       </div>
@@ -32,9 +34,7 @@
         @if (authService.isLoggedIn()) {
           <app-notification-bell [forAdmin]="isAdmin()"></app-notification-bell>
           @if (!isAdmin()) {
-            <a routerLink="/profile" class="btn-profile">
-              Cá nhân
-            </a>
+            <a routerLink="/profile" class="btn-profile">Tài khoản</a>
           }
           <button class="btn-logout" (click)="onLogout()">Đăng xuất</button>
         } @else {

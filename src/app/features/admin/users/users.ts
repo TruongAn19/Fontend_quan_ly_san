@@ -19,12 +19,98 @@ export class AdminUsersComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   selectedUser = signal<any | null>(null);
+  showUserModal = signal<boolean>(false);
+  isEditingUser = signal<boolean>(false);
+  editingUserId = signal<number | null>(null);
+
+  userForm: FormGroup = this.fb.group({
+    fullName: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    phone: ['', [Validators.required]],
+    address: [''],
+    password: [''],
+    roleName: ['USER', [Validators.required]]
+  });
+
   roleForm: FormGroup = this.fb.group({
     role: ['', [Validators.required]]
   });
 
   ngOnInit(): void {
     this.loadUsers();
+  }
+
+  openCreateUser(): void {
+    this.isEditingUser.set(false);
+    this.editingUserId.set(null);
+    this.userForm.reset({ roleName: 'USER' });
+    this.userForm.get('email')?.enable();
+    this.showUserModal.set(true);
+  }
+
+  openEditUser(userId: number): void {
+    this.adminService.getUserDetail(userId).subscribe({
+      next: (res) => {
+        const user = res?.data;
+        if (!user) return;
+        this.isEditingUser.set(true);
+        this.editingUserId.set(userId);
+        this.userForm.reset({
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          password: '',
+          roleName: user.roleName
+        });
+        this.userForm.get('email')?.disable();
+        this.showUserModal.set(true);
+      },
+      error: (err) => this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết người dùng.')
+    });
+  }
+
+  closeUserModal(): void {
+    this.showUserModal.set(false);
+    this.userForm.get('email')?.enable();
+  }
+
+  saveUser(): void {
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
+    const value = this.userForm.getRawValue();
+    if (!this.isEditingUser() && !value.password) {
+      this.errorMessage.set('Mật khẩu không được để trống khi tạo người dùng.');
+      return;
+    }
+
+    const userPayload: any = {
+      fullName: value.fullName,
+      email: value.email,
+      phone: value.phone,
+      address: value.address
+    };
+    if (!this.isEditingUser()) {
+      userPayload.password = value.password;
+      userPayload.role = { name: value.roleName };
+    }
+
+    const formData = new FormData();
+    formData.append('user', new Blob(
+      [JSON.stringify(userPayload)], { type: 'application/json' }
+    ));
+    const request = this.isEditingUser()
+      ? this.adminService.updateUser(this.editingUserId()!, formData)
+      : this.adminService.createUser(formData);
+    request.subscribe({
+      next: () => {
+        this.closeUserModal();
+        this.loadUsers();
+      },
+      error: (err) => this.errorMessage.set(err.error?.message || 'Lưu người dùng thất bại.')
+    });
   }
 
   loadUsers(): void {
@@ -43,7 +129,7 @@ export class AdminUsersComponent implements OnInit {
 
   openRoleModal(user: any): void {
     this.selectedUser.set(user);
-    this.roleForm.patchValue({ role: user.role });
+    this.roleForm.patchValue({ role: user.roleName });
   }
 
   closeRoleModal(): void {

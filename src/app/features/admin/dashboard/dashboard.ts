@@ -28,7 +28,9 @@ export class AdminDashboardComponent implements OnInit {
     maintainAspectRatio: true,
     scales: {
       x: {
+        grid: { display: false },
         ticks: {
+          color: '#655d70',
           maxRotation: 0,
           minRotation: 0,
           autoSkip: false,
@@ -55,21 +57,23 @@ export class AdminDashboardComponent implements OnInit {
       },
       y: {
         min: 0,
+        grid: { color: 'rgba(111, 79, 163, 0.10)' },
         ticks: {
+          color: '#655d70',
           stepSize: 1,
           precision: 0
         }
       }
     },
     plugins: {
-      legend: { display: true },
+      legend: { display: true, labels: { color: '#4d4358', font: { family: 'Inter' } } },
     }
   };
   public barChartType: ChartType = 'bar';
   public barChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
-      { data: [], label: 'Lượt thuê', backgroundColor: '#16a34a' }
+      { data: [], label: 'Lượt thuê', backgroundColor: '#6f4fa3', borderRadius: 8 }
     ]
   };
 
@@ -77,7 +81,7 @@ export class AdminDashboardComponent implements OnInit {
   public bookingChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
-      { data: [], label: 'Số đơn', backgroundColor: '#3b82f6' }
+      { data: [], label: 'Số đơn', backgroundColor: '#d88968', borderRadius: 8 }
     ]
   };
 
@@ -116,7 +120,7 @@ export class AdminDashboardComponent implements OnInit {
           this.bookingChartData = {
             labels,
             datasets: [
-              { data: Object.values(countByStatus) as number[], label: 'Số đơn', backgroundColor: '#3b82f6' }
+              { data: Object.values(countByStatus) as number[], label: 'Số đơn', backgroundColor: '#d88968', borderRadius: 8 }
             ]
           };
         }
@@ -182,7 +186,7 @@ export class AdminDashboardComponent implements OnInit {
           this.barChartData = {
             labels: popularRackets.map((r: any) => r.name || r.racketName),
             datasets: [
-              { data: popularRackets.map((r: any) => r.rentalStock !== undefined ? r.rentalStock : r.rentalCount), label: 'Lượt thuê', backgroundColor: '#22c55e' }
+              { data: popularRackets.map((r: any) => r.rentalStock !== undefined ? r.rentalStock : r.rentalCount), label: 'Lượt thuê', backgroundColor: '#6f4fa3', borderRadius: 8 }
             ]
           };
         }

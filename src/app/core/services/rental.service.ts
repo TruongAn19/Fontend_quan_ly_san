@@ -38,4 +38,14 @@ export class RentalService {
   getRacketById(id: number): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.API_URL}/rackets/${id}`);
   }
+
+  getRentalDetail(id: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/rentals/${id}`);
+  }
+
+  getRacketsByBooking(bookingCode: string, productId: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(
+      `${this.API_URL}/client/bookings/${encodeURIComponent(bookingCode)}/${productId}/rackets`
+    );
+  }
 }

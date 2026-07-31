@@ -1,0 +1,12 @@
+:host { display: block; min-height: 100vh; padding: 3.5rem 0 5rem; color: var(--text-primary); }
+.history-container { width: min(var(--page-width), calc(100% - 2rem)); margin: 0 auto; }
+.page-title { margin-bottom: 1.6rem; }
+.table-responsive { overflow-x: auto; }
+.premium-table td:first-child { font-family: var(--font-caption); color: var(--primary-hover); }
+.total-price { color: var(--primary-hover); font-weight: 750; white-space: nowrap; }
+.refund-sub-badge { display: flex; margin-top: .35rem; background: var(--warning-soft); color: #704a12; }
+.status-badge { white-space: nowrap; }
+.error-alert { margin-bottom: 1rem; padding: .9rem; }
+.loading-state { padding: 4rem 0; text-align: center; }
+.empty-state p { margin: 0; }
+@media (max-width: 620px) { :host { padding-top: 2rem; } .history-container { width: calc(100% - 1rem); } }

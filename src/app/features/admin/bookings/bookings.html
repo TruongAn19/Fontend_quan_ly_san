@@ -54,14 +54,26 @@
                 {{ getStatusDisplay(item.status) }}
               </span>
             </td>
-            <td>
-              <div class="action-dropdown">
-                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
-                  <option value="">-- Đổi trạng thái --</option>
+            <td class="admin-action-cell">
+              <div class="admin-actions" [class.is-locked]="isActionLocked(item.status)">
+                <button type="button" class="icon-action-btn detail" aria-label="Xem chi tiết" title="Xem chi tiết" (click)="viewDetail(item.id)">
+                  <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                </button>
+                <div class="status-control">
+                  <select
+                    #statusSelect
+                    [value]="item.status"
+                    [disabled]="isActionLocked(item.status)"
+                    [attr.aria-label]="'Đổi trạng thái booking ' + item.id"
+                    [title]="isActionLocked(item.status) ? 'Booking đã kết thúc, không thể đổi trạng thái' : 'Đổi trạng thái'"
+                    (change)="updateStatus(item.id, statusSelect.value, item.status)"
+                  >
                   <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
                     {{ statusMap[st] }}
                   </option>
-                </select>
+                  </select>
+                  <span class="select-chevron" aria-hidden="true">⌄</span>
+                </div>
               </div>
             </td>
           </tr>
@@ -75,5 +87,35 @@
       <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
     </div>
 
+  }
+
+  @if (selectedDetail()) {
+    <div class="modal-overlay animate-fade-in">
+      <div class="modal-content glass-card">
+        <h3>Chi tiết booking</h3>
+        <p><strong>Mã:</strong> {{ selectedDetail().booking?.bookingCode }}</p>
+        <p><strong>Người đặt:</strong> {{ selectedDetail().booking?.receiverName }}</p>
+        <p><strong>Điện thoại:</strong> {{ selectedDetail().booking?.receiverPhone }}</p>
+        <p><strong>Ngày:</strong> {{ selectedDetail().booking?.bookingDate }}</p>
+        <p><strong>Trạng thái:</strong> {{ getStatusDisplay(selectedDetail().booking?.status) }}</p>
+        <p><strong>Tổng tiền:</strong> {{ selectedDetail().booking?.totalPrice | number }} VNĐ</p>
+
+        <h4>Vợt thuê kèm</h4>
+        @if (selectedDetail().rentalTools?.length) {
+          <ul>
+            <li *ngFor="let rental of selectedDetail().rentalTools">
+              {{ rental.racketName || rental.racketId }} — {{ rental.quantity }} chiếc —
+              {{ rental.rentalPrice | number }} VNĐ
+            </li>
+          </ul>
+        } @else {
+          <p>Không có vợt thuê kèm.</p>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeDetail()">Đóng</button>
+        </div>
+      </div>
+    </div>
   }
 </div>

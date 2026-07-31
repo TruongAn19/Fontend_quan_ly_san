@@ -29,6 +29,7 @@
           <th>Số lượng</th>
           <th>Thời gian thuê</th>
           <th>Trạng thái</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
@@ -43,11 +44,11 @@
           <td>{{ item.quantity }}</td>
           <td class="time-cell">
             @if (item.type === 'DAILY') {
-            <strong>{{ item.rentalDate }}</strong>
+            <strong>{{ item.rentalDate || 'Chưa có ngày thuê' }}</strong>
             <div style="font-size: 0.85rem; color: #94a3b8;">({{ item.quantityDay }} ngày)</div>
             } @else {
             <div class="booking-time-info">
-              <div style="font-weight: 700; color: #38bdf8;">{{ item.rentalDate }}</div>
+              <div style="font-weight: 700; color: #38bdf8;">{{ item.rentalDate || 'Theo lịch đặt sân' }}</div>
               <div style="font-size: 0.85rem;">Mã sân: <strong>{{ item.bookingCode }}</strong></div>
               <!-- <div style="font-size: 0.85rem; color: #fbbf24; font-weight: 600;">
                 Giờ thuê: {{ item.bookingTime }}
@@ -59,6 +60,11 @@
             <span class="status-badge" [class]="item.status?.toLowerCase()">
               {{ getStatusText(item.status) }}
             </span>
+          </td>
+          <td>
+            <button type="button" class="detail-btn" [disabled]="isDetailLoading()" (click)="viewDetail(item.id)">
+              Xem chi tiết
+            </button>
           </td>
         </tr>
       </tbody>
@@ -74,6 +80,39 @@
       sau</button>
   </div>
 
+  }
+
+  @if (selectedDetail(); as detail) {
+    <div class="modal-overlay" (click)="closeDetail()">
+      <section class="modal-content glass-card rental-detail-modal" (click)="$event.stopPropagation()">
+        <div class="detail-heading">
+          <div>
+            <span class="detail-caption">Đơn thuê vợt</span>
+            <h2>{{ detail.rentalToolCode || ('#' + detail.id) }}</h2>
+          </div>
+          <button type="button" class="close-detail-btn" aria-label="Đóng" (click)="closeDetail()">×</button>
+        </div>
+
+        <div class="detail-grid">
+          <div><span>Người thuê</span><strong>{{ detail.fullName }}</strong></div>
+          <div><span>Số điện thoại</span><strong>{{ detail.phone }}</strong></div>
+          <div><span>Email</span><strong>{{ detail.email }}</strong></div>
+          <div><span>Vợt</span><strong>{{ detail.racketName }}</strong></div>
+          <div><span>Hình thức</span><strong>{{ getTypeDisplay(detail.type) }}</strong></div>
+          <div><span>Trạng thái</span><strong>{{ getStatusText(detail.status) }}</strong></div>
+          <div><span>Số lượng</span><strong>{{ detail.quantity }}</strong></div>
+          <div><span>Ngày thuê</span><strong>{{ detail.rentalDate || 'Theo lịch đặt sân' }}</strong></div>
+          @if (detail.type === 'DAILY') {
+            <div><span>Số ngày thuê</span><strong>{{ detail.quantityDay }}</strong></div>
+          } @else {
+            <div><span>Mã đặt sân</span><strong>{{ detail.bookingCode }}</strong></div>
+            <div><span>Giờ thuê</span><strong>{{ detail.bookingTime || 'Theo lịch đặt sân' }}</strong></div>
+          }
+          <div><span>Tiền thuê</span><strong>{{ detail.rentalPrice | number }} VNĐ</strong></div>
+          <div><span>Tiền cọc</span><strong>{{ detail.price | number }} VNĐ</strong></div>
+        </div>
+      </section>
+    </div>
   }
 
   }

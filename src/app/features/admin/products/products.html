@@ -56,7 +56,7 @@
 
   @if (showModal()) {
     <div class="modal-overlay animate-fade-in">
-      <div class="modal-content glass-card">
+      <div class="modal-content glass-card editor-modal">
         <h3>{{ isEdit() ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h3>
         
         <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="premium-form">
@@ -106,10 +106,8 @@
           </div>
 
           <div class="form-group">
-            <label for="image">Hình ảnh (Nhập link URL hoặc tải file ảnh lên)</label>
+            <label for="image">Link hình ảnh</label>
             <input type="text" id="image" formControlName="image" placeholder="https://example.com/image.jpg" />
-            <span style="font-size: 0.8rem; color: #94a3b8; margin: 4px 0;">Hoặc tải lên từ máy tính:</span>
-            <input type="file" id="productImg" (change)="onFileSelected($event)" accept="image/*" />
           </div>
 
           <div class="modal-actions">

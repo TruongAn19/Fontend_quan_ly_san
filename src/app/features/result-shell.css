@@ -1,0 +1,21 @@
+:host { position: relative; display: grid; min-height: calc(100vh - 76px); place-items: center; overflow: hidden; padding: 3rem 1rem; color: var(--text-primary); }
+:host::before { content: ''; position: absolute; top: 14%; left: -10%; width: 60%; height: 96px; transform: rotate(-17deg); border-radius: 999px; background: linear-gradient(90deg,#6f4fa3,#c5a8dc,#f1d8cc); opacity: .72; }
+.success-container, .callback-container { position: relative; z-index: 1; width: min(100%, 600px); }
+.glass-card, .result-card { padding: clamp(1.6rem, 5vw, 2.7rem); text-align: center; box-shadow: 0 26px 70px rgba(47,32,66,.17); }
+.icon-circle { display: grid; width: 64px; height: 64px; margin: 0 auto 1rem; place-items: center; border-radius: 20px; }
+.icon-circle.success { background: var(--success-soft); color: var(--success); }
+.icon-circle.failed { background: var(--danger-soft); color: var(--danger); }
+.icon { font-size: 1.65rem; font-weight: 800; }
+h2 { margin-bottom: .6rem; font-size: clamp(2rem, 5vw, 3.1rem); }
+p { color: var(--text-secondary); }
+.booking-info, .rental-info { display: grid; gap: .55rem; margin: 1.5rem 0; padding: 1rem; border-radius: 14px; background: var(--surface-soft); text-align: left; }
+.info-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.label { color: var(--text-secondary); font-family: var(--font-caption); font-size: .8rem; }
+.value { color: var(--text-primary); font-weight: 720; }
+.value.code { color: var(--primary-hover); font-family: var(--font-caption); letter-spacing: .04em; }
+.action-group { display: flex; justify-content: center; gap: .7rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.loading-state { padding: 2rem 0; }
+.loading-state .spinner { width: 36px; height: 36px; display: inline-block; margin-bottom: 1rem; border-width: 3px; border-style: solid; border-radius: 50%; animation: spin 800ms linear infinite; }
+.error-text { color: var(--danger); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 560px) { :host { min-height: auto; padding: 1rem .5rem 3rem; } .action-group { flex-direction: column; } .action-group > * { width: 100%; } }

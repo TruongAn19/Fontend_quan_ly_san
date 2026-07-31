@@ -1,4 +1,4 @@
-<div class="notification-bell">
+<div class="notification-bell" [class.admin-bell]="forAdmin">
   <button class="bell-btn" (click)="toggleDropdown()" aria-label="Thông báo">
     🔔
     @if (unreadCount() > 0) {

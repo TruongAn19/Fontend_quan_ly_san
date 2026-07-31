@@ -26,6 +26,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   productId = signal<number | null>(null);
   bookingInfo = signal<any>(null);
   availableTimes = signal<any[]>([]);
+  recommendedTimeIds = signal<number[]>([]);
 
   bookingForm!: FormGroup;
   priceEstimate = signal<any>(null);
@@ -100,10 +101,26 @@ export class BookingComponent implements OnInit, OnDestroy {
       this.productId.set(+id);
       this.initForm();
       this.loadBookingInfo();
+      this.loadRecommendations();
       this.loadUserProfile(); // Tự động điền thông tin người dùng
     } else {
       this.showError('Mã sản phẩm không hợp lệ.');
     }
+  }
+
+  loadRecommendations(): void {
+    const productId = this.productId();
+    if (!productId) return;
+    this.bookingService.getRecommendSlots(productId).subscribe({
+      next: (res) => {
+        this.recommendedTimeIds.set((res?.data || []).map(slot => slot.id));
+      },
+      error: () => this.recommendedTimeIds.set([])
+    });
+  }
+
+  isRecommendedTime(timeId: number): boolean {
+    return this.recommendedTimeIds().includes(timeId);
   }
 
   ngOnDestroy(): void {

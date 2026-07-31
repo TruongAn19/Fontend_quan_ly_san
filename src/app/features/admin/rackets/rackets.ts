@@ -24,7 +24,6 @@ export class AdminRacketsComponent implements OnInit {
   isEdit = signal<boolean>(false);
   selectedRacketId = signal<number | null>(null);
   racketForm!: FormGroup;
-  selectedFile: File | null = null;
 
   ngOnInit(): void {
     this.loadRackets();
@@ -37,7 +36,13 @@ export class AdminRacketsComponent implements OnInit {
       factory: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
       status: ['ACTIVE', [Validators.required]],
-      rentalPricePerDay: [0, [Validators.required, Validators.min(0)]]
+      rentalPricePerDay: [0, [Validators.required, Validators.min(0)]],
+      rentalPricePerPlay: [0, [Validators.required, Validators.min(0)]],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      bookingStockQuantity: [0, [Validators.required, Validators.min(0)]],
+      productId: [null, [Validators.required, Validators.min(1)]],
+      available: [true],
+      image: ['']
     });
   }
 
@@ -59,32 +64,49 @@ export class AdminRacketsComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-    }
-  }
-
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedRacketId.set(null);
-    this.selectedFile = null;
-    this.racketForm.reset({ price: 0, status: 'ACTIVE', rentalPricePerDay: 0 });
+    this.racketForm.reset({
+      price: 0,
+      status: 'ACTIVE',
+      rentalPricePerDay: 0,
+      rentalPricePerPlay: 0,
+      quantity: 1,
+      bookingStockQuantity: 0,
+      productId: null,
+      available: true,
+      image: ''
+    });
     this.showModal.set(true);
   }
 
   openEditModal(racket: any): void {
-    this.isEdit.set(true);
-    this.selectedRacketId.set(racket.id);
-    this.selectedFile = null;
-    this.racketForm.patchValue({
-      name: racket.name,
-      factory: racket.factory,
-      price: racket.price,
-      status: racket.status || 'ACTIVE',
-      rentalPricePerDay: racket.rentalPricePerDay || 0
+    this.adminService.getRacketDetail(racket.id).subscribe({
+      next: (res) => {
+        const detail = res?.data;
+        if (!detail) return;
+        this.isEdit.set(true);
+        this.selectedRacketId.set(racket.id);
+        this.racketForm.patchValue({
+          name: detail.name,
+          factory: detail.factory,
+          price: detail.price,
+          status: detail.status || 'ACTIVE',
+          rentalPricePerDay: detail.rentalPricePerDay || 0,
+          rentalPricePerPlay: detail.rentalPricePerPlay || 0,
+          quantity: detail.quantity,
+          bookingStockQuantity: detail.bookingStockQuantity,
+          productId: detail.product?.id,
+          available: detail.available,
+          image: detail.image || ''
+        });
+        this.showModal.set(true);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết vợt.');
+      }
     });
-    this.showModal.set(true);
   }
 
   closeModal(): void {
@@ -95,16 +117,29 @@ export class AdminRacketsComponent implements OnInit {
     if (this.racketForm.invalid) return;
 
     const formValue = this.racketForm.value;
+    if (formValue.bookingStockQuantity > formValue.quantity) {
+      this.errorMessage.set('Tồn kho cho thuê tại sân không được lớn hơn tổng số lượng vợt.');
+      return;
+    }
+    const payload = {
+      name: formValue.name,
+      factory: formValue.factory,
+      price: formValue.price,
+      status: formValue.status,
+      rentalPricePerDay: formValue.rentalPricePerDay,
+      rentalPricePerPlay: formValue.rentalPricePerPlay,
+      quantity: formValue.quantity,
+      bookingStockQuantity: formValue.bookingStockQuantity,
+      available: formValue.available,
+      image: formValue.image,
+      product: { id: formValue.productId }
+    };
     const formData = new FormData();
 
     formData.append(
       'racket',
-      new Blob([JSON.stringify(formValue)], { type: 'application/json' })
+      new Blob([JSON.stringify(payload)], { type: 'application/json' })
     );
-
-    if (this.selectedFile) {
-      formData.append('racketImg', this.selectedFile);
-    }
 
     const request = this.isEdit()
       ? this.adminService.updateRacket(this.selectedRacketId()!, formData)
@@ -117,6 +152,16 @@ export class AdminRacketsComponent implements OnInit {
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Thao tác vợt thất bại.');
+      }
+    });
+  }
+
+  deleteRacket(id: number): void {
+    if (!confirm('Bạn có chắc chắn muốn xóa vợt này?')) return;
+    this.adminService.deleteRacket(id).subscribe({
+      next: () => this.loadRackets(),
+      error: (err) => {
+        this.errorMessage.set(err.error?.message || 'Xóa vợt thất bại.');
       }
     });
   }

@@ -1,0 +1,13 @@
+.admin-action-cell { min-width: 210px; }
+.admin-actions { display: grid; grid-template-columns: 40px minmax(150px, 1fr); align-items: center; gap: .5rem; width: 100%; }
+.admin-actions.rental-actions { grid-template-columns: 40px minmax(150px, 1fr); }
+.icon-action-btn { display: inline-grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; padding: 0; border-radius: 11px; font-size: .9rem; cursor: pointer; transition: border-color 150ms ease, background 150ms ease, color 150ms ease, transform 150ms ease; }
+.icon-action-btn:not(:disabled):hover { transform: translateY(-2px); }
+.icon-action-btn.detail { border: 1px solid #c9b8d8; background: var(--primary-pale); color: var(--primary-hover); }
+.icon-action-btn.detail:hover { border-color: var(--primary); background: var(--primary-soft); }
+.status-control { position: relative; min-width: 0; }
+.status-control select { min-height: 40px; padding: .55rem 2rem .55rem .72rem; appearance: none; font-family: var(--font-caption); font-size: .77rem; font-weight: 650; cursor: pointer; }
+.select-chevron { position: absolute; top: 50%; right: .72rem; color: var(--text-secondary); font-size: .9rem; pointer-events: none; transform: translateY(-50%); }
+.admin-actions.is-locked .status-control select, .icon-action-btn:disabled { border-color: #ddd7df; background: #efebef; color: #9b949e; opacity: 1; cursor: not-allowed; transform: none; }
+.admin-actions.is-locked .select-chevron { display: none; }
+@media (max-width: 760px) { .admin-action-cell { min-width: 210px; } .admin-actions { grid-template-columns: 40px minmax(140px, 1fr); } }

@@ -46,14 +46,31 @@
                 {{ getStatusDisplay(item.status) }}
               </span>
             </td>
-            <td>
-              <div class="action-dropdown">
-                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
-                  <option value="">-- Đổi trạng thái --</option>
-                  <option *ngFor="let st of statusList" [value]="st" [selected]="item.status === st">
-                    {{ statusMap[st] }}
-                  </option>
-                </select>
+            <td class="admin-action-cell">
+              <div class="admin-actions rental-actions" [class.is-locked]="isActionLocked(item.status)">
+                <button type="button" class="icon-action-btn detail" aria-label="Xem chi tiết" title="Xem chi tiết" (click)="viewDetail(item.id)">
+                  <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                </button>
+                <div class="status-control">
+                  <select
+                    #statusSelect
+                    [value]="item.status"
+                    [disabled]="isActionLocked(item.status)"
+                    [attr.aria-label]="'Đổi trạng thái đơn thuê ' + item.id"
+                    [title]="isActionLocked(item.status) ? 'Đơn thuê đã kết thúc, không thể đổi trạng thái' : 'Đổi trạng thái'"
+                    (change)="updateStatus(item.id, statusSelect, item.status)"
+                  >
+                    <option
+                      *ngFor="let st of statusList"
+                      [value]="st"
+                      [selected]="item.status === st"
+                      [disabled]="!isStatusOptionEnabled(item.status, st)"
+                    >
+                      {{ statusMap[st] }}
+                    </option>
+                  </select>
+                  <span class="select-chevron" aria-hidden="true">⌄</span>
+                </div>
               </div>
             </td>
           </tr>
@@ -67,5 +84,25 @@
       <button class="page-btn" [disabled]="currentPage() + 1 >= totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
     </div>
 
+  }
+
+  @if (selectedDetail()) {
+    <div class="modal-overlay animate-fade-in">
+      <div class="modal-content glass-card">
+        <h3>Chi tiết đơn thuê</h3>
+        <p><strong>Mã đơn:</strong> {{ selectedDetail().rentalTool?.rentalToolCode }}</p>
+        <p><strong>Người thuê:</strong> {{ selectedDetail().rentalTool?.fullName }}</p>
+        <p><strong>Email:</strong> {{ selectedDetail().rentalTool?.email }}</p>
+        <p><strong>Điện thoại:</strong> {{ selectedDetail().rentalTool?.phone }}</p>
+        <p><strong>Vợt:</strong> {{ selectedDetail().racket?.name }}</p>
+        <p><strong>Số lượng:</strong> {{ selectedDetail().rentalTool?.quantity }}</p>
+        <p><strong>Ngày thuê:</strong> {{ selectedDetail().rentalTool?.rentalDate }}</p>
+        <p><strong>Trạng thái:</strong> {{ getStatusDisplay(selectedDetail().rentalTool?.status) }}</p>
+        <p><strong>Chi phí:</strong> {{ selectedDetail().rentalTool?.rentalPrice | number }} VNĐ</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeDetail()">Đóng</button>
+        </div>
+      </div>
+    </div>
   }
 </div>

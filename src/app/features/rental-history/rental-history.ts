@@ -20,6 +20,8 @@ export class RentalHistoryComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  selectedDetail = signal<any | null>(null);
+  isDetailLoading = signal<boolean>(false);
 
   ngOnInit(): void {
     this.loadHistory();
@@ -35,12 +37,7 @@ export class RentalHistoryComponent implements OnInit {
         this.isLoading.set(false);
         const rawData = res.data?.rentals || res.rentals || [];
         
-        // Chỉ lấy các đơn đã thanh toán, đã đặt, đang thuê hoặc đã trả
-        const valid = rawData.filter((r: any) => 
-          ['PAID', 'DA_THANH_TOAN', 'SUCCESS', 'BOOKED', 'DA_DAT', 'RENTING', 'DANG_THUE', 'RETURNED', 'DA_TRA'].includes(r.status?.toUpperCase())
-        );
-        
-        this.allValidRentals.set(valid);
+        this.allValidRentals.set(rawData);
         this.updateDisplay();
       },
       error: (err) => {
@@ -67,6 +64,25 @@ export class RentalHistoryComponent implements OnInit {
     }
   }
 
+  viewDetail(id: number): void {
+    this.isDetailLoading.set(true);
+    this.errorMessage.set(null);
+    this.rentalService.getRentalDetail(id).subscribe({
+      next: (res) => {
+        this.isDetailLoading.set(false);
+        this.selectedDetail.set(res?.data || null);
+      },
+      error: (err) => {
+        this.isDetailLoading.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết đơn thuê.');
+      }
+    });
+  }
+
+  closeDetail(): void {
+    this.selectedDetail.set(null);
+  }
+
   getTypeDisplay(type: string): string {
     if (!type) return '';
     return type === 'DAILY' ? 'Thuê theo ngày' : 'Thuê tại sân';
@@ -84,6 +100,8 @@ export class RentalHistoryComponent implements OnInit {
       case 'RETURNED':
       case 'DA_TRA':
         return 'Đã trả vợt';
+      case 'COMPLETED':
+        return 'Hoàn thành';
       case 'CHO_THANH_TOAN':
       case 'PENDING':
         return 'Chờ thanh toán';

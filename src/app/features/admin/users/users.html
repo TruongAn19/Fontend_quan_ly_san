@@ -1,5 +1,8 @@
 <div class="admin-users animate-fade-in">
-  <h1 class="page-title">Quản lý Người dùng</h1>
+  <div class="header-row">
+    <h1 class="page-title">Quản lý Người dùng</h1>
+    <button class="btn-create" (click)="openCreateUser()">+ Thêm người dùng</button>
+  </div>
 
   @if (errorMessage()) {
     <div class="error-alert">
@@ -22,6 +25,7 @@
             <th>Email</th>
             <th>Số điện thoại</th>
             <th>Vai trò</th>
+            <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -32,13 +36,15 @@
             <td>{{ user.email }}</td>
             <td>{{ user.phone }}</td>
             <td>
-              <span class="role-badge" [class]="user.role?.toLowerCase()">
-                {{ user.role }}
+              <span class="role-badge" [class]="user.roleName?.toLowerCase()">
+                {{ user.roleName }}
               </span>
             </td>
+            <td>{{ user.active ? 'Đang hoạt động' : 'Đã vô hiệu hóa' }}</td>
             <td class="actions-cell">
+              <button class="btn-edit" (click)="openEditUser(user.id)">Sửa</button>
               <button class="btn-edit" (click)="openRoleModal(user)">Đổi Quyền</button>
-              <button class="btn-delete" (click)="deleteUser(user.id)">Xóa</button>
+              <button class="btn-delete" (click)="deleteUser(user.id)" [disabled]="!user.active">Vô hiệu hóa</button>
             </td>
           </tr>
         </tbody>
@@ -66,6 +72,50 @@
           <div class="modal-actions">
             <button type="button" class="btn-secondary" (click)="closeRoleModal()">Hủy</button>
             <button type="submit" class="btn-primary" [disabled]="roleForm.invalid">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (showUserModal()) {
+    <div class="modal-overlay animate-fade-in">
+      <div class="modal-content glass-card editor-modal">
+        <h3>{{ isEditingUser() ? 'Sửa người dùng' : 'Thêm người dùng' }}</h3>
+        <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="premium-form">
+          <div class="form-group">
+            <label for="fullName">Họ tên</label>
+            <input id="fullName" type="text" formControlName="fullName" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" />
+          </div>
+          <div class="form-group">
+            <label for="phone">Số điện thoại</label>
+            <input id="phone" type="text" formControlName="phone" />
+          </div>
+          <div class="form-group">
+            <label for="address">Địa chỉ</label>
+            <input id="address" type="text" formControlName="address" />
+          </div>
+          @if (!isEditingUser()) {
+            <div class="form-group">
+              <label for="password">Mật khẩu</label>
+              <input id="password" type="password" formControlName="password" />
+            </div>
+            <div class="form-group">
+              <label for="roleName">Vai trò</label>
+              <select id="roleName" formControlName="roleName">
+                <option value="USER">USER</option>
+                <option value="STAFF">STAFF</option>
+                <option value="ADMIN">ADMIN</option>
+              </select>
+            </div>
+          }
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeUserModal()">Hủy</button>
+            <button type="submit" class="btn-primary" [disabled]="userForm.invalid">Lưu</button>
           </div>
         </form>
       </div>

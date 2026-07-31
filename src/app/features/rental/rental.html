@@ -14,16 +14,29 @@
       <div class="form-group">
         <label for="fullName">Họ và Tên</label>
         <input type="text" id="fullName" formControlName="fullName" [class.invalid]="rentalForm.get('fullName')?.invalid && rentalForm.get('fullName')?.touched" />
+        @if (rentalForm.get('fullName')?.hasError('required') && rentalForm.get('fullName')?.touched) {
+          <small class="field-error">Vui lòng nhập họ và tên.</small>
+        }
       </div>
 
       <div class="form-group">
         <label for="email">Email</label>
         <input type="email" id="email" formControlName="email" [class.invalid]="rentalForm.get('email')?.invalid && rentalForm.get('email')?.touched" />
+        @if (rentalForm.get('email')?.touched && rentalForm.get('email')?.hasError('required')) {
+          <small class="field-error">Vui lòng nhập email.</small>
+        } @else if (rentalForm.get('email')?.touched && rentalForm.get('email')?.hasError('email')) {
+          <small class="field-error">Email không đúng định dạng.</small>
+        }
       </div>
 
       <div class="form-group">
         <label for="phone">Số điện thoại</label>
         <input type="text" id="phone" formControlName="phone" [class.invalid]="rentalForm.get('phone')?.invalid && rentalForm.get('phone')?.touched" />
+        @if (rentalForm.get('phone')?.touched && rentalForm.get('phone')?.hasError('required')) {
+          <small class="field-error">Vui lòng nhập số điện thoại.</small>
+        } @else if (rentalForm.get('phone')?.touched && rentalForm.get('phone')?.hasError('pattern')) {
+          <small class="field-error">Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0.</small>
+        }
       </div>
 
       <div class="form-group">
@@ -36,18 +49,27 @@
 
       <div class="form-group">
         <label for="quantity">Số lượng vợt</label>
-        <input type="number" id="quantity" formControlName="quantity" min="1" />
+        <input type="number" id="quantity" formControlName="quantity" min="1" [class.invalid]="rentalForm.get('quantity')?.invalid && rentalForm.get('quantity')?.touched" />
+        @if (rentalForm.get('quantity')?.invalid && rentalForm.get('quantity')?.touched) {
+          <small class="field-error">Số lượng vợt phải từ 1 trở lên.</small>
+        }
       </div>
 
       @if (rentalForm.get('type')?.value === 'DAILY') {
         <div class="form-group animate-fade-in">
           <label for="rentalDate">Ngày bắt đầu thuê</label>
-          <input type="date" id="rentalDate" formControlName="rentalDate" />
+          <input type="date" id="rentalDate" formControlName="rentalDate" [class.invalid]="rentalForm.get('rentalDate')?.invalid && rentalForm.get('rentalDate')?.touched" />
+          @if (rentalForm.get('rentalDate')?.hasError('required') && rentalForm.get('rentalDate')?.touched) {
+            <small class="field-error">Vui lòng chọn ngày bắt đầu thuê.</small>
+          }
         </div>
 
         <div class="form-group animate-fade-in">
           <label for="quantityDay">Số ngày thuê</label>
-          <input type="number" id="quantityDay" formControlName="quantityDay" min="1" />
+          <input type="number" id="quantityDay" formControlName="quantityDay" min="1" [class.invalid]="rentalForm.get('quantityDay')?.invalid && rentalForm.get('quantityDay')?.touched" />
+          @if (rentalForm.get('quantityDay')?.invalid && rentalForm.get('quantityDay')?.touched) {
+            <small class="field-error">Số ngày thuê phải từ 1 trở lên.</small>
+          }
         </div>
       }
 
@@ -55,6 +77,9 @@
         <div class="form-group animate-fade-in">
           <label for="bookingCode">Mã đặt sân (Booking Code)</label>
           <input type="text" id="bookingCode" formControlName="bookingCode" placeholder="VD: BK123456" [class.invalid]="rentalForm.get('bookingCode')?.invalid && rentalForm.get('bookingCode')?.touched" />
+          @if (rentalForm.get('bookingCode')?.hasError('required') && rentalForm.get('bookingCode')?.touched) {
+            <small class="field-error">Vui lòng nhập mã đặt sân.</small>
+          }
         </div>
       }
 

@@ -58,7 +58,10 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   loadNotifications(): void {
-    this.notificationService.getNotifications(0, 10).subscribe({
+    const request = this.forAdmin
+      ? this.notificationService.getAdminNotifications(0, 10)
+      : this.notificationService.getNotifications(0, 10);
+    request.subscribe({
       next: res => {
         const content = res?.data?.content ?? res?.data ?? [];
         this.notifications.set(content);

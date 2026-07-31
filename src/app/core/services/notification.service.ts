@@ -36,6 +36,13 @@ export class NotificationService {
     return this.http.get<ApiResponse<any>>(this.CLIENT_URL, { params });
   }
 
+  getAdminNotifications(page = 0, size = 10): Observable<ApiResponse<any>> {
+    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    return this.http.get<ApiResponse<any>>(
+      `${environment.apiBaseUrl}/admin/notifications`, { params }
+    );
+  }
+
   getUnreadCount(): Observable<ApiResponse<number>> {
     return this.http.get<ApiResponse<number>>(`${this.CLIENT_URL}/unread-count`);
   }

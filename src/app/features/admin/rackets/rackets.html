@@ -39,6 +39,7 @@
             <td>{{ item.status }}</td>
             <td class="actions-cell">
               <button class="btn-edit" (click)="openEditModal(item)">Sửa</button>
+              <button class="btn-delete" (click)="deleteRacket(item.id)">Xóa</button>
             </td>
           </tr>
         </tbody>
@@ -55,7 +56,7 @@
 
   @if (showModal()) {
     <div class="modal-overlay animate-fade-in">
-      <div class="modal-content glass-card">
+      <div class="modal-content glass-card editor-modal">
         <h3>{{ isEdit() ? 'Sửa thông tin vợt' : 'Thêm vợt mới' }}</h3>
         
         <form [formGroup]="racketForm" (ngSubmit)="onSubmit()" class="premium-form">
@@ -88,8 +89,35 @@
           </div>
 
           <div class="form-group">
-            <label for="racketImg">Hình ảnh</label>
-            <input type="file" id="racketImg" (change)="onFileSelected($event)" accept="image/*" />
+            <label for="image">Link hình ảnh</label>
+            <input type="text" id="image" formControlName="image" placeholder="https://example.com/image.jpg" />
+          </div>
+
+          <div class="form-group">
+            <label for="rentalPricePerPlay">Giá thuê theo buổi (VNĐ)</label>
+            <input type="number" id="rentalPricePerPlay" formControlName="rentalPricePerPlay" min="0" />
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Tổng số lượng vợt</label>
+            <input type="number" id="quantity" formControlName="quantity" min="1" />
+          </div>
+
+          <div class="form-group">
+            <label for="bookingStockQuantity">Số lượng dành cho thuê tại sân</label>
+            <input type="number" id="bookingStockQuantity" formControlName="bookingStockQuantity" min="0" />
+          </div>
+
+          <div class="form-group">
+            <label for="productId">ID sân sở hữu</label>
+            <input type="number" id="productId" formControlName="productId" min="1" />
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" formControlName="available" />
+              Cho phép thuê
+            </label>
           </div>
 
           <div class="modal-actions">

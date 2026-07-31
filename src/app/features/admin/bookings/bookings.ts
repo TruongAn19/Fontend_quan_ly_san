@@ -19,6 +19,7 @@ export class AdminBookingsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  selectedDetail = signal<any | null>(null);
 
   filterForm: FormGroup = this.fb.group({
     date: [''],
@@ -68,16 +69,36 @@ export class AdminBookingsComponent implements OnInit {
     this.loadBookings();
   }
 
-  updateStatus(bookingId: number, status: string): void {
-    if (!status) return;
+  updateStatus(bookingId: number, status: string, currentStatus?: string): void {
+    if (!status || this.isActionLocked(currentStatus)) return;
     this.adminService.updateBookingStatus(bookingId, status).subscribe({
       next: () => this.loadBookings(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
     });
   }
 
+  viewDetail(bookingId: number): void {
+    this.adminService.getBookingDetail(bookingId).subscribe({
+      next: (res) => this.selectedDetail.set(res?.data || null),
+      error: (err) => this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết booking.')
+    });
+  }
+
+  closeDetail(): void {
+    this.selectedDetail.set(null);
+  }
+
   getStatusDisplay(status: string): string {
     return this.statusMap[status] || status;
+  }
+
+  isActionLocked(status?: string): boolean {
+    if (!status) return false;
+    const normalized = status.trim().toUpperCase();
+    return normalized === 'DA_HUY'
+      || normalized === 'DA_THANH_TOAN'
+      || normalized === 'ĐÃ HỦY'
+      || normalized === 'ĐÃ THANH TOÁN';
   }
 
   changePage(page: number): void {

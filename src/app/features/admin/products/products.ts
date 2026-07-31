@@ -24,7 +24,6 @@ export class AdminProductsComponent implements OnInit {
   isEdit = signal<boolean>(false);
   selectedProductId = signal<number | null>(null);
   productForm!: FormGroup;
-  selectedFile: File | null = null;
 
   ngOnInit(): void {
     this.loadProducts();
@@ -64,37 +63,38 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-    }
-  }
-
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedProductId.set(null);
-    this.selectedFile = null;
     this.productForm.reset({ price: 0, sale: 0, quantity: 1, subCourtNames: '', image: '' });
     this.showModal.set(true);
   }
 
   openEditModal(product: any): void {
-    this.isEdit.set(true);
-    this.selectedProductId.set(product.id);
-    this.selectedFile = null;
-    this.productForm.patchValue({
-      name: product.name,
-      detailDesc: product.detailDesc,
-      price: product.price,
-      address: product.address,
-      addressDetail: product.addressDetail || '',
-      shortDesc: product.shortDesc || '',
-      sale: product.sale || 0,
-      quantity: product.quantity || 1,
-      subCourtNames: product.subCourtNames || '',
-      image: product.image || ''
+    this.adminService.getProductDetail(product.id).subscribe({
+      next: (res) => {
+        const detail = res?.data;
+        if (!detail) return;
+        this.isEdit.set(true);
+        this.selectedProductId.set(product.id);
+        this.productForm.patchValue({
+          name: detail.name,
+          detailDesc: detail.detailDesc,
+          price: detail.price,
+          address: detail.address,
+          addressDetail: detail.addressDetail || '',
+          shortDesc: detail.shortDesc || '',
+          sale: detail.sale || 0,
+          quantity: detail.quantity || 1,
+          subCourtNames: detail.subCourtNames || '',
+          image: detail.image || ''
+        });
+        this.showModal.set(true);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết sân.');
+      }
     });
-    this.showModal.set(true);
   }
 
   closeModal(): void {
@@ -111,10 +111,6 @@ export class AdminProductsComponent implements OnInit {
       'product',
       new Blob([JSON.stringify(formValue)], { type: 'application/json' })
     );
-
-    if (this.selectedFile) {
-      formData.append('productImg', this.selectedFile);
-    }
 
     const request = this.isEdit() 
       ? this.adminService.updateProduct(this.selectedProductId()!, formData)

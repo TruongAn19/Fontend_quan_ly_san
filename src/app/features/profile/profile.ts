@@ -37,7 +37,7 @@ export class ProfileComponent implements OnInit {
   initForms(): void {
     this.profileForm = this.fb.group({
       fullName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^(0[3|5|7|8|9])+([0-9]{8})\b$/)]],
       address: ['']
     });
@@ -53,6 +53,14 @@ export class ProfileComponent implements OnInit {
     const pass = g.get('newPassword')?.value;
     const confirm = g.get('confirmPassword')?.value;
     return pass === confirm ? null : { mismatch: true };
+  }
+
+  avatarUrl(): string {
+    const avatar = this.profileData()?.avatar;
+    if (!avatar) return '';
+    return avatar.startsWith('http')
+      ? avatar
+      : `http://localhost:8080/resources/images/avatar/${avatar}`;
   }
 
   loadProfile(): void {
@@ -90,7 +98,7 @@ export class ProfileComponent implements OnInit {
     // Chỉ gửi dữ liệu văn bản, không gửi file
     const formData = FormDataHelper.createMultipartData(
       'user',
-      this.profileForm.value
+      this.profileForm.getRawValue()
     );
 
     this.profileService.updateProfile(formData).subscribe({

@@ -70,6 +70,9 @@
                     <input type="radio" formControlName="availableTimeId" [value]="time.id" style="display: none;" 
                            [attr.disabled]="(time.status === 'HOLD' || time.status === 'BOOKED') ? true : null" />
                     {{ time.time }}
+                    @if (isRecommendedTime(time.id)) {
+                      <small title="Khung giờ được gợi ý theo lịch sử đặt sân">★ Gợi ý</small>
+                    }
                   </label>
                 </div>
               </form>
@@ -173,17 +176,28 @@
         <form [formGroup]="bookingForm" (ngSubmit)="onPlaceBooking()" class="premium-form">
           <div class="form-group mb-3">
             <label>Người đặt:</label>
-            <input type="text" formControlName="receiverName" placeholder="Tên..." />
+            <input type="text" formControlName="receiverName" placeholder="Tên..." [class.invalid]="bookingForm.get('receiverName')?.invalid && bookingForm.get('receiverName')?.touched" />
+            @if (bookingForm.get('receiverName')?.hasError('required') && bookingForm.get('receiverName')?.touched) {
+              <small class="field-error">Vui lòng nhập tên người đặt.</small>
+            }
           </div>
 
           <div class="form-group mb-3">
             <label>SĐT:</label>
-            <input type="text" formControlName="receiverPhone" placeholder="SĐT..." />
+            <input type="text" formControlName="receiverPhone" placeholder="SĐT..." [class.invalid]="bookingForm.get('receiverPhone')?.invalid && bookingForm.get('receiverPhone')?.touched" />
+            @if (bookingForm.get('receiverPhone')?.touched && bookingForm.get('receiverPhone')?.hasError('required')) {
+              <small class="field-error">Vui lòng nhập số điện thoại.</small>
+            } @else if (bookingForm.get('receiverPhone')?.touched && bookingForm.get('receiverPhone')?.hasError('pattern')) {
+              <small class="field-error">Số điện thoại không đúng định dạng.</small>
+            }
           </div>
 
           <div class="form-group mb-3">
             <label>Địa chỉ:</label>
-            <input type="text" formControlName="receiverAddress" placeholder="Địa chỉ..." />
+            <input type="text" formControlName="receiverAddress" placeholder="Địa chỉ..." [class.invalid]="bookingForm.get('receiverAddress')?.invalid && bookingForm.get('receiverAddress')?.touched" />
+            @if (bookingForm.get('receiverAddress')?.hasError('required') && bookingForm.get('receiverAddress')?.touched) {
+              <small class="field-error">Vui lòng nhập địa chỉ.</small>
+            }
           </div>
 
           @if (priceEstimate(); as est) {

@@ -125,12 +125,52 @@ export class RentalComponent implements OnInit {
       payload.rentalDate = new Date().toISOString().split('T')[0];
     }
 
+    if (formValue.type === 'ON_SITE') {
+      const productId = this.racket()?.product?.id;
+      if (!productId) {
+        this.isCreating.set(false);
+        this.errorMessage.set('Vợt chưa được gắn với sân.');
+        return;
+      }
+      this.rentalService.getRacketsByBooking(payload.bookingCode, productId).subscribe({
+        next: (res) => {
+          const rackets = res?.data?.rackets || [];
+          const selected = rackets.find((item: any) => item.id === this.racketId());
+          if (!selected || selected.bookingStockQuantity < payload.quantity) {
+            this.isCreating.set(false);
+            this.errorMessage.set('Vợt không còn đủ tồn kho tại sân của booking.');
+            return;
+          }
+          this.submitRental(payload, formValue.type);
+        },
+        error: (err) => {
+          this.isCreating.set(false);
+          this.errorMessage.set(err.error?.message || 'Không thể kiểm tra vợt tại sân.');
+        }
+      });
+      return;
+    }
+
+    this.submitRental(payload, formValue.type);
+  }
+
+  private submitRental(payload: any, rentalType: string): void {
     this.rentalService.createRental(payload).subscribe({
       next: (res) => {
         this.isCreating.set(false);
         if (res && res.data) {
           this.createdRentalId.set(res.data.id);
-          this.proceedToPay();
+          if (rentalType === 'DAILY') {
+            this.proceedToPay();
+          } else {
+            this.router.navigate(['/rental-success'], {
+              state: {
+                rentalCode: res.data.rentalToolCode ?? null,
+                rentalId: res.data.id,
+                message: res.message ?? 'Thuê vợt tại sân thành công!'
+              }
+            });
+          }
         }
       },
       error: (err) => {

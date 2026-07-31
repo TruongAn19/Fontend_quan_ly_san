@@ -1,13 +1,23 @@
 <div class="home-container animate-fade-in">
   
-  <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-content">
-      <h1 class="hero-title">Sân Pickleball <span class="highlight">Premium</span></h1>
-      <p class="hero-subtitle">Đặt sân trực tuyến nhanh chóng, tiện lợi. Trải nghiệm tốt nhất cho người đam mê Pickleball.</p>
+      <span class="hero-eyebrow">Pickleball, theo lịch của bạn</span>
+      <h1 class="hero-title">Chọn sân phù hợp.<br><span class="highlight">Vào trận đúng giờ.</span></h1>
+      <p class="hero-subtitle">Xem sân, chọn khung giờ còn trống và hoàn tất đặt cọc trong một luồng rõ ràng.</p>
       <div class="hero-actions">
-        <a routerLink="/products" class="btn-primary">Đặt Sân Ngay</a>
-        <a routerLink="/rackets" class="btn-secondary">Thuê Vợt</a>
+        <a routerLink="/products" class="btn-primary">Khám phá sân</a>
+        <a routerLink="/rackets" class="btn-secondary">Xem vợt cho thuê</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-label="Quy trình đặt sân">
+      <div class="ribbon ribbon-one"></div>
+      <div class="ribbon ribbon-two"></div>
+      <div class="journey-card">
+        <span class="journey-caption">Quy trình đặt sân</span>
+        <div class="journey-step"><b>01</b><span>Chọn sân</span></div>
+        <div class="journey-step"><b>02</b><span>Chọn ngày & giờ</span></div>
+        <div class="journey-step"><b>03</b><span>Giữ chỗ & đặt cọc</span></div>
       </div>
     </div>
   </section>
@@ -27,9 +37,11 @@
     </div>
   } @else {
     
-    <!-- Top Products Section -->
     <section class="section-grid-container" *ngIf="homeData()?.topProducts?.length">
-      <h2 class="section-title">Sân Pickleball Nổi Bật</h2>
+      <div class="section-heading">
+        <div><span class="section-kicker">Được lựa chọn nhiều</span><h2 class="section-title">Sân nổi bật</h2></div>
+        <a routerLink="/products" class="section-link">Xem tất cả sân</a>
+      </div>
       <div class="product-grid">
         <div class="product-card" *ngFor="let item of homeData()?.topProducts">
           <img [src]="item.imageUrl || 'assets/img/default-court.png'" alt="{{item.name}}" class="card-img">
@@ -45,9 +57,11 @@
       </div>
     </section>
 
-    <!-- Top Rackets Section -->
     <section class="section-grid-container" *ngIf="homeData()?.topRackets?.length">
-      <h2 class="section-title">Vợt Cho Thuê Hot</h2>
+      <div class="section-heading">
+        <div><span class="section-kicker">Sẵn sàng cho buổi chơi</span><h2 class="section-title">Vợt được thuê nhiều</h2></div>
+        <a routerLink="/rackets" class="section-link">Xem tất cả vợt</a>
+      </div>
       <div class="product-grid">
         <div class="product-card" *ngFor="let item of homeData()?.topRackets">
           <img [src]="item.imageUrl || 'assets/img/default-racket.png'" alt="{{item.name}}" class="card-img">
