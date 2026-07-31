@@ -60,7 +60,7 @@
       <!-- Equipment Grid -->
       <div class="product-grid">
         <div class="product-card animate-fade-in" *ngFor="let equipment of equipments()">
-          <img [src]="equipment.imageUrl || 'assets/img/default-equipment.png'" alt="{{equipment.name}}" class="card-img"/>
+          <img [src]="equipmentImageUrl(equipment.image)" alt="{{equipment.name}}" class="card-img"/>
           <div class="card-body">
             <h3 class="card-name">{{ equipment.name }}</h3>
             <p class="card-address">Hãng: {{ equipment.factory }}</p>

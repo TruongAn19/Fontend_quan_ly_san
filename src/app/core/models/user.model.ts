@@ -2,8 +2,8 @@ export interface UserResponseDTO {
   id: number;
   fullName: string;
   email: string;
-  phone?: string;
-  address?: string;
-  avatarUrl?: string;
-  role: string;
+  phone: string | null;
+  address: string | null;
+  avatar: string | null;
+  roleName: string | null;
 }

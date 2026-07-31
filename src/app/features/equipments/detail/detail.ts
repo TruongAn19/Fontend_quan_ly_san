@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
+import { Equipment } from '../../../core/models/equipment.model';
+import { resolveMediaUrl } from '../../../core/utils/media-url.util';
 
 @Component({
   selector: 'app-equipment-detail',
@@ -16,7 +18,7 @@ export class EquipmentDetailComponent implements OnInit {
   private router = inject(Router);
 
   equipmentId = signal<number | null>(null);
-  equipmentDetail = signal<any>(null);
+  equipmentDetail = signal<Equipment | null>(null);
   stockCount = signal<number | null>(null);
 
   isLoading = signal<boolean>(false);
@@ -42,11 +44,7 @@ export class EquipmentDetailComponent implements OnInit {
     this.productService.getEquipmentDetail(this.equipmentId()!).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const data = res?.data || res;
-        if (data) {
-          data.imageUrl = data.image ? (data.image.startsWith('http') ? data.image : `/resources/images/equipment/${data.image}`) : 'assets/img/default-equipment.png';
-        }
-        this.equipmentDetail.set(data);
+        this.equipmentDetail.set(res.data);
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -72,8 +70,7 @@ export class EquipmentDetailComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         this.isCheckingStock.set(false);
-        const stock = res.availableStock !== undefined ? res.availableStock : res.quantity;
-        this.stockCount.set(stock);
+        this.stockCount.set(res.availableStock);
       },
       error: (err) => {
         this.isCheckingStock.set(false);
@@ -86,5 +83,9 @@ export class EquipmentDetailComponent implements OnInit {
     if (this.equipmentId()) {
       this.router.navigate(['/rentals', this.equipmentId()]);
     }
+  }
+
+  equipmentImageUrl(image: string | null): string {
+    return resolveMediaUrl(image, 'equipment');
   }
 }

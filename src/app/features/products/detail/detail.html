@@ -12,21 +12,21 @@
   </div>
   } @else {
 
-  @if (productDetail()) {
+  @if (productDetail(); as detail) {
   <!-- Breadcrumb -->
   <nav class="breadcrumb">
     <a routerLink="/">Trang chủ</a>
     <span class="separator">›</span>
     <a routerLink="/products">Sân bóng</a>
     <span class="separator">›</span>
-    <span class="active">{{ productDetail().product?.name }}</span>
+    <span class="active">{{ detail.product.name }}</span>
   </nav>
 
   <!-- Gallery Row -->
   <div class="gallery-row">
     <div class="main-image-wrapper">
-      <img [src]="productDetail().product?.imageUrl || 'assets/img/default-pitch.png'"
-        alt="{{ productDetail().product?.name }}" class="main-image" />
+      <img [src]="productImageUrl(detail.product.image)"
+        alt="{{ detail.product.name }}" class="main-image" />
     </div>
   </div>
 
@@ -39,10 +39,10 @@
       <!-- Basic Info -->
       <div class="content-block">
         <div class="header-info-integrated">
-          <h1 class="product-name">{{ productDetail().product?.name }}</h1>
+          <h1 class="product-name">{{ detail.product.name }}</h1>
           <div class="address-row">
             <span class="location-icon">📍</span>
-            <span>{{ productDetail().product?.addressDetail || productDetail().product?.address }}</span>
+            <span>{{ detail.product.addressDetail || detail.product.address }}</span>
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@
       <div class="content-block">
         <h3 class="block-title">Mô tả</h3>
         <p class="description-text">
-          {{ productDetail().product?.detailDesc || productDetail().product?.shortDesc || 'Chưa có mô tả.' }}
+          {{ detail.product.detailDesc || detail.product.shortDesc || 'Chưa có mô tả.' }}
         </p>
       </div>
 
@@ -61,9 +61,9 @@
           <h3 class="block-title">Khung giờ được cấu hình</h3>
         </div>
 
-        @if (productDetail().availableTime?.length) {
+        @if (detail.availableTime.length) {
         <div class="slots-grid">
-          @for (time of productDetail().availableTime; track time.time) {
+          @for (time of detail.availableTime; track time.time) {
           <div class="slot-item available">
             <span class="slot-time">{{ time.time }}</span>
           </div>
@@ -75,11 +75,11 @@
       </div>
 
       <!-- Equipment Section -->
-      @if (productDetail().equipments?.length) {
+      @if (detail.equipments.length) {
       <div class="content-block">
         <h3 class="block-title">Thiết bị cho thuê tại sân</h3>
         <div class="equipment-list">
-          @for (equipment of productDetail().equipments; track equipment.id) {
+          @for (equipment of detail.equipments; track equipment.id) {
           <div class="equipment-item">
             <div class="equipment-info">
               <span class="equipment-name">{{ equipment.name }}</span>
@@ -105,7 +105,7 @@
     <div class="right-sidebar">
       <div class="sidebar-card">
         <div class="price-display">
-          <span class="price-value">{{ productDetail().product?.pricePerHour | number }}đ</span>
+          <span class="price-value">{{ detail.product.price | number }}đ</span>
           <span class="price-unit">/ giờ</span>
         </div>
 

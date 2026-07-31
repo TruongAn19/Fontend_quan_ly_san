@@ -1,39 +1,65 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { AdminService } from '../../../core/services/admin.service';
+import {
+  DashboardStats,
+  EquipmentStatistics,
+  RevenueChartPoint,
+} from '../../../core/models/admin.model';
+
+type Period = 'week' | 'month';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  private adminService = inject(AdminService);
+  private readonly adminService = inject(AdminService);
 
-  stats = signal<any>(null);
-  revenue = signal<any>(null);
-  equipmentStats = signal<any>(null);
+  readonly stats = signal<DashboardStats | null>(null);
+  readonly revenue = signal<{ daily: RevenueChartPoint[] }>({ daily: [] });
+  readonly equipmentStats = signal<EquipmentStatistics | null>(null);
+  readonly period = signal<Period>('week');
+  readonly isLoading = signal(true);
+  readonly errorMessage = signal<string | null>(null);
 
-  isLoading = signal<boolean>(false);
-  errorMessage = signal<string | null>(null);
+  readonly totalWeeklyRevenue = computed(() =>
+    this.revenue().daily.reduce((sum, day) => sum + day.value, 0)
+  );
+
+  readonly chartMax = computed(() => Math.max(...this.revenue().daily.map(day => day.value), 1));
 
   ngOnInit(): void {
     this.loadDashboard();
   }
 
+  setPeriod(period: Period): void {
+    if (this.period() === period) return;
+    this.period.set(period);
+    this.loadRevenue();
+  }
+
   loadDashboard(): void {
     this.isLoading.set(true);
-    this.adminService.getDashboardStats().subscribe({
-      next: (res) => {
-        this.stats.set(res.data || res);
-        this.loadRevenue();
-        this.loadEquipments();
-      },
-      error: (err) => {
+    this.errorMessage.set(null);
+    forkJoin({
+      dashboard: this.adminService.getDashboardStats(),
+      equipment: this.adminService.getEquipmentStats()
+    }).subscribe({
+      next: ({ dashboard, equipment }) => {
+        this.stats.set(dashboard.data);
+        this.equipmentStats.set(equipment.data);
         this.isLoading.set(false);
-        this.errorMessage.set('Không thể tải thống kê tổng quan.');
+        this.loadRevenue();
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.errorMessage.set('Không thể tải dữ liệu tổng quan. Vui lòng thử lại.');
       }
     });
   }
@@ -41,50 +67,32 @@ export class AdminDashboardComponent implements OnInit {
   loadRevenue(): void {
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 6); // Last 7 days
+    start.setDate(end.getDate() - (this.period() === 'week' ? 6 : 29));
 
-    const startStr = start.toISOString().split('T')[0];
-    const endStr = end.toISOString().split('T')[0];
-
-    this.adminService.getRevenueStats(startStr, endStr).subscribe({
+    this.adminService.getRevenueStats(this.toDateString(start), this.toDateString(end)).subscribe({
       next: (res) => {
-        const rawData = res.data || res;
-        // Transform Map<String, Double> to daily array format
-        const dailyArr = Object.entries(rawData).map(([date, value]) => {
-          const d = new Date(date);
-          const labels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        const rawData = res.data;
+        const today = this.toDateString(new Date());
+        const labels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        const daily = Array.from({ length: this.period() === 'week' ? 7 : 30 }, (_, index) => {
+          const parsedDate = new Date(start);
+          parsedDate.setDate(start.getDate() + index);
+          const date = this.toDateString(parsedDate);
           return {
-            date: date,
-            label: labels[d.getDay()],
-            value: Number(value),
-            isToday: date === new Date().toISOString().split('T')[0]
+            date,
+            label: this.period() === 'week' ? labels[parsedDate.getDay()] : `${parsedDate.getDate()}/${parsedDate.getMonth() + 1}`,
+            value: Number(rawData[date] ?? 0),
+            isToday: date === today
           };
-        }).sort((a, b) => a.date.localeCompare(b.date));
-
-        // Calculate percentages for bars
-        const maxVal = Math.max(...dailyArr.map(d => d.value), 1);
-        const daily = dailyArr.map(d => ({
-          ...d,
-          percent: (d.value / maxVal) * 100
-        }));
-
+        });
         this.revenue.set({ daily });
       },
-      error: () => {
-        console.error('Không thể tải dữ liệu doanh thu đồ thị');
-      }
+      error: () => this.revenue.set({ daily: [] })
     });
   }
 
-  loadEquipments(): void {
-    this.adminService.getEquipmentStats().subscribe({
-      next: (res) => {
-        this.isLoading.set(false);
-        this.equipmentStats.set(res.data || res);
-      },
-      error: () => {
-        this.isLoading.set(false);
-      }
-    });
+  private toDateString(date: Date): string {
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+    return local.toISOString().slice(0, 10);
   }
 }

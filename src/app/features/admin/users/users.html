@@ -32,8 +32,8 @@
             <td>{{ user.email }}</td>
             <td>{{ user.phone }}</td>
             <td>
-              <span class="role-badge" [class]="user.role?.toLowerCase()">
-                {{ user.role }}
+              <span class="role-badge" [class]="user.roleName?.toLowerCase()">
+                {{ user.roleName }}
               </span>
             </td>
             <td class="actions-cell">
@@ -47,11 +47,11 @@
 
   }
 
-  @if (selectedUser()) {
+  @if (selectedUser(); as selected) {
     <div class="modal-overlay animate-fade-in">
       <div class="modal-content glass-card">
         <h3>Thay đổi quyền người dùng</h3>
-        <p>Người dùng: <strong>{{ selectedUser().fullName }}</strong></p>
+        <p>Người dùng: <strong>{{ selected.fullName }}</strong></p>
         
         <form [formGroup]="roleForm" (ngSubmit)="onUpdateRole()">
           <div class="form-group">

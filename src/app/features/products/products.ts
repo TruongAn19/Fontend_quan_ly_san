@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
+import { ProductResponseDTO } from '../../core/models/product.model';
+import { resolveMediaUrl } from '../../core/utils/media-url.util';
 
 @Component({
   selector: 'app-products',
@@ -18,11 +20,11 @@ export class ProductsComponent implements OnInit {
   filterForm: FormGroup = this.fb.group({
     search: [''],
     address: [''],
-    price: [2000000],
+    price: [null],
     sort: ['']
   });
 
-  products = signal<any[]>([]);
+  products = signal<ProductResponseDTO[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   totalProductCount = signal<number>(0);
@@ -49,18 +51,9 @@ export class ProductsComponent implements OnInit {
     this.productService.getProducts(filters).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const rawData = res?.data?.products || res?.products || [];
-        const pages = res?.data?.totalPages || res?.totalPages || 1;
-        
-        const mappedData = rawData.map((item: any) => ({
-          ...item,
-          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `/resources/images/product/${item.image}`) : 'assets/img/default-pitch.png',
-          pricePerHour: item.pricePerHour || item.price
-        }));
-
-        this.products.set(mappedData);
-        this.totalPages.set(pages);
-        this.totalProductCount.set(res?.data?.totalElements || res?.totalElements || 0);
+        this.products.set(res.data.products);
+        this.totalPages.set(Math.max(res.data.totalPages, 1));
+        this.totalProductCount.set(res.data.totalElements);
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -84,7 +77,7 @@ export class ProductsComponent implements OnInit {
     this.filterForm.reset({
       search: '',
       address: '',
-      price: 2000000,
+      price: null,
       sort: ''
     });
     this.applyFilters();
@@ -101,5 +94,9 @@ export class ProductsComponent implements OnInit {
       this.currentPage.set(page);
       this.loadProducts();
     }
+  }
+
+  productImageUrl(image: string | null): string {
+    return resolveMediaUrl(image, 'product');
   }
 }

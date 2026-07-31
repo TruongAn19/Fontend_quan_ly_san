@@ -11,19 +11,14 @@ import {
 
 interface CancelPreview {
   canCancel: boolean;
-  reason?: string;        // why blocked (when canCancel=false)
-  refundAmount: number;
-  usedSessions: number;
-  totalSessions: number;
+  reason?: string;
 }
 
 /**
  * BookingDetailComponent — `/booking-detail/:id`.
  *
- * Driven entirely by `GET /api/v1/client/bookings/detail/{id}`. Pre-computes the
- * refund preview client-side so the modal can show the user what they'll get
- * back before they commit, then calls `POST /{id}/cancel` which returns the
- * authoritative refund summary.
+ * Driven entirely by `GET /api/v1/client/bookings/detail/{id}`. The backend
+ * remains the only source for cancellation eligibility and refund amounts.
  */
 @Component({
   selector: 'app-booking-detail',
@@ -52,11 +47,6 @@ export class BookingDetailComponent implements OnInit {
   // template helpers
   readonly refundStatusLabel = refundStatusLabel;
 
-  /**
-   * Client-side cancel preview (C5.4) — runs over the current booking signal.
-   * Mirrors BookingService.cancelByUser server-side logic so the modal shows
-   * the expected refund before the user commits.
-   */
   cancelPreview = computed<CancelPreview | null>(() => {
     const b = this.booking();
     if (!b) return null;
@@ -68,45 +58,10 @@ export class BookingDetailComponent implements OnInit {
       return {
         canCancel: false,
         reason: 'Đơn không ở trạng thái cho phép huỷ.',
-        refundAmount: 0, usedSessions: 0, totalSessions: 0,
       };
     }
 
-    const deposit = b.depositPrice ?? 0;
-    const type = b.bookingType ?? 'ONE_TIME';
-
-    if (type === 'WEEKLY_RECURRING') {
-      // The booking-history endpoint doesn't return BookingDetail rows for
-      // each session today, so we can only show an approximation when missing.
-      // FE shows deposit verbatim — server is the source of truth.
-      return {
-        canCancel: true,
-        refundAmount: deposit,
-        usedSessions: 0,
-        totalSessions: 0,
-      };
-    }
-
-    // ONE_TIME: 2h gate (E3)
-    if (b.bookingDate && b.time) {
-      const slotStart = new Date(`${b.bookingDate}T${b.time}`);
-      const twoHoursBefore = new Date(slotStart.getTime() - 2 * 60 * 60 * 1000);
-      if (new Date() > twoHoursBefore) {
-        const minutes = Math.max(0, Math.floor((slotStart.getTime() - Date.now()) / 60000));
-        return {
-          canCancel: false,
-          reason: `Không thể huỷ trong vòng 2 tiếng trước giờ bắt đầu (còn ${minutes} phút).`,
-          refundAmount: 0, usedSessions: 0, totalSessions: 1,
-        };
-      }
-    }
-
-    return {
-      canCancel: true,
-      refundAmount: deposit,
-      usedSessions: 0,
-      totalSessions: 1,
-    };
+    return { canCancel: true };
   });
 
   ngOnInit(): void {

@@ -21,7 +21,11 @@ export class ProfileService {
     return this.http.put<ApiResponse<UserResponseDTO>>(`${this.API_URL}/profile`, formData);
   }
 
-  changePassword(params: any): Observable<ApiResponse<null>> {
+  changePassword(params: {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Observable<ApiResponse<null>> {
     let httpParams = new HttpParams()
       .set('oldPassword', params.oldPassword)
       .set('newPassword', params.newPassword)

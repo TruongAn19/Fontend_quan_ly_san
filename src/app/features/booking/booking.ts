@@ -7,6 +7,7 @@ import { BookingService } from '../../core/services/booking.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { SlotEventsService, SlotHeldEvent } from '../../core/services/slot-events.service';
 import { AuthService } from '../../core/services/auth.service';
+import { resolveMediaUrl } from '../../core/utils/media-url.util';
 import {
   AvailableTimeDTO,
   BookingInfoResponse,
@@ -54,6 +55,7 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   /** Template helper — label for a SubPitch's PitchType. */
   readonly pitchTypeLabel = pitchTypeLabel;
+  readonly productImageUrl = (image: string | null) => resolveMediaUrl(image, 'product');
 
   // Popup xác nhận
   showConfirmPopup = signal<boolean>(false);

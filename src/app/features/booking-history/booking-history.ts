@@ -6,7 +6,6 @@ import { BookingHistoryItem, CancelBookingResponse, refundStatusLabel } from '..
 
 interface CancelModalState {
   bookingId: number;
-  refundAmount?: number;
   loading?: boolean;
 }
 
@@ -62,28 +61,9 @@ export class BookingHistoryComponent implements OnInit {
     }
   }
 
-  /**
-   * Mở modal xác nhận huỷ. Fetch booking detail trước để có depositPrice
-   * hiển thị "số tiền hoàn dự kiến" (BE sẽ trả refundAmount thực tế sau khi
-   * confirm — có thể khác do gate 2h / WEEKLY pro-rate).
-   */
   onCancelBooking(bookingId: number): void {
-    this.showCancelModal.set({ bookingId, loading: true });
+    this.showCancelModal.set({ bookingId, loading: false });
     this.cancelError.set(null);
-
-    this.bookingService.getBookingById(bookingId).subscribe({
-      next: (res) => {
-        this.showCancelModal.set({
-          bookingId,
-          refundAmount: res.data?.depositPrice,
-          loading: false,
-        });
-      },
-      error: () => {
-        // Vẫn cho phép huỷ — chỉ không hiển thị được preview.
-        this.showCancelModal.set({ bookingId, loading: false });
-      },
-    });
   }
 
   confirmCancel(): void {

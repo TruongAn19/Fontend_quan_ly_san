@@ -2,30 +2,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
-import { RefundStatus, refundStatusLabel } from '../../../core/models/booking.model';
+import {
+  AdminBookingDTO,
+  RefundStatus,
+  refundStatusLabel,
+} from '../../../core/models/booking.model';
 
 type Tab = 'PENDING_REFUND' | 'REFUNDED' | 'ALL';
-
-interface RefundBooking {
-  id: number;
-  bookingCode?: string;
-  status?: string;
-  totalPrice?: number;
-  depositPrice?: number;
-  refundStatus?: RefundStatus;
-  refundAmount?: number;
-  usedSessionsAtCancel?: number;
-  totalSessionsAtCancel?: number;
-  cancelReason?: string;
-  cancelledAt?: string;
-  bookingType?: string;
-  receiverName?: string;
-  receiverPhone?: string;
-  courtName?: string;
-  time?: string;
-  bookingDate?: string;
-  user?: { id: number; email?: string; fullName?: string; phone?: string };
-}
 
 @Component({
   selector: 'app-admin-refund-requests',
@@ -38,7 +21,7 @@ export class AdminRefundRequestsComponent implements OnInit {
   private adminService = inject(AdminService);
   private route = inject(ActivatedRoute);
 
-  bookings = signal<RefundBooking[]>([]);
+  bookings = signal<AdminBookingDTO[]>([]);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   currentPage = signal(0);
@@ -46,7 +29,7 @@ export class AdminRefundRequestsComponent implements OnInit {
   tab = signal<Tab>('PENDING_REFUND');
 
   // Modal state for the "confirm refund" action
-  modalBooking = signal<RefundBooking | null>(null);
+  modalBooking = signal<AdminBookingDTO | null>(null);
   isSubmitting = signal(false);
 
   readonly refundStatusLabel = refundStatusLabel;
@@ -77,12 +60,13 @@ export class AdminRefundRequestsComponent implements OnInit {
   load(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    const filter = this.tab() === 'ALL' ? null : this.tab();
-    this.adminService.getRefundRequests(filter as any, this.currentPage(), 10).subscribe({
+    const selectedTab = this.tab();
+    const filter = selectedTab === 'ALL' ? null : selectedTab;
+    this.adminService.getRefundRequests(filter, this.currentPage(), 10).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.bookings.set(res?.data?.bookings ?? []);
-        this.totalPages.set(res?.data?.totalPages ?? 1);
+        this.bookings.set(res.data.bookings);
+        this.totalPages.set(Math.max(res.data.totalPages, 1));
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -97,7 +81,7 @@ export class AdminRefundRequestsComponent implements OnInit {
     this.load();
   }
 
-  openDetail(b: RefundBooking): void {
+  openDetail(b: AdminBookingDTO): void {
     this.modalBooking.set(b);
   }
 

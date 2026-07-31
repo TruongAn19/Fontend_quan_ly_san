@@ -35,6 +35,7 @@
                 <th>Số lượng</th>
                 <th>Thời gian</th>
                 <th>Trạng thái</th>
+                <th>Thanh toán</th>
                 <th class="text-right">Hành động</th>
               </tr>
             </thead>
@@ -67,11 +68,12 @@
                     {{ getStatusLabel(item.status) }}
                   </span>
                 </td>
+                <td>{{ getPaymentStatusLabel(item.paymentStatus) }}</td>
                 <td class="text-right">
-                  @if (item.status === 'PENDING') {
+                  @if (item.status === 'PENDING' && item.paymentStatus !== 'PAID') {
                     <button class="btn-action" (click)="onRetryPayment(item.id)">Thanh toán</button>
                   }
-                  @if (item.status === 'PENDING' || item.status === 'DEPOSITED') {
+                  @if (item.status === 'PENDING') {
                     <button class="btn-action btn-danger" (click)="onCancelRental(item.id)">Huỷ</button>
                   }
                 </td>

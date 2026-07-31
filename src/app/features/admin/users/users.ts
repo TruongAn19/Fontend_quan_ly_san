@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { UserResponseDTO } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-admin-users',
@@ -14,11 +15,11 @@ export class AdminUsersComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
-  users = signal<any[]>([]);
+  users = signal<UserResponseDTO[]>([]);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
-  selectedUser = signal<any | null>(null);
+  selectedUser = signal<UserResponseDTO | null>(null);
   roleForm: FormGroup = this.fb.group({
     role: ['', [Validators.required]]
   });
@@ -32,7 +33,7 @@ export class AdminUsersComponent implements OnInit {
     this.adminService.getUsers().subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.users.set(res.data || res || []);
+        this.users.set(res.data);
       },
       error: () => {
         this.isLoading.set(false);
@@ -41,9 +42,9 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  openRoleModal(user: any): void {
+  openRoleModal(user: UserResponseDTO): void {
     this.selectedUser.set(user);
-    this.roleForm.patchValue({ role: user.role });
+    this.roleForm.patchValue({ role: user.roleName });
   }
 
   closeRoleModal(): void {
@@ -53,7 +54,7 @@ export class AdminUsersComponent implements OnInit {
   onUpdateRole(): void {
     if (this.roleForm.invalid || !this.selectedUser()) return;
 
-    const userId = this.selectedUser().id;
+    const userId = this.selectedUser()!.id;
     const newRole = this.roleForm.get('role')?.value;
 
     this.adminService.updateUserRole(userId, newRole).subscribe({

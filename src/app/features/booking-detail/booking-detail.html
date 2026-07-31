@@ -19,7 +19,14 @@
         <div class="info-row"><span class="label">Sân</span><span class="value">{{ b.pitchName || b.courtName }}</span></div>
         <div class="info-row"><span class="label">Ngày</span><span class="value">{{ b.bookingDate }}</span></div>
         <div class="info-row"><span class="label">Giờ</span><span class="value">{{ b.time }}</span></div>
-        <div class="info-row"><span class="label">Loại</span><span class="value">{{ b.bookingType === 'WEEKLY_RECURRING' ? 'Sân cố định' : 'Đặt một lần' }}</span></div>
+        <div class="info-row">
+          <span class="label">Loại</span>
+          <span class="value">
+            {{ b.bookingType === 'WEEKLY_RECURRING'
+              ? 'Sân cố định'
+              : (b.bookingType === 'ONE_TIME' ? 'Đặt một lần' : 'Không xác định') }}
+          </span>
+        </div>
         <div class="info-row"><span class="label">Tổng tiền</span><span class="value">{{ b.totalPrice | number }}đ</span></div>
         <div class="info-row"><span class="label">Tiền cọc</span><span class="value">{{ b.depositPrice | number }}đ</span></div>
       </div>
@@ -78,7 +85,9 @@
         @if (cancelPreview(); as p) {
           @if (p.canCancel) {
             <div class="action-card">
-              <p class="muted">Bạn có thể huỷ đơn này. Số tiền cọc dự kiến hoàn: <strong>{{ p.refundAmount | number }}đ</strong>.</p>
+              <p class="muted">
+                Backend sẽ kiểm tra thời hạn hủy và tính số tiền hoàn chính thức.
+              </p>
               <button class="btn-danger" (click)="openCancelModal()">Huỷ đặt sân</button>
             </div>
           } @else {
@@ -100,12 +109,7 @@
         </div>
         <div class="modal-body">
           <p>Bạn có chắc chắn muốn huỷ lịch đặt sân này không?</p>
-          @if (cancelPreview(); as p) {
-            <p>Số tiền cọc dự kiến hoàn: <strong>{{ p.refundAmount | number }}đ</strong></p>
-            @if (booking()?.bookingType === 'WEEKLY_RECURRING' && p.totalSessions > 0) {
-              <p>Đã sử dụng {{ p.usedSessions }} / {{ p.totalSessions }} buổi.</p>
-            }
-          }
+          <p>Số tiền hoàn sẽ được lấy từ kết quả xử lý của backend.</p>
           <label class="reason-label">Lý do huỷ (tuỳ chọn)</label>
           <textarea class="reason-input" rows="3" maxlength="255"
                     [value]="cancelReason()" (input)="cancelReason.set($any($event.target).value)">

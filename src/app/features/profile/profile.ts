@@ -5,6 +5,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormDataHelper } from '../../core/utils/form-data.helper';
 import { UserResponseDTO } from '../../core/models/user.model';
+import { resolveMediaUrl } from '../../core/utils/media-url.util';
 
 @Component({
   selector: 'app-profile',
@@ -70,8 +71,8 @@ export class ProfileComponent implements OnInit {
             phone: res.data.phone,
             address: res.data.address
           });
-          if (res.data.avatarUrl) {
-            this.avatarPreview.set(res.data.avatarUrl);
+          if (res.data.avatar) {
+            this.avatarPreview.set(resolveMediaUrl(res.data.avatar, 'avatar'));
           }
         }
       },

@@ -4,10 +4,11 @@ export type RentalPaymentMethod = 'VNPAY' | 'CASH';
 
 export type RentalStatus =
   | 'PENDING'
-  | 'DEPOSITED'
-  | 'PAID'
+  | 'RENTING'
   | 'COMPLETED'
   | 'CANCELLED';
+
+export type RentalPaymentStatus = 'UNPAID' | 'PAID' | 'REFUNDED';
 
 export type RentalRefundStatus = 'NONE' | 'PENDING_REFUND' | 'REFUNDED' | 'NOT_APPLICABLE';
 
@@ -30,6 +31,7 @@ export interface RentalCreatedResponse {
   id: number;
   rentalToolCode?: string;
   status?: RentalStatus;
+  paymentStatus?: RentalPaymentStatus;
   totalPrice?: number;
 }
 
@@ -47,6 +49,7 @@ export interface RentalHistoryItem {
   rentalToolCode?: string;
   rentalDate?: string;
   status?: RentalStatus | string;
+  paymentStatus?: RentalPaymentStatus | string;
   type?: RentalType | string;
   quantity?: number;
   quantityDay?: number;
@@ -69,6 +72,40 @@ export interface RentalHistoryResponse {
   currentPage?: number;
   totalPages: number;
   totalElements?: number;
+}
+
+/** Exact response shape of the backend RentalToolDTO. */
+export interface RentalToolDTO {
+  id: number;
+  fullName: string | null;
+  email: string | null;
+  phone: string | null;
+  type: string | null;
+  bookingId: string | null;
+  bookingCode: string | null;
+  bookingDate: string | null;
+  bookingTime: string | null;
+  equipmentId: string | null;
+  equipmentName: string | null;
+  productId: string | null;
+  price: number;
+  rentalPrice: number;
+  status: RentalStatus;
+  paymentStatus: RentalPaymentStatus;
+  quantity: number;
+  quantityDay: number;
+  rentalDate: string | null;
+  rentalToolCode: string | null;
+  refundStatus: RentalRefundStatus;
+  depositAmount: number;
+  cancelledAt: string | null;
+}
+
+export interface RentalToolListResponse {
+  rentals: RentalToolDTO[];
+  currentPage: number;
+  totalPages: number;
+  totalElements: number;
 }
 
 /**

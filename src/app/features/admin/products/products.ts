@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { ProductResponseDTO } from '../../../core/models/product.model';
+import { SubPitchDTO } from '../../../core/models/booking.model';
 
 @Component({
   selector: 'app-admin-products',
@@ -14,7 +16,7 @@ export class AdminProductsComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
-  products = signal<any[]>([]);
+  products = signal<ProductResponseDTO[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -28,7 +30,7 @@ export class AdminProductsComponent implements OnInit {
 
   // Sub-pitch management panel
   expandedProductId = signal<number | null>(null);
-  subPitches = signal<any[]>([]);
+  subPitches = signal<SubPitchDTO[]>([]);
   subPitchLoading = signal<boolean>(false);
   showSubPitchModal = signal<boolean>(false);
   isEditSubPitch = signal<boolean>(false);
@@ -71,7 +73,7 @@ export class AdminProductsComponent implements OnInit {
     this.showSubPitchModal.set(true);
   }
 
-  openEditSubPitchModal(sp: any): void {
+  openEditSubPitchModal(sp: SubPitchDTO): void {
     this.isEditSubPitch.set(true);
     this.selectedSubPitchId.set(sp.id);
     this.subPitchForm.patchValue({ name: sp.name, pitchType: sp.pitchType || 'FIVE_ASIDE' });
@@ -129,7 +131,6 @@ export class AdminProductsComponent implements OnInit {
       sale: [0, [Validators.min(0), Validators.max(100)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
       pitchType: ['FIVE_ASIDE', [Validators.required]],
-      subPitchNames: [''],
       image: ['']
     });
   }
@@ -152,8 +153,8 @@ export class AdminProductsComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.products.set(res.products || res.data?.products || []);
-          this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
+          this.products.set(res.data.products);
+          this.totalPages.set(Math.max(res.data.totalPages, 1));
         }
       },
       error: (err) => {
@@ -174,11 +175,12 @@ export class AdminProductsComponent implements OnInit {
     this.isEdit.set(false);
     this.selectedProductId.set(null);
     this.selectedFile = null;
-    this.productForm.reset({ price: 0, sale: 0, quantity: 1, pitchType: 'FIVE_ASIDE', subPitchNames: '', image: '' });
+    this.productForm.get('quantity')?.enable({ emitEvent: false });
+    this.productForm.reset({ price: 0, sale: 0, quantity: 1, pitchType: 'FIVE_ASIDE', image: '' });
     this.showModal.set(true);
   }
 
-  openEditModal(product: any): void {
+  openEditModal(product: ProductResponseDTO): void {
     this.isEdit.set(true);
     this.selectedProductId.set(product.id);
     this.selectedFile = null;
@@ -189,12 +191,12 @@ export class AdminProductsComponent implements OnInit {
       address: product.address,
       addressDetail: product.addressDetail || '',
       shortDesc: product.shortDesc || '',
-      sale: product.sale || 0,
-      quantity: product.quantity || 1,
-      pitchType: product.pitchType || 'FIVE_ASIDE',
-      subPitchNames: product.subPitchNames || '',
+      sale: product.sale,
+      quantity: product.quantity,
+      pitchType: product.pitchType,
       image: product.image || ''
     });
+    this.productForm.get('quantity')?.disable({ emitEvent: false });
     this.showModal.set(true);
   }
 
@@ -209,7 +211,7 @@ export class AdminProductsComponent implements OnInit {
   onSubmit(): void {
     if (this.productForm.invalid) return;
 
-    const formValue = this.productForm.value;
+    const formValue = this.productForm.getRawValue();
     const formData = new FormData();
 
     formData.append(

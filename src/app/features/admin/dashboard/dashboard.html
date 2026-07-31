@@ -1,131 +1,47 @@
-<div class="admin-dashboard animate-fade-in">
-  <div class="dashboard-header">
-    <div class="header-left">
-      <h1 class="page-title">Bảng điều khiển</h1>
-      <p class="page-subtitle">Tổng quan hoạt động đặt sân bóng</p>
+<main class="admin-dashboard">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">TRUNG TÂM ĐIỀU HÀNH</p>
+      <h1>Tổng quan sân bóng</h1>
+      <p class="subtitle">Theo dõi hiệu quả vận hành và các lượt đặt sân mới nhất.</p>
     </div>
-  </div>
+    <button class="refresh-button" type="button" (click)="loadDashboard()" [disabled]="isLoading()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"/></svg>
+      Làm mới
+    </button>
+  </header>
 
   @if (errorMessage()) {
-    <div class="error-alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
+    <div class="alert"><span>!</span>{{ errorMessage() }}<button type="button" (click)="loadDashboard()">Thử lại</button></div>
   }
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <span class="spinner"></span> Đang tổng hợp dữ liệu...
-    </div>
+    <section class="loading-state"><span class="loader"></span>Đang đồng bộ dữ liệu dashboard...</section>
   } @else {
-    <div class="stats-row">
-      <div class="stat-mini-card">
-        <div class="stat-mini-header">
-          <span class="stat-mini-label">Tổng người dùng</span>
-          <span class="stat-mini-icon users">👥</span>
-        </div>
-        <div class="stat-mini-body">
-          <span class="stat-mini-value">{{ stats()?.countUser || 0 | number }}</span>
-        </div>
-      </div>
+    <section class="metric-grid" aria-label="Chỉ số tổng quan">
+      <article class="metric-card"><div class="metric-icon blue"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><p>Người dùng</p><strong>{{ stats()?.countUser || 0 | number }}</strong><span>tài khoản đã đăng ký</span></article>
+      <article class="metric-card"><div class="metric-icon violet"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-7 7 7v11M9 21v-6h6v6"/></svg></div><p>Sân đang quản lý</p><strong>{{ stats()?.countProduct || 0 | number }}</strong><span>cụm sân hoạt động</span></article>
+      <article class="metric-card"><div class="metric-icon amber"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg></div><p>Lịch đặt hôm nay</p><strong>{{ stats()?.countBookingToday || 0 | number }}</strong><span>lượt đặt theo ngày</span></article>
+      <article class="metric-card emphasis"><div class="metric-icon green"><svg viewBox="0 0 24 24"><path d="M12 1v22M17 5.5c0-2-2.24-3.5-5-3.5S7 3.35 7 5.5 9.24 9 12 9s5 1.35 5 3.5S14.76 16 12 16s-5-1.35-5-3.5"/></svg></div><p>Doanh thu tháng</p><strong>{{ stats()?.monthlyRevenue || 0 | number }}<small>đ</small></strong><span>booking đã đặt & thanh toán</span></article>
+    </section>
 
-      <div class="stat-mini-card">
-        <div class="stat-mini-header">
-          <span class="stat-mini-label">Sân bóng</span>
-          <span class="stat-mini-icon pitches">⚽</span>
-        </div>
-        <div class="stat-mini-body">
-          <span class="stat-mini-value">{{ stats()?.countProduct || 0 | number }}</span>
-        </div>
-      </div>
-
-      <div class="stat-mini-card">
-        <div class="stat-mini-header">
-          <span class="stat-mini-label">Lịch đặt hôm nay</span>
-          <span class="stat-mini-icon bookings">📅</span>
-        </div>
-        <div class="stat-mini-body">
-          <span class="stat-mini-value">{{ stats()?.countBookingToday || 0 | number }}</span>
-        </div>
-      </div>
-
-      <div class="stat-mini-card">
-        <div class="stat-mini-header">
-          <span class="stat-mini-label">Doanh thu tháng</span>
-          <span class="stat-mini-icon revenue">💰</span>
-        </div>
-        <div class="stat-mini-body">
-          <span class="stat-mini-value">{{ stats()?.monthlyRevenue || 0 | number }}đ</span>
-        </div>
-      </div>
-
-      <div class="stat-mini-card">
-        <div class="stat-mini-header">
-          <span class="stat-mini-label">Thiết bị đang thuê</span>
-          <span class="stat-mini-icon equipment">🧰</span>
-        </div>
-        <div class="stat-mini-body">
-          <span class="stat-mini-value">{{ equipmentStats()?.currentlyRented || 0 | number }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard-grid">
-      <div class="grid-col-left">
-        <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">Thiết bị được thuê nhiều</h3>
+    <section class="content-grid">
+      <article class="panel revenue-panel">
+        <div class="panel-header"><div><h2>Doanh thu đặt sân</h2><p>{{ totalWeeklyRevenue() | number }}đ trong kỳ đã chọn</p></div><div class="period-switch"><button type="button" [class.active]="period() === 'week'" (click)="setPeriod('week')">7 ngày</button><button type="button" [class.active]="period() === 'month'" (click)="setPeriod('month')">30 ngày</button></div></div>
+        @if (revenue().daily.length) {
+          <div class="chart" [class.month-view]="period() === 'month'">
+            @for (day of revenue().daily; track day.date) {<div class="bar-column"><div class="bar-wrap"><span class="bar-tooltip">{{ day.value | number }}đ</span><div class="bar" [class.today]="day.isToday" [style.height.%]="(day.value / chartMax()) * 100"></div></div><span>{{ day.label }}</span></div>}
           </div>
-          <div class="rank-list">
-            <div class="rank-item" *ngFor="let item of equipmentStats()?.topEquipments; let i = index">
-              <span class="rank-num">{{ i + 1 | number:'2.0-0' }}</span>
-              <div class="rank-info">
-                <span class="rank-name">{{ item.name }}</span>
-                <span class="rank-desc">{{ item.rentCount }} lượt thuê</span>
-              </div>
-              <span class="rank-value">{{ item.revenue | number }}đ</span>
-            </div>
-            <div class="empty-state" *ngIf="!equipmentStats()?.topEquipments?.length">
-              Chưa có dữ liệu thiết bị.
-            </div>
-          </div>
-        </div>
+        } @else {<div class="chart-empty">Chưa có dữ liệu doanh thu trong khoảng thời gian này.</div>}
+      </article>
 
-        <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">Booking gần đây</h3>
-          </div>
-          <div class="recent-list">
-            <div class="recent-item" *ngFor="let booking of stats()?.recentBookings">
-              <span class="recent-code">#{{ booking.id }}</span>
-              <span class="recent-val">{{ booking.totalPrice | number }}đ</span>
-            </div>
-            <div class="empty-state" *ngIf="!stats()?.recentBookings?.length">
-              Chưa có booking gần đây.
-            </div>
-          </div>
-        </div>
-      </div>
+      <article class="panel equipment-summary"><div class="panel-header"><div><h2>Thiết bị tháng này</h2><p>Tình trạng cho thuê hiện tại</p></div><a routerLink="/admin/equipments">Quản lý →</a></div><div class="equipment-numbers"><div><strong>{{ equipmentStats()?.currentlyRented || 0 | number }}</strong><span>đang được thuê</span></div><div><strong>{{ equipmentStats()?.totalEquipments || stats()?.countByEquipment || 0 | number }}</strong><span>tổng thiết bị</span></div><div><strong>{{ equipmentStats()?.monthlyRentals || 0 | number }}</strong><span>lượt thuê tháng</span></div></div><div class="occupancy"><div><span>Thiết bị đang khai thác</span><strong>{{ (equipmentStats()?.currentlyRented || 0) }} / {{ equipmentStats()?.totalEquipments || stats()?.countByEquipment || 0 }}</strong></div><div class="progress"><i [style.width.%]="((equipmentStats()?.currentlyRented || 0) / (equipmentStats()?.totalEquipments || stats()?.countByEquipment || 1)) * 100"></i></div></div></article>
 
-      <div class="grid-col-right">
-        <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">Sân được đặt nhiều</h3>
-          </div>
-          <div class="rank-list">
-            <div class="rank-item" *ngFor="let product of stats()?.topProducts; let i = index">
-              <span class="rank-num">{{ i + 1 | number:'2.0-0' }}</span>
-              <div class="rank-info">
-                <span class="rank-name">{{ product.name }}</span>
-                <span class="rank-desc">{{ product.bookingCount }} lượt đặt</span>
-              </div>
-              <span class="rank-value">{{ product.revenue | number }}đ</span>
-            </div>
-            <div class="empty-state" *ngIf="!stats()?.topProducts?.length">
-              Chưa có dữ liệu sân.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <article class="panel ranking-panel"><div class="panel-header"><div><h2>Sân được đặt nhiều</h2><p>Top 5 theo tổng lượt đặt</p></div><a routerLink="/admin/products">Xem sân →</a></div><div class="rank-list">@for (product of stats()?.topProducts || []; track product.name; let index = $index) {<div class="rank-row"><b [class.top]="index < 3">0{{ index + 1 }}</b><div class="rank-copy"><strong>{{ product.name }}</strong><span>{{ product.bookingCount | number }} lượt đặt</span></div><strong class="money">{{ product.revenue | number }}đ</strong></div>} @empty {<p class="empty-text">Chưa có dữ liệu đặt sân.</p>}</div></article>
+
+      <article class="panel ranking-panel"><div class="panel-header"><div><h2>Thiết bị được thuê nhiều</h2><p>Top 5 theo lượt thuê tháng</p></div><a routerLink="/admin/equipments">Xem thiết bị →</a></div><div class="rank-list">@for (item of equipmentStats()?.topEquipments || []; track item.id; let index = $index) {<div class="rank-row"><b [class.top]="index < 3">0{{ index + 1 }}</b><div class="rank-copy"><strong>{{ item.name }}</strong><span>{{ item.rentCount | number }} lượt thuê</span></div><strong class="money">{{ item.revenue | number }}đ</strong></div>} @empty {<p class="empty-text">Chưa có dữ liệu thuê thiết bị.</p>}</div></article>
+
+      <article class="panel recent-panel"><div class="panel-header"><div><h2>Booking gần đây</h2><p>5 giao dịch mới nhất</p></div><a routerLink="/admin/bookings">Tất cả →</a></div><div class="booking-list">@for (booking of stats()?.recentBookings || []; track booking.id) {<div class="booking-row"><div class="booking-badge">#</div><div><strong>Booking #{{ booking.id }}</strong><span>Đơn đặt sân mới</span></div><strong>{{ booking.totalPrice | number }}đ</strong></div>} @empty {<p class="empty-text">Chưa có booking gần đây.</p>}</div></article>
+    </section>
   }
-</div>
+</main>

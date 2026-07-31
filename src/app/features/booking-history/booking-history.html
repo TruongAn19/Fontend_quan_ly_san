@@ -88,18 +88,10 @@
     <div class="modal-overlay" (click)="closeCancelModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <h3 class="modal-title">Xác nhận huỷ đặt sân</h3>
-        @if (modal.loading && modal.refundAmount === undefined) {
-          <p class="modal-body"><span class="spinner"></span> Đang tải thông tin...</p>
-        } @else {
-          <p class="modal-body">
-            @if (modal.refundAmount !== undefined && modal.refundAmount !== null) {
-              Bạn sẽ được hoàn khoảng <strong>{{ modal.refundAmount | number }}đ</strong>.
-              <br />Xác nhận huỷ?
-            } @else {
-              Bạn có chắc chắn muốn huỷ lịch đặt sân này? Thao tác này không thể hoàn tác.
-            }
-          </p>
-        }
+        <p class="modal-body">
+          Bạn có chắc chắn muốn huỷ lịch đặt sân này? Backend sẽ kiểm tra điều kiện
+          hủy và trả số tiền hoàn chính thức sau khi xử lý.
+        </p>
         @if (cancelError()) {
           <p class="modal-error">{{ cancelError() }}</p>
         }
@@ -121,7 +113,7 @@
         <h3 class="modal-title">Đã huỷ thành công</h3>
         <p class="modal-body">
           @if (result.refundAmount > 0) {
-            Số tiền cọc hoàn dự kiến: <strong>{{ result.refundAmount | number }}đ</strong>.
+            Số tiền cọc cần hoàn: <strong>{{ result.refundAmount | number }}đ</strong>.
             <br />Vui lòng liên hệ quản trị viên nếu cần hỗ trợ.
             @if (result.contactHotline || result.contactEmail) {
               <br />

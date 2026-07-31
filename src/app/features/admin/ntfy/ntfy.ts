@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -71,9 +71,15 @@ export class AdminNtfyComponent implements OnInit, OnDestroy {
     this.isSending.set(true);
     this.errorMessage.set(null);
 
-    const payload = this.notifyForm.get('message')?.value;
+    const message = this.notifyForm.get('message')?.value;
+    const params = new HttpParams()
+      .set('topic', this.topic())
+      .set('message', message);
 
-    this.http.post(`${environment.apiBaseUrl}/notify`, payload, { responseType: 'text' }).subscribe({
+    this.http.post(`${environment.apiBaseUrl}/notify`, null, {
+      params,
+      responseType: 'text'
+    }).subscribe({
       next: () => {
         this.isSending.set(false);
         this.notifyForm.reset();

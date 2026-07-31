@@ -9,7 +9,8 @@ import {
   RentalPaymentMethod,
   RentalType,
 } from '../../core/models/rental.model';
-import { EquipmentDetail } from '../../core/models/equipment.model';
+import { Equipment } from '../../core/models/equipment.model';
+import { resolveMediaUrl } from '../../core/utils/media-url.util';
 
 @Component({
   selector: 'app-rental',
@@ -26,7 +27,7 @@ export class RentalComponent implements OnInit {
   private equipmentService = inject(EquipmentService);
 
   equipmentId = signal<number | null>(null);
-  equipmentDetail = signal<EquipmentDetail | null>(null);
+  equipmentDetail = signal<Equipment | null>(null);
   rentalForm!: FormGroup;
 
   isLoading = signal<boolean>(false);
@@ -144,6 +145,12 @@ export class RentalComponent implements OnInit {
     this.isPaying.set(true);
     const paymentMethod = this.rentalForm.get('paymentMethod')?.value as RentalPaymentMethod;
 
+    if (paymentMethod === 'CASH') {
+      this.isPaying.set(false);
+      this.router.navigate(['/rental-history']);
+      return;
+    }
+
     this.rentalService.payRental(rentalId, { paymentMethod }).subscribe({
       next: (res) => {
         this.isPaying.set(false);
@@ -158,5 +165,9 @@ export class RentalComponent implements OnInit {
         this.errorMessage.set(err.error?.message || 'Thanh toán đơn thuê thất bại.');
       }
     });
+  }
+
+  equipmentImageUrl(image: string | null): string {
+    return resolveMediaUrl(image, 'equipment');
   }
 }

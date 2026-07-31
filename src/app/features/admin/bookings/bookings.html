@@ -49,7 +49,7 @@
               <td>{{ item.time }}</td>
               <td class="total-price">{{ item.totalPrice | number }}đ</td>
               <td>
-                <span class="status-badge" [class]="item.status?.toLowerCase()">
+                <span class="status-badge" [class]="item.status.toLowerCase()">
                   {{ getStatusLabel(item.status) }}
                 </span>
               </td>

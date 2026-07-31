@@ -32,6 +32,7 @@
               <th>Hãng</th>
               <th>Giá trị</th>
               <th>Giá thuê / lượt</th>
+              <th>Tồn kho</th>
               <th>Trạng thái</th>
               <th>Hành động</th>
             </tr>
@@ -45,9 +46,10 @@
               <td>{{ item.factory }}</td>
               <td>{{ item.price | number }} VNĐ</td>
               <td>{{ item.rentalPricePerPlay | number }} VNĐ</td>
+              <td>{{ item.bookingStockQuantity }} / {{ item.quantity }}</td>
               <td>
-                <span class="status-badge" [ngClass]="item.status?.toLowerCase() || 'active'">
-                  {{ item.status === 'ACTIVE' ? 'Sẵn sàng' : (item.status === 'MAINTENANCE' ? 'Bảo trì' : 'Ngừng dùng') }}
+                <span class="status-badge" [ngClass]="statusClass(item.status)">
+                  {{ statusLabel(item.status) }}
                 </span>
               </td>
               <td class="actions">
@@ -55,7 +57,7 @@
               </td>
             </tr>
             <tr *ngIf="equipments().length === 0">
-              <td colspan="6" style="text-align: center; padding: 40px; color: #9CA3AF;">
+              <td colspan="7" style="text-align: center; padding: 40px; color: #9CA3AF;">
                 Chưa có thiết bị nào trong hệ thống.
               </td>
             </tr>
@@ -97,15 +99,41 @@
             <input type="text" id="factory" formControlName="factory" placeholder="Ví dụ: Nike, Adidas..." />
           </div>
 
+          <div class="form-group">
+            <label for="productId">Sân quản lý thiết bị</label>
+            <select id="productId" formControlName="productId">
+              <option [ngValue]="null" disabled>Chọn sân</option>
+              <option *ngFor="let product of products()" [ngValue]="product.id">
+                {{ product.name }}
+              </option>
+            </select>
+          </div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
               <label for="price">Giá trị (VNĐ)</label>
               <input type="number" id="price" formControlName="price" />
             </div>
             <div class="form-group">
-              <label for="rentalPricePerPlay">Giá thuê (VNĐ)</label>
+              <label for="rentalPricePerPlay">Giá thuê tại sân (VNĐ)</label>
               <input type="number" id="rentalPricePerPlay" formControlName="rentalPricePerPlay" />
             </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="rentalPricePerDay">Giá thuê theo ngày (VNĐ)</label>
+              <input type="number" id="rentalPricePerDay" formControlName="rentalPricePerDay" />
+            </div>
+            <div class="form-group">
+              <label for="quantity">Tổng tồn kho</label>
+              <input type="number" id="quantity" formControlName="quantity" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bookingStockQuantity">Tồn kho dành cho thuê tại sân</label>
+            <input type="number" id="bookingStockQuantity" formControlName="bookingStockQuantity" />
           </div>
 
           <div class="form-group">
@@ -116,6 +144,11 @@
               <option value="INACTIVE">Hỏng / Ngừng sử dụng</option>
             </select>
           </div>
+
+          <label class="form-group">
+            <span>Khả dụng cho khách thuê</span>
+            <input type="checkbox" formControlName="available" />
+          </label>
 
           <div class="form-group">
             <label for="equipmentImg">Hình ảnh thiết bị</label>

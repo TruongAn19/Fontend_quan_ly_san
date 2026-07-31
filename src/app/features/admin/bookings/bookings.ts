@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { AdminBookingDTO } from '../../../core/models/booking.model';
 
 @Component({
   selector: 'app-admin-bookings',
@@ -14,7 +15,7 @@ export class AdminBookingsComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
-  bookings = signal<any[]>([]);
+  bookings = signal<AdminBookingDTO[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -43,8 +44,8 @@ export class AdminBookingsComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.bookings.set(res.bookings || res.data?.bookings || []);
-          this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
+          this.bookings.set(res.data.bookings);
+          this.totalPages.set(Math.max(res.data.totalPages, 1));
         }
       },
       error: () => {
@@ -67,7 +68,7 @@ export class AdminBookingsComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    const mapping: any = {
+    const mapping: Record<string, string> = {
       'CHO_THANH_TOAN': 'Chờ thanh toán',
       'DA_DAT': 'Đã đặt cọc',
       'DA_THANH_TOAN': 'Đã thanh toán',

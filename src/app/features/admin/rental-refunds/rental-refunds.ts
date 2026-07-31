@@ -2,23 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
 import { RefundStatus, refundStatusLabel } from '../../../core/models/booking.model';
+import { RentalToolDTO } from '../../../core/models/rental.model';
 
 type Tab = 'PENDING_REFUND' | 'REFUNDED' | 'ALL';
-
-interface RentalRefundItem {
-  id: number;
-  rentalToolCode?: string;
-  refundStatus?: RefundStatus | string;
-  depositAmount?: number;
-  cancelledAt?: string;
-  equipmentName?: string;
-  quantity?: number;
-  rentalPrice?: number;
-  rentalDate?: string;
-  fullName?: string;
-  email?: string;
-  phone?: string;
-}
 
 @Component({
   selector: 'app-admin-rental-refunds',
@@ -30,14 +16,14 @@ interface RentalRefundItem {
 export class AdminRentalRefundsComponent implements OnInit {
   private adminService = inject(AdminService);
 
-  rentals = signal<RentalRefundItem[]>([]);
+  rentals = signal<RentalToolDTO[]>([]);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   currentPage = signal(0);
   totalPages = signal(1);
   tab = signal<Tab>('PENDING_REFUND');
 
-  modalRental = signal<RentalRefundItem | null>(null);
+  modalRental = signal<RentalToolDTO | null>(null);
   isSubmitting = signal(false);
 
   readonly refundStatusLabel = refundStatusLabel;
@@ -55,12 +41,13 @@ export class AdminRentalRefundsComponent implements OnInit {
   load(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    const filter = this.tab() === 'ALL' ? null : this.tab();
-    this.adminService.getRentalRefunds(filter as any, this.currentPage(), 10).subscribe({
+    const selectedTab = this.tab();
+    const filter = selectedTab === 'ALL' ? null : selectedTab;
+    this.adminService.getRentalRefunds(filter, this.currentPage(), 10).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.rentals.set(res?.data?.rentals ?? []);
-        this.totalPages.set(res?.data?.totalPages ?? 1);
+        this.rentals.set(res.data.rentals);
+        this.totalPages.set(Math.max(res.data.totalPages, 1));
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -75,7 +62,7 @@ export class AdminRentalRefundsComponent implements OnInit {
     this.load();
   }
 
-  openDetail(r: RentalRefundItem): void {
+  openDetail(r: RentalToolDTO): void {
     this.modalRental.set(r);
   }
 

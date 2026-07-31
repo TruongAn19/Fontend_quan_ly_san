@@ -143,6 +143,7 @@
 
 .status-badge.paid, .status-badge.da_thanh_toan { background: #DCFCE7; color: #166534; }
 .status-badge.pending, .status-badge.cho_thanh_toan { background: #FEF3C7; color: #92400E; }
+.status-badge.renting { background: #DBEAFE; color: #1D4ED8; }
 .status-badge.cancelled, .status-badge.da_huy { background: #FEE2E2; color: #991B1B; }
 .status-badge.returned, .status-badge.da_tra { background: #F3F4F6; color: #374151; }
 

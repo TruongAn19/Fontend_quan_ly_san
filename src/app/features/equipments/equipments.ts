@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
+import { Equipment } from '../../core/models/equipment.model';
+import { resolveMediaUrl } from '../../core/utils/media-url.util';
 
 @Component({
   selector: 'app-equipments',
@@ -21,7 +23,7 @@ export class EquipmentsComponent implements OnInit {
     sort: ['']
   });
 
-  equipments = signal<any[]>([]);
+  equipments = signal<Equipment[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -43,16 +45,8 @@ export class EquipmentsComponent implements OnInit {
     this.productService.getEquipments(filters).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const rawData = res?.data?.equipments || res?.equipments || [];
-        const pages = res?.data?.totalPages || res?.totalPages || 1;
-
-        const mappedData = rawData.map((item: any) => ({
-          ...item,
-          imageUrl: item.image ? (item.image.startsWith('http') ? item.image : `/resources/images/equipment/${item.image}`) : 'assets/img/default-equipment.png'
-        }));
-
-        this.equipments.set(mappedData);
-        this.totalPages.set(pages);
+        this.equipments.set(res.data.equipments);
+        this.totalPages.set(Math.max(res.data.totalPages, 1));
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -71,5 +65,9 @@ export class EquipmentsComponent implements OnInit {
       this.currentPage.set(page);
       this.loadEquipments();
     }
+  }
+
+  equipmentImageUrl(image: string | null): string {
+    return resolveMediaUrl(image, 'equipment');
   }
 }

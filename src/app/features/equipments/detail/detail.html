@@ -12,51 +12,46 @@
     </div>
   } @else {
     
-    @if (equipmentDetail()) {
+    @if (equipmentDetail(); as equipment) {
       <div class="grid-layout">
         
         <!-- Image Section -->
         <div class="image-section">
           <img 
-            [src]="equipmentDetail().imageUrl || 'assets/img/default-equipment.png'"
-            alt="{{ equipmentDetail().name }}" 
+            [src]="equipmentImageUrl(equipment.image)"
+            alt="{{ equipment.name }}"
             class="detail-img"
           />
         </div>
 
         <!-- Info Section -->
         <div class="info-section glass-card">
-          <h1 class="product-name">{{ equipmentDetail().name }}</h1>
-          <p class="product-address">Hãng sản xuất: {{ equipmentDetail().factory }}</p>
+          <h1 class="product-name">{{ equipment.name }}</h1>
+          <p class="product-address">Hãng sản xuất: {{ equipment.factory }}</p>
 
           <div class="price-box-group">
             <div class="price-item">
               <span class="label">Giá mua:</span>
-              <span class="value">{{ equipmentDetail().price | number }} VNĐ</span>
+              <span class="value">{{ equipment.price | number }} VNĐ</span>
             </div>
-            @if (equipmentDetail().rentalPricePerDay > 0) {
+            @if (equipment.rentalPricePerDay > 0) {
               <div class="price-item rental">
                 <span class="label">Thuê theo ngày:</span>
-                <span class="value main">{{ equipmentDetail().rentalPricePerDay | number }} VNĐ / ngày</span>
+                <span class="value main">{{ equipment.rentalPricePerDay | number }} VNĐ / ngày</span>
               </div>
             }
-            @if (equipmentDetail().rentalPricePerPlay > 0) {
+            @if (equipment.rentalPricePerPlay > 0) {
               <div class="price-item rental">
                 <span class="label">Thuê tại sân:</span>
-                <span class="value main">{{ equipmentDetail().rentalPricePerPlay | number }} VNĐ / buổi</span>
+                <span class="value main">{{ equipment.rentalPricePerPlay | number }} VNĐ / buổi</span>
               </div>
             }
-            @if (!(equipmentDetail().rentalPricePerDay > 0) && !(equipmentDetail().rentalPricePerPlay > 0)) {
+            @if (!(equipment.rentalPricePerDay > 0) && !(equipment.rentalPricePerPlay > 0)) {
               <div class="price-item rental">
                 <span class="label">Giá thuê:</span>
                 <span class="value main">Chưa có giá thuê</span>
               </div>
             }
-          </div>
-
-          <div class="detail-block">
-            <h3 class="block-title">Mô tả sản phẩm</h3>
-            <p class="block-desc">{{ equipmentDetail().description || 'Chưa có mô tả cho sản phẩm này.' }}</p>
           </div>
 
           <!-- Stock Checker -->

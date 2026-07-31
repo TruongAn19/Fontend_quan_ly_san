@@ -11,14 +11,14 @@ export interface JwtAuthResponse {
 
 export interface LoginRequest {
   email: string;
-  password?: string; // Optional just in case
+  password: string;
 }
 
 export interface RegisterRequest {
   firstName?: string;
   lastName?: string;
   email?: string;
-  password?: string;
-  confirmPassword?: string;
+  password: string;
+  confirmPassword: string;
   phone?: string;
 }

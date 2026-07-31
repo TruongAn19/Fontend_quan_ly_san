@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { Equipment } from '../../../core/models/equipment.model';
+import { ProductResponseDTO } from '../../../core/models/product.model';
 
 @Component({
   selector: 'app-admin-equipments',
@@ -14,7 +16,8 @@ export class AdminEquipmentsComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
-  equipments = signal<any[]>([]);
+  equipments = signal<Equipment[]>([]);
+  products = signal<ProductResponseDTO[]>([]);
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -28,6 +31,7 @@ export class AdminEquipmentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEquipments();
+    this.loadProductOptions();
     this.initForm();
   }
 
@@ -37,7 +41,21 @@ export class AdminEquipmentsComponent implements OnInit {
       factory: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
       status: ['ACTIVE', [Validators.required]],
-      rentalPricePerPlay: [0, [Validators.required, Validators.min(0)]]
+      available: [true, [Validators.required]],
+      rentalPricePerDay: [0, [Validators.required, Validators.min(0)]],
+      rentalPricePerPlay: [0, [Validators.required, Validators.min(0)]],
+      bookingStockQuantity: [0, [Validators.required, Validators.min(0)]],
+      quantity: [0, [Validators.required, Validators.min(0)]],
+      productId: [null, [Validators.required]]
+    });
+  }
+
+  loadProductOptions(): void {
+    this.adminService.getProductOptions().subscribe({
+      next: (res) => this.products.set(res.data),
+      error: (err) => {
+        this.errorMessage.set(err?.error?.message || 'Không thể tải danh sách sân.');
+      }
     });
   }
 
@@ -47,8 +65,8 @@ export class AdminEquipmentsComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.equipments.set(res.equipments || res.data?.equipments || []);
-          this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
+          this.equipments.set(res.data.equipments);
+          this.totalPages.set(Math.max(res.data.totalPages, 1));
         }
       },
       error: (err) => {
@@ -69,11 +87,20 @@ export class AdminEquipmentsComponent implements OnInit {
     this.isEdit.set(false);
     this.selectedEquipmentId.set(null);
     this.selectedFile = null;
-    this.equipmentForm.reset({ price: 0, status: 'ACTIVE', rentalPricePerPlay: 0 });
+    this.equipmentForm.reset({
+      price: 0,
+      status: 'ACTIVE',
+      available: true,
+      rentalPricePerDay: 0,
+      rentalPricePerPlay: 0,
+      bookingStockQuantity: 0,
+      quantity: 0,
+      productId: null
+    });
     this.showModal.set(true);
   }
 
-  openEditModal(equipment: any): void {
+  openEditModal(equipment: Equipment): void {
     this.isEdit.set(true);
     this.selectedEquipmentId.set(equipment.id);
     this.selectedFile = null;
@@ -81,8 +108,13 @@ export class AdminEquipmentsComponent implements OnInit {
       name: equipment.name,
       factory: equipment.factory,
       price: equipment.price,
-      status: equipment.status || 'ACTIVE',
-      rentalPricePerPlay: equipment.rentalPricePerPlay || 0
+      status: equipment.status,
+      available: equipment.available,
+      rentalPricePerDay: equipment.rentalPricePerDay,
+      rentalPricePerPlay: equipment.rentalPricePerPlay,
+      bookingStockQuantity: equipment.bookingStockQuantity,
+      quantity: equipment.quantity,
+      productId: equipment.product?.id ?? null
     });
     this.showModal.set(true);
   }
@@ -126,5 +158,16 @@ export class AdminEquipmentsComponent implements OnInit {
       this.currentPage.set(page);
       this.loadEquipments();
     }
+  }
+
+  statusLabel(status: string | null): string {
+    if (status === 'ACTIVE') return 'Sẵn sàng';
+    if (status === 'MAINTENANCE') return 'Bảo trì';
+    if (status === 'INACTIVE') return 'Ngừng dùng';
+    return status || 'Không xác định';
+  }
+
+  statusClass(status: string | null): string {
+    return status?.toLowerCase() || 'unknown';
   }
 }

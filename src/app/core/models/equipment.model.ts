@@ -1,33 +1,30 @@
 export interface Equipment {
   id: number;
   name: string;
-  factory?: string;
   price: number;
-  rentalPricePerDay?: number;
-  rentalPricePerPlay?: number;
-  imageUrl?: string;
+  available: boolean;
+  factory: string | null;
+  image: string | null;
+  rentalPricePerDay: number;
+  rentalPricePerPlay: number;
+  bookingStockQuantity: number;
+  quantity: number;
+  status: string | null;
+  product: {
+    id: number;
+    name: string;
+  } | null;
 }
 
-/**
- * Detail shape used by rental form header. `image` từ BE được đổi alias
- * sang `imageUrl` cho nhất quán với phần còn lại của FE; `description`
- * hiện chưa có trên BE — sẽ undefined cho tới khi backend bổ sung.
- */
-export interface EquipmentDetail {
-  id: number;
-  name: string;
-  price: number;
-  rentalPricePerDay?: number;
-  rentalPricePerPlay?: number;
-  factory?: string;
-  description?: string;
-  imageUrl?: string;
-}
+export type EquipmentDetail = Equipment;
 
 export interface EquipmentStockByDate {
   equipmentId: number;
   date: string;
-  availableCount: number;
+  availableStock: number;
+  reservedStock: number;
+  rentalStock: number;
+  totalStock: number;
 }
 
 export interface EquipmentListResponse {

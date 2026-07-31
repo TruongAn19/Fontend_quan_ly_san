@@ -11,8 +11,8 @@
 
     @if (equipmentDetail(); as eq) {
       <div class="equipment-header">
-        @if (eq.imageUrl) {
-          <img class="equipment-header-img" [src]="eq.imageUrl" [alt]="eq.name" />
+        @if (eq.image) {
+          <img class="equipment-header-img" [src]="equipmentImageUrl(eq.image)" [alt]="eq.name" />
         } @else {
           <div class="equipment-header-img placeholder">🧰</div>
         }
@@ -27,9 +27,6 @@
             <p class="equipment-header-price">
               Thuê tại sân: <strong>{{ eq.rentalPricePerPlay | number:'1.0-0' }}đ</strong> / buổi
             </p>
-          }
-          @if (eq.description) {
-            <p class="equipment-header-desc">{{ eq.description }}</p>
           }
         </div>
       </div>

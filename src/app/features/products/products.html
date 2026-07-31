@@ -39,18 +39,14 @@
       </div>
 
       <div class="filter-group">
-        <p class="filter-subtitle">Khoảng giá</p>
+        <p class="filter-subtitle">Giá tối đa</p>
         <div class="price-range">
-          <input type="range" 
-                 class="range-slider" 
-                 min="100000" 
-                 max="2000000" 
+          <input type="number"
+                 class="search-input"
+                 min="0"
                  step="50000"
-                 formControlName="price">
-          <div class="range-labels">
-            <span>{{ filterForm.get('price')?.value | number }}đ</span>
-            <span>2.000.000đ</span>
-          </div>
+                 formControlName="price"
+                 placeholder="Không giới hạn">
         </div>
       </div>
 
@@ -82,7 +78,7 @@
           @for (item of products(); track item.id) {
             <a [routerLink]="['/products/detail', item.id]" class="product-card">
               <div class="product-image">
-                <img [src]="item.imageUrl || 'assets/img/default-pitch.png'" [alt]="item.name">
+                <img [src]="productImageUrl(item.image)" [alt]="item.name">
               </div>
               <div class="product-info">
                 <h4 class="product-name">{{ item.name }}</h4>
@@ -91,7 +87,7 @@
                 </div>
                 <div class="product-footer">
                   <div class="price-box">
-                    <span class="price-value">{{ item.pricePerHour | number }}đ</span>
+                    <span class="price-value">{{ item.price | number }}đ</span>
                     <span class="price-unit">/ giờ</span>
                   </div>
                 </div>

@@ -93,23 +93,24 @@ export class RentalHistoryComponent implements OnInit {
     if (!status) return 'Không xác định';
     const s = status.toUpperCase();
     switch (s) {
-      case 'PAID': 
-      case 'DA_THANH_TOAN':
-        return 'Đã thanh toán';
+      case 'RENTING':
+        return 'Đang thuê';
       case 'COMPLETED': 
       case 'RETURNED':
-        return 'Đã trả đồ';
+        return 'Đã trả phụ kiện';
       case 'PENDING': 
-      case 'CHO_THANH_TOAN':
-        return 'Chờ thanh toán';
+        return 'Chờ nhận phụ kiện';
       case 'CANCELLED': 
       case 'DA_HUY':
         return 'Đã hủy';
-      case 'DEPOSITED':
-      case 'DA_DAT_COC':
-        return 'Đã đặt cọc';
       default: return status;
     }
+  }
+
+  getPaymentStatusLabel(status?: string | null): string {
+    if (status === 'PAID') return 'Đã thanh toán';
+    if (status === 'REFUNDED') return 'Đã hoàn tiền';
+    return 'Chưa thanh toán';
   }
 
   getTypeLabel(type?: string | null): string {

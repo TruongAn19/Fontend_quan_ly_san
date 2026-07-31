@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { RentalStatus, RentalToolDTO } from '../../../core/models/rental.model';
 
 @Component({
   selector: 'app-admin-rentals',
@@ -14,7 +15,7 @@ export class AdminRentalsComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
 
-  rentals = signal<any[]>([]);
+  rentals = signal<RentalToolDTO[]>([]);
   currentPage = signal<number>(0);
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
@@ -25,15 +26,31 @@ export class AdminRentalsComponent implements OnInit {
   });
 
   statusList = [
-    { value: 'PENDING', label: 'Chờ thanh toán' },
-    { value: 'PAID', label: 'Đã thanh toán' },
-    { value: 'COMPLETED', label: 'Đã trả' },
+    { value: 'PENDING', label: 'Chờ nhận phụ kiện' },
+    { value: 'RENTING', label: 'Đang thuê' },
+    { value: 'COMPLETED', label: 'Đã trả phụ kiện' },
     { value: 'CANCELLED', label: 'Đã hủy' }
   ];
 
   getStatusLabel(status: string): string {
     const found = this.statusList.find(s => s.value === status);
-    return found ? found.label : (status || 'Chờ thanh toán');
+    return found ? found.label : (status || 'Không xác định');
+  }
+
+  getPaymentStatusLabel(status?: string): string {
+    if (status === 'PAID') return 'Đã thanh toán';
+    if (status === 'REFUNDED') return 'Đã hoàn tiền';
+    return 'Chưa thanh toán';
+  }
+
+  getAllowedStatusTransitions(status?: RentalStatus) {
+    if (status === 'PENDING') {
+      return this.statusList.filter(item => item.value === 'RENTING' || item.value === 'CANCELLED');
+    }
+    if (status === 'RENTING') {
+      return this.statusList.filter(item => item.value === 'COMPLETED');
+    }
+    return [];
   }
 
   ngOnInit(): void {
@@ -48,8 +65,8 @@ export class AdminRentalsComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         if (res) {
-          this.rentals.set(res.rentals || res.data?.rentals || []);
-          this.totalPages.set(res.totalPages || res.data?.totalPages || 1);
+          this.rentals.set(res.data.rentals);
+          this.totalPages.set(Math.max(res.data.totalPages, 1));
         }
       },
       error: () => {

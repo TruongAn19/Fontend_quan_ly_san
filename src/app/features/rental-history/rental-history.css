@@ -155,6 +155,11 @@
   color: #92400E;
 }
 
+.status-badge.renting {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
 .status-badge.cancelled,
 .status-badge.da_huy {
   background: #FEE2E2;

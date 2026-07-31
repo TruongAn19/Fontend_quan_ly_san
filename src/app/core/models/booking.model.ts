@@ -1,36 +1,37 @@
+import { UserResponseDTO } from './user.model';
+import { ProductResponseDTO } from './product.model';
+
 export interface AvailableTimeDTO {
   id: number;
   time: string;
-  available?: boolean;
+  status?: string;
 }
 
 export type PitchType = 'FIVE_ASIDE' | 'SEVEN_ASIDE';
 
 export interface SubPitchDTO {
   id: number;
-  name?: string;
-  description?: string;
-  pitchType?: PitchType;
+  name: string;
+  pitchType: PitchType;
+  productId: number;
 }
 
-export interface BookingProductInfo {
+export interface BookingCourtResponse {
   id: number;
   name: string;
-  description?: string;
-  price: number;
-  sale?: number;
-  depositPrice?: number;
-  address?: string;
-  imageUrl?: string;
-  /** Legacy field name kept for templates that reference {@code product.image}. */
-  image?: string;
+  pitchType: PitchType;
+  product: {
+    id: number;
+    name: string;
+  } | null;
+  subPitchAvailableTimes: unknown[];
 }
 
 /** Shape of GET /client/bookings/{id}/info response payload. */
 export interface BookingInfoResponse {
-  product: BookingProductInfo;
-  courts: SubPitchDTO[];
-  availableTimes: AvailableTimeDTO[];
+  product: ProductResponseDTO;
+  courts: BookingCourtResponse[];
+  availableTimes: Array<{ id: number; time: string }>;
   totalPrice: number;
 }
 
@@ -111,7 +112,6 @@ export interface BookingHistoryItem {
   depositPrice?: number;
   receiverName?: string;
   receiverPhone?: string;
-  product?: BookingProductInfo;
   availableTime?: AvailableTimeDTO;
   bookingType?: BookingType;
   /** Server-enriched fields used by templates. */
@@ -132,6 +132,50 @@ export interface BookingHistoryResponse {
   currentPage?: number;
   totalPages: number;
   totalElements?: number;
+}
+
+export interface BookingDetailResponseDTO {
+  id: number;
+  price: number;
+  sale: number;
+  date: string;
+  productId: number | null;
+  productName: string | null;
+  availableTimeId: number | null;
+  availableTime: string | null;
+  subPitchId: number | null;
+  subPitchName: string | null;
+}
+
+export interface AdminBookingDTO {
+  id: number;
+  bookingCode: string | null;
+  totalPrice: number;
+  depositPrice: number;
+  receiverName: string | null;
+  receiverAddress: string | null;
+  receiverPhone: string | null;
+  status: string;
+  bookingDate: string | null;
+  rentalToolCode: string | null;
+  user: UserResponseDTO | null;
+  courtName: string | null;
+  time: string | null;
+  bookingDetails: BookingDetailResponseDTO[];
+  bookingType: BookingType | null;
+  refundStatus: RefundStatus | null;
+  refundAmount: number | null;
+  cancelledAt: string | null;
+  usedSessionsAtCancel: number | null;
+  totalSessionsAtCancel: number | null;
+  cancelReason: string | null;
+}
+
+export interface AdminBookingListResponse {
+  bookings: AdminBookingDTO[];
+  currentPage: number;
+  totalPages: number;
+  totalElements: number;
 }
 
 export interface CancelBookingRequest {
