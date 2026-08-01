@@ -13,6 +13,7 @@
 .message.user { align-self: flex-end; border-bottom-right-radius: 4px; background: var(--primary); color: #fff; }
 .message.assistant { align-self: flex-start; border: 1px solid var(--border-ultra-light); border-bottom-left-radius: 4px; background: #fff; color: var(--text-primary); box-shadow: 0 4px 12px rgba(45,31,60,.06); }
 .typing-indicator { display: flex; width: fit-content; gap: .25rem; padding: .65rem; border-radius: 12px; background: #fff; }
+.message .inline-typing { padding: .1rem 0; background: transparent; }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); animation: bounce 1.2s infinite ease-in-out both; }
 .dot:nth-child(1) { animation-delay: -.25s; } .dot:nth-child(2) { animation-delay: -.12s; }
 @keyframes bounce { 0%,80%,100% { transform: scale(.5); opacity: .45; } 40% { transform: scale(1); opacity: 1; } }

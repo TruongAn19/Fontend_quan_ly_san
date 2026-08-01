@@ -5,8 +5,16 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error-alert">
+    <div class="admin-toast" role="alert" aria-live="assertive">
+      <i class="fa-solid fa-circle-exclamation"></i>
       <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="admin-toast success" role="status" aria-live="polite">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>{{ successMessage() }}</span>
     </div>
   }
 

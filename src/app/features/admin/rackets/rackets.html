@@ -5,8 +5,16 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error-alert">
+    <div class="admin-toast" role="alert" aria-live="assertive">
+      <i class="fa-solid fa-circle-exclamation"></i>
       <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="admin-toast success" role="status" aria-live="polite">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>{{ successMessage() }}</span>
     </div>
   }
 
@@ -109,8 +117,15 @@
           </div>
 
           <div class="form-group">
-            <label for="productId">ID sân sở hữu</label>
-            <input type="number" id="productId" formControlName="productId" min="1" />
+            <label for="productId">Sân sở hữu</label>
+            @if (isEdit()) {
+              <input type="text" id="ownerCourtName" [value]="selectedCourtName()" disabled />
+            } @else {
+              <select id="productId" formControlName="productId">
+                <option [ngValue]="null" disabled>Chọn sân</option>
+                <option *ngFor="let court of courtOptions()" [ngValue]="court.id">{{ court.name }}</option>
+              </select>
+            }
           </div>
 
           <div class="form-group">

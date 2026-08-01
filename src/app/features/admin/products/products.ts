@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, effect, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
@@ -19,11 +19,21 @@ export class AdminProductsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+  private toastTimer?: ReturnType<typeof setTimeout>;
 
   showModal = signal<boolean>(false);
   isEdit = signal<boolean>(false);
   selectedProductId = signal<number | null>(null);
   productForm!: FormGroup;
+
+  constructor() {
+    effect(() => {
+      if (!this.errorMessage()) return;
+      if (this.toastTimer) clearTimeout(this.toastTimer);
+      this.toastTimer = setTimeout(() => this.errorMessage.set(null), 4000);
+    });
+  }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -35,6 +45,7 @@ export class AdminProductsComponent implements OnInit {
       name: ['', [Validators.required]],
       detailDesc: ['', [Validators.required]],
       price: [0, [Validators.required, Validators.min(0)]],
+      depositPrice: [0, [Validators.required, Validators.min(0)]],
       address: ['', [Validators.required]],
       addressDetail: ['', [Validators.required]],
       shortDesc: ['', [Validators.required]],
@@ -66,7 +77,8 @@ export class AdminProductsComponent implements OnInit {
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedProductId.set(null);
-    this.productForm.reset({ price: 0, sale: 0, quantity: 1, subCourtNames: '', image: '' });
+    this.productForm.get('quantity')?.enable();
+    this.productForm.reset({ price: 0, depositPrice: 0, sale: 0, quantity: 1, subCourtNames: '', image: '' });
     this.showModal.set(true);
   }
 
@@ -81,6 +93,7 @@ export class AdminProductsComponent implements OnInit {
           name: detail.name,
           detailDesc: detail.detailDesc,
           price: detail.price,
+          depositPrice: detail.depositPrice || 0,
           address: detail.address,
           addressDetail: detail.addressDetail || '',
           shortDesc: detail.shortDesc || '',
@@ -89,12 +102,20 @@ export class AdminProductsComponent implements OnInit {
           subCourtNames: detail.subCourtNames || '',
           image: detail.image || ''
         });
+        this.productForm.get('quantity')?.disable();
         this.showModal.set(true);
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết sân.');
       }
     });
+  }
+
+  private showSuccessToast(message: string): void {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.errorMessage.set(null);
+    this.successMessage.set(message);
+    this.toastTimer = setTimeout(() => this.successMessage.set(null), 4000);
   }
 
   closeModal(): void {
@@ -104,7 +125,7 @@ export class AdminProductsComponent implements OnInit {
   onSubmit(): void {
     if (this.productForm.invalid) return;
 
-    const formValue = this.productForm.value;
+    const formValue = this.productForm.getRawValue();
     const formData = new FormData();
 
     formData.append(
@@ -118,10 +139,17 @@ export class AdminProductsComponent implements OnInit {
 
     request.subscribe({
       next: () => {
+        const message = this.isEdit() ? 'Cập nhật sân thành công.' : 'Tạo sân thành công.';
         this.closeModal();
         this.loadProducts();
+        this.showSuccessToast(message);
       },
       error: (err) => {
+        const validationMessage = Object.values(err?.error?.data || {}).filter(Boolean).join('. ');
+        if (validationMessage) {
+          this.errorMessage.set(validationMessage);
+          return;
+        }
         this.errorMessage.set(err.error?.message || 'Thao tác sản phẩm thất bại.');
       }
     });

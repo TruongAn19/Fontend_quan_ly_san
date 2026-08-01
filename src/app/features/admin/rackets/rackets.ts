@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, effect, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
@@ -19,15 +19,56 @@ export class AdminRacketsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+  private toastTimer?: ReturnType<typeof setTimeout>;
+  courtOptions = signal<any[]>([]);
+  selectedCourtName = signal<string>('');
 
   showModal = signal<boolean>(false);
   isEdit = signal<boolean>(false);
   selectedRacketId = signal<number | null>(null);
   racketForm!: FormGroup;
 
+  constructor() {
+    effect(() => {
+      if (!this.errorMessage()) return;
+      if (this.toastTimer) clearTimeout(this.toastTimer);
+      this.toastTimer = setTimeout(() => this.errorMessage.set(null), 4000);
+    });
+  }
+
   ngOnInit(): void {
-    this.loadRackets();
     this.initForm();
+    this.loadRackets();
+    this.loadCourtOptions();
+  }
+
+  private showSuccessToast(message: string): void {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.errorMessage.set(null);
+    this.successMessage.set(message);
+    this.toastTimer = setTimeout(() => this.successMessage.set(null), 4000);
+  }
+
+  private showRequestError(error: any, fallback: string): void {
+    const validationMessage = Object.values(error?.error?.data || {}).filter(Boolean).join('. ');
+    this.errorMessage.set(validationMessage || error?.error?.message || fallback);
+  }
+
+  private loadCourtOptions(page: number = 1, accumulated: any[] = []): void {
+    this.adminService.getProducts(page).subscribe({
+      next: (res) => {
+        const products = res?.products || res?.data?.products || [];
+        const allProducts = [...accumulated, ...products];
+        const totalPages = res?.totalPages || res?.data?.totalPages || 1;
+        if (page < totalPages) {
+          this.loadCourtOptions(page + 1, allProducts);
+        } else {
+          this.courtOptions.set(allProducts);
+        }
+      },
+      error: (err) => this.showRequestError(err, 'Không thể tải danh sách sân.')
+    });
   }
 
   initForm(): void {
@@ -67,6 +108,8 @@ export class AdminRacketsComponent implements OnInit {
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedRacketId.set(null);
+    this.selectedCourtName.set('');
+    this.racketForm.get('productId')?.enable();
     this.racketForm.reset({
       price: 0,
       status: 'ACTIVE',
@@ -88,6 +131,7 @@ export class AdminRacketsComponent implements OnInit {
         if (!detail) return;
         this.isEdit.set(true);
         this.selectedRacketId.set(racket.id);
+        this.selectedCourtName.set(detail.product?.name || 'Chưa có sân sở hữu');
         this.racketForm.patchValue({
           name: detail.name,
           factory: detail.factory,
@@ -101,6 +145,7 @@ export class AdminRacketsComponent implements OnInit {
           available: detail.available,
           image: detail.image || ''
         });
+        this.racketForm.get('productId')?.disable();
         this.showModal.set(true);
       },
       error: (err) => {
@@ -116,7 +161,7 @@ export class AdminRacketsComponent implements OnInit {
   onSubmit(): void {
     if (this.racketForm.invalid) return;
 
-    const formValue = this.racketForm.value;
+    const formValue = this.racketForm.getRawValue();
     if (formValue.bookingStockQuantity > formValue.quantity) {
       this.errorMessage.set('Tồn kho cho thuê tại sân không được lớn hơn tổng số lượng vợt.');
       return;
@@ -147,11 +192,13 @@ export class AdminRacketsComponent implements OnInit {
 
     request.subscribe({
       next: () => {
+        const message = this.isEdit() ? 'Cập nhật vợt thành công.' : 'Tạo vợt thành công.';
         this.closeModal();
         this.loadRackets();
+        this.showSuccessToast(message);
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Thao tác vợt thất bại.');
+        this.showRequestError(err, 'Lưu thông tin vợt thất bại.');
       }
     });
   }

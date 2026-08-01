@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, effect, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
@@ -17,6 +17,8 @@ export class AdminUsersComponent implements OnInit {
   users = signal<any[]>([]);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+  private toastTimer?: ReturnType<typeof setTimeout>;
 
   selectedUser = signal<any | null>(null);
   showUserModal = signal<boolean>(false);
@@ -35,6 +37,26 @@ export class AdminUsersComponent implements OnInit {
   roleForm: FormGroup = this.fb.group({
     role: ['', [Validators.required]]
   });
+
+  constructor() {
+    effect(() => {
+      if (!this.errorMessage()) return;
+      if (this.toastTimer) clearTimeout(this.toastTimer);
+      this.toastTimer = setTimeout(() => this.errorMessage.set(null), 4000);
+    });
+  }
+
+  private showSuccessToast(message: string): void {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.errorMessage.set(null);
+    this.successMessage.set(message);
+    this.toastTimer = setTimeout(() => this.successMessage.set(null), 4000);
+  }
+
+  private showRequestError(error: any, fallback: string): void {
+    const validationMessage = Object.values(error?.error?.data || {}).filter(Boolean).join('. ');
+    this.errorMessage.set(validationMessage || error?.error?.message || fallback);
+  }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -106,10 +128,12 @@ export class AdminUsersComponent implements OnInit {
       : this.adminService.createUser(formData);
     request.subscribe({
       next: () => {
+        const message = this.isEditingUser() ? 'Cập nhật người dùng thành công.' : 'Tạo người dùng thành công.';
         this.closeUserModal();
         this.loadUsers();
+        this.showSuccessToast(message);
       },
-      error: (err) => this.errorMessage.set(err.error?.message || 'Lưu người dùng thất bại.')
+      error: (err) => this.showRequestError(err, 'Lưu người dùng thất bại.')
     });
   }
 
@@ -146,6 +170,7 @@ export class AdminUsersComponent implements OnInit {
       next: () => {
         this.closeRoleModal();
         this.loadUsers();
+        this.showSuccessToast('Cập nhật quyền thành công.');
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Cập nhật quyền thất bại.');
