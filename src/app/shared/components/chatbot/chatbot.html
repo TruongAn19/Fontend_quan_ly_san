@@ -24,15 +24,15 @@
             <div class="chat-messages" #scrollContainer>
                 @for (msg of messages(); track $index) {
                     <div class="message" [ngClass]="msg.role">
-                        <div class="message-content" [innerHTML]="msg.content"></div>
-                    </div>
-                }
-                
-                @if (isProcessing()) {
-                    <div class="typing-indicator">
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
+                        @if (msg.isTyping && !msg.content) {
+                            <div class="typing-indicator" aria-label="AI đang trả lời">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </div>
+                        } @else {
+                            <div class="message-content" [innerHTML]="msg.content"></div>
+                        }
                     </div>
                 }
             </div>

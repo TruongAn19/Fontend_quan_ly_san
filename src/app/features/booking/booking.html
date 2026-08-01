@@ -259,8 +259,10 @@
 
       <div class="popup-header">
         <span class="popup-icon">📋</span>
-        <h2 class="popup-title">Xác nhận đặt sân</h2>
-        <p class="popup-subtitle">Kiểm tra chi tiết giá trước khi thanh toán</p>
+        <div class="popup-heading-text">
+          <h2 class="popup-title">Xác nhận đặt sân</h2>
+          <p class="popup-subtitle">Kiểm tra chi tiết giá trước khi thanh toán</p>
+        </div>
       </div>
 
       @if (priceEstimate()) {
@@ -306,6 +308,52 @@
               <span>{{ (priceEstimate()!.totalPrice - priceEstimate()!.depositPrice) | number:'1.0-0' }}đ</span>
             </div>
           </div>
+
+          <div class="equipment-choice">
+            <div class="equipment-question">
+              <div>
+                <strong>Bạn có muốn thuê thêm phụ kiện tại sân không?</strong>
+                <p>Phụ kiện được tính riêng và thanh toán cùng tiền cọc sân.</p>
+              </div>
+              <button type="button" class="btn-toggle-equipment"
+                      [class.active]="includeEquipments()"
+                      (click)="toggleEquipmentChoice()">
+                {{ includeEquipments() ? 'Có thuê phụ kiện' : 'Không thuê phụ kiện' }}
+              </button>
+            </div>
+
+            @if (includeEquipments()) {
+              @if (availableBookingEquipments().length === 0) {
+                <p class="equipment-empty">Sân này hiện không còn phụ kiện có thể thuê.</p>
+              } @else {
+                <div class="booking-equipment-list">
+                  @for (equipment of availableBookingEquipments(); track equipment.id) {
+                    <div class="booking-equipment-item">
+                      <div class="equipment-meta">
+                        <strong>{{ equipment.name }}</strong>
+                        <span>{{ equipment.rentalPricePerPlay | number:'1.0-0' }}đ / buổi · còn {{ equipment.bookingStockQuantity }}</span>
+                      </div>
+                      <div class="equipment-counter">
+                        <button type="button"
+                                (click)="changeEquipmentQuantity(equipment.id, -1, equipment.bookingStockQuantity)"
+                                [disabled]="equipmentQuantity(equipment.id) === 0">−</button>
+                        <span>{{ equipmentQuantity(equipment.id) }}</span>
+                        <button type="button"
+                                (click)="changeEquipmentQuantity(equipment.id, 1, equipment.bookingStockQuantity)"
+                                [disabled]="equipmentQuantity(equipment.id) >= equipment.bookingStockQuantity">+</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+
+          <div class="payment-summary">
+            <div><span>Tiền cọc sân</span><strong>{{ priceEstimate()!.depositPrice | number:'1.0-0' }}đ</strong></div>
+            <div><span>Tiền thuê phụ kiện</span><strong>{{ selectedEquipmentRentalPrice() | number:'1.0-0' }}đ</strong></div>
+            <div class="payment-total"><span>Tổng thanh toán qua VNPay</span><strong>{{ paymentAmount() | number:'1.0-0' }}đ</strong></div>
+          </div>
         </div>
       } @else {
         <div class="popup-body">
@@ -316,7 +364,7 @@
       <div class="popup-actions">
         <button class="btn-cancel-popup" (click)="cancelPopup()">Hủy bỏ</button>
         <button class="btn-confirm-popup" (click)="confirmBooking()" [disabled]="isPlacing()">
-          {{ isPlacing() ? 'Đang xử lý...' : '✓ Xác nhận & Thanh toán cọc' }}
+          {{ isPlacing() ? 'Đang xử lý...' : '✓ Tiếp tục thanh toán' }}
         </button>
       </div>
 

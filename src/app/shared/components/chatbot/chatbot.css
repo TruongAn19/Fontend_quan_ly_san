@@ -37,8 +37,8 @@
   position: absolute;
   bottom: 85px;
   right: 0;
-  width: 400px;
-  height: 600px;
+  width: min(350px, calc(100vw - 32px));
+  height: min(500px, calc(100vh - 120px));
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -137,12 +137,11 @@
 }
 
 .typing-indicator {
-  padding: 10px 15px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 15px;
-  width: fit-content;
   display: flex;
+  align-items: center;
   gap: 4px;
+  min-height: 9px;
+  padding: 2px 0;
 }
 
 .dot {
@@ -163,13 +162,22 @@
 
 .suggestions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  padding: 0 20px 15px;
+  padding: 0 16px 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.suggestions::-webkit-scrollbar {
+  display: none;
 }
 
 .suggestion-chip {
-  padding: 6px 14px;
+  flex: 0 0 auto;
+  padding: 6px 12px;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid #e0e0e0;
   border-radius: 20px;
@@ -177,6 +185,7 @@
   color: #1a237e;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .suggestion-chip:hover {

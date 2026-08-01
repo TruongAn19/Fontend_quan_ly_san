@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, computed, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -63,6 +63,25 @@ export class BookingComponent implements OnInit, OnDestroy {
   priceEstimate = signal<EstimatePriceResponse | null>(null);
   estimateWarning = signal<string | null>(null);
   pendingPayload: PlaceBookingRequest | null = null;
+  includeEquipments = signal(false);
+  equipmentQuantities = signal<Record<number, number>>({});
+  availableBookingEquipments = computed(() =>
+    (this.productDetail()?.equipments ?? []).filter(
+      equipment => equipment.available
+        && equipment.rentalPricePerPlay > 0
+        && equipment.bookingStockQuantity > 0,
+    ),
+  );
+  selectedEquipmentRentalPrice = computed(() =>
+    this.availableBookingEquipments().reduce(
+      (total, equipment) => total
+        + (this.equipmentQuantities()[equipment.id] ?? 0) * equipment.rentalPricePerPlay,
+      0,
+    ),
+  );
+  paymentAmount = computed(() =>
+    (this.priceEstimate()?.depositPrice ?? 0) + this.selectedEquipmentRentalPrice(),
+  );
 
   // Realtime slot conflict
   conflictToast = signal<{ timeName: string; visible: boolean } | null>(null);
@@ -406,6 +425,8 @@ export class BookingComponent implements OnInit, OnDestroy {
         this.isEstimating.set(false);
         this.priceEstimate.set(res.data);
         this.estimateWarning.set(null);
+        this.includeEquipments.set(false);
+        this.equipmentQuantities.set({});
         this.showConfirmPopup.set(true);
       },
       error: () => {
@@ -424,6 +445,25 @@ export class BookingComponent implements OnInit, OnDestroy {
     this.priceEstimate.set(null);
     this.estimateWarning.set(null);
     this.pendingPayload = null;
+    this.includeEquipments.set(false);
+    this.equipmentQuantities.set({});
+  }
+
+  toggleEquipmentChoice(): void {
+    this.includeEquipments.update(value => !value);
+    if (!this.includeEquipments()) {
+      this.equipmentQuantities.set({});
+    }
+  }
+
+  equipmentQuantity(equipmentId: number): number {
+    return this.equipmentQuantities()[equipmentId] ?? 0;
+  }
+
+  changeEquipmentQuantity(equipmentId: number, delta: number, max: number): void {
+    const current = this.equipmentQuantity(equipmentId);
+    const next = Math.max(0, Math.min(max, current + delta));
+    this.equipmentQuantities.update(quantities => ({ ...quantities, [equipmentId]: next }));
   }
 
   confirmBooking(): void {
@@ -435,6 +475,18 @@ export class BookingComponent implements OnInit, OnDestroy {
       this.isPlacing.set(false);
       return;
     }
+
+    this.pendingPayload = {
+      ...this.pendingPayload,
+      equipments: this.includeEquipments()
+        ? this.availableBookingEquipments()
+            .map(equipment => ({
+              equipmentId: equipment.id,
+              quantity: this.equipmentQuantity(equipment.id),
+            }))
+            .filter(selection => selection.quantity > 0)
+        : [],
+    };
 
     this.bookingService.placeBooking(this.pendingPayload).subscribe({
       next: (res) => {

@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
+import { BookingEquipmentResponse } from '../models/equipment.model';
 import {
   AvailableTimeDTO,
   BookingHistoryItem,
@@ -68,5 +69,11 @@ export class BookingService {
 
   getBookingById(bookingId: number): Observable<ApiResponse<BookingHistoryItem>> {
     return this.http.get<ApiResponse<BookingHistoryItem>>(`${this.API_URL}/detail/${bookingId}`);
+  }
+
+  getBookingEquipments(bookingCode: string): Observable<ApiResponse<BookingEquipmentResponse>> {
+    return this.http.get<ApiResponse<BookingEquipmentResponse>>(
+      `${this.API_URL}/${encodeURIComponent(bookingCode)}/equipments`,
+    );
   }
 }

@@ -33,3 +33,9 @@ export interface EquipmentListResponse {
   totalPages: number;
   totalElements?: number;
 }
+
+/** Equipment available for an existing booking's pitch cluster. */
+export interface BookingEquipmentResponse {
+  equipments: Equipment[];
+  bookingCode: string;
+}

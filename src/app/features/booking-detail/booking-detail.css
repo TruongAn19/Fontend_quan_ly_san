@@ -92,6 +92,50 @@
 .action-card.disabled { background: #F9FAFB; text-align: left; }
 .action-card .muted { color: #6B7280; font-size: 14px; margin: 0 0 12px; }
 
+.booked-equipment-section {
+  margin-top: 18px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+}
+.booked-equipment-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.booked-equipment-heading h2 { margin: 3px 0 0; font-size: 18px; }
+.booked-equipment-heading > strong { color: #2563eb; font-size: 13px; }
+.equipment-eyebrow {
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.booked-equipment-list { display: grid; gap: 10px; }
+.booked-equipment-item {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) minmax(210px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 11px;
+  background: #f9fafb;
+}
+.booked-equipment-main { display: grid; gap: 4px; }
+.booked-equipment-main > strong { color: #111827; }
+.booked-equipment-main > span { color: #6b7280; font-size: 12px; }
+.booked-equipment-detail { display: flex; gap: 18px; color: #6b7280; font-size: 13px; }
+.booked-equipment-detail strong { color: #111827; margin-left: 3px; }
+.booked-equipment-status { display: grid; justify-items: end; gap: 5px; }
+.booked-equipment-status span { padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.rental-status { color: #92400e; background: #fef3c7; }
+.payment-status { color: #065f46; background: #d1fae5; }
+
 .btn-danger {
   background: #DC2626;
   color: white;
@@ -160,3 +204,10 @@
   vertical-align: -2px; margin-right: 6px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  :host { padding: 16px; }
+  .booked-equipment-item { grid-template-columns: 1fr; gap: 10px; }
+  .booked-equipment-detail { justify-content: space-between; }
+  .booked-equipment-status { display: flex; justify-content: flex-start; }
+}

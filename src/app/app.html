@@ -84,7 +84,7 @@
     </main>
 
     <!-- Global Footer (Hidden for admin) -->
-    @if (!isAdmin()) {
+    @if (!isAdmin() && !isAuthPage()) {
       <footer class="global-footer">
     <div class="footer-container">
       <div class="footer-main">

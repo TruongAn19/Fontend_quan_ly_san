@@ -82,7 +82,8 @@ export class BookingDetailComponent implements OnInit {
     this.bookingService.getBookingById(id).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.booking.set(res.data ?? null);
+        const booking = res.data ?? null;
+        this.booking.set(booking);
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -126,6 +127,25 @@ export class BookingDetailComponent implements OnInit {
   isCancelled(): boolean {
     const s = (this.booking()?.status || '').toUpperCase();
     return s === 'DA_HUY' || s === 'ĐÃ HỦY' || s === 'CANCELLED';
+  }
+
+  rentalStatusLabel(status?: string | null): string {
+    switch (status) {
+      case 'PENDING': return 'Chờ nhận phụ kiện';
+      case 'RENTING': return 'Đang thuê';
+      case 'COMPLETED': return 'Đã trả';
+      case 'CANCELLED': return 'Đã hủy';
+      default: return status || 'Chưa xác định';
+    }
+  }
+
+  rentalPaymentLabel(status?: string | null): string {
+    switch (status) {
+      case 'PAID': return 'Đã thanh toán';
+      case 'REFUNDED': return 'Đã hoàn tiền';
+      case 'UNPAID': return 'Chưa thanh toán';
+      default: return status || 'Chưa xác định';
+    }
   }
 
   // For badge colouring

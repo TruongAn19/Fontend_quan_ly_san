@@ -28,6 +28,7 @@ export class RentalComponent implements OnInit {
 
   equipmentId = signal<number | null>(null);
   equipmentDetail = signal<Equipment | null>(null);
+  onSiteContext = signal(false);
   rentalForm!: FormGroup;
 
   isLoading = signal<boolean>(false);
@@ -63,32 +64,43 @@ export class RentalComponent implements OnInit {
   }
 
   initForm(): void {
+    const requestedType = this.route.snapshot.queryParamMap.get('type');
+    const initialBookingCode = this.route.snapshot.queryParamMap.get('bookingCode') ?? '';
+    const hasOnSiteContext = requestedType === 'ON_SITE' && initialBookingCode.trim().length > 0;
+    const initialType: RentalType = hasOnSiteContext ? 'ON_SITE' : 'DAILY';
+    this.onSiteContext.set(hasOnSiteContext);
+
     this.rentalForm = this.fb.group({
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^(0[3|5|7|8|9])+([0-9]{8})\b$/)]],
-      type: ['DAILY' as RentalType, [Validators.required]],
+      type: [initialType, [Validators.required]],
       quantity: [1, [Validators.required, Validators.min(1)]],
       quantityDay: [1],
       rentalDate: [new Date().toISOString().split('T')[0]],
-      bookingCode: [''],
+      bookingCode: [initialBookingCode],
       paymentMethod: ['VNPAY' as RentalPaymentMethod, [Validators.required]]
     });
 
+    this.applyRentalTypeValidators(initialType);
     this.rentalForm.get('type')?.valueChanges.subscribe(type => {
-      if (type === 'DAILY') {
-        this.rentalForm.get('quantityDay')?.setValidators([Validators.required, Validators.min(1)]);
-        this.rentalForm.get('rentalDate')?.setValidators([Validators.required]);
-        this.rentalForm.get('bookingCode')?.clearValidators();
-      } else {
-        this.rentalForm.get('quantityDay')?.clearValidators();
-        this.rentalForm.get('rentalDate')?.clearValidators();
-        this.rentalForm.get('bookingCode')?.setValidators([Validators.required]);
-      }
-      this.rentalForm.get('quantityDay')?.updateValueAndValidity();
-      this.rentalForm.get('rentalDate')?.updateValueAndValidity();
-      this.rentalForm.get('bookingCode')?.updateValueAndValidity();
+      this.applyRentalTypeValidators(type as RentalType);
     });
+  }
+
+  private applyRentalTypeValidators(type: RentalType): void {
+    if (type === 'DAILY') {
+      this.rentalForm.get('quantityDay')?.setValidators([Validators.required, Validators.min(1)]);
+      this.rentalForm.get('rentalDate')?.setValidators([Validators.required]);
+      this.rentalForm.get('bookingCode')?.clearValidators();
+    } else {
+      this.rentalForm.get('quantityDay')?.clearValidators();
+      this.rentalForm.get('rentalDate')?.clearValidators();
+      this.rentalForm.get('bookingCode')?.setValidators([Validators.required]);
+    }
+    this.rentalForm.get('quantityDay')?.updateValueAndValidity();
+    this.rentalForm.get('rentalDate')?.updateValueAndValidity();
+    this.rentalForm.get('bookingCode')?.updateValueAndValidity();
   }
 
   onSubmitRental(): void {

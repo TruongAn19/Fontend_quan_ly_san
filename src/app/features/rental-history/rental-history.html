@@ -41,19 +41,24 @@
             </thead>
             <tbody>
               <tr *ngFor="let item of rentals()">
-                <td class="booking-code">{{ item.rentalToolCode || item.id }}</td>
-                <td>
-                  <div class="pitch-info">
+                <td class="booking-code" data-label="Mã đơn">{{ item.rentalToolCode || item.id }}</td>
+                <td class="equipment-cell" data-label="Dụng cụ">
+                  <div class="equipment-info">
+                    <span class="equipment-mark" aria-hidden="true">
+                      {{ item.equipmentName?.charAt(0) || 'D' }}
+                    </span>
                     <span class="pitch-name">{{ item.equipmentName || 'Không có tên thiết bị' }}</span>
                   </div>
                 </td>
-                <td>
+                <td data-label="Hình thức">
                   <span class="type-badge" [class.daily]="item.type === 'DAILY'">
                     {{ getTypeLabel(item.type) }}
                   </span>
                 </td>
-                <td class="text-center">{{ item.quantity }}</td>
-                <td>
+                <td class="quantity-cell" data-label="Số lượng">
+                  <span class="quantity-badge">{{ item.quantity }}</span>
+                </td>
+                <td data-label="Thời gian">
                   <div class="time-slot">
                     @if (item.type === 'DAILY') {
                       <span>{{ item.rentalDate }} ({{ item.quantityDay }} ngày)</span>
@@ -63,19 +68,28 @@
                     }
                   </div>
                 </td>
-                <td>
+                <td data-label="Trạng thái">
                   <span class="status-badge" [class]="item.status?.toLowerCase()">
                     {{ getStatusLabel(item.status) }}
                   </span>
                 </td>
-                <td>{{ getPaymentStatusLabel(item.paymentStatus) }}</td>
-                <td class="text-right">
-                  @if (item.status === 'PENDING' && item.paymentStatus !== 'PAID') {
-                    <button class="btn-action" (click)="onRetryPayment(item.id)">Thanh toán</button>
-                  }
-                  @if (item.status === 'PENDING') {
-                    <button class="btn-action btn-danger" (click)="onCancelRental(item.id)">Huỷ</button>
-                  }
+                <td data-label="Thanh toán">
+                  <span class="payment-badge" [class.paid]="item.paymentStatus === 'PAID'" [class.refunded]="item.paymentStatus === 'REFUNDED'">
+                    {{ getPaymentStatusLabel(item.paymentStatus) }}
+                  </span>
+                </td>
+                <td class="action-cell" data-label="Hành động">
+                  <div class="action-group">
+                    @if (item.status === 'PENDING' && item.paymentStatus !== 'PAID') {
+                      <button class="btn-action" (click)="onRetryPayment(item.id)">Thanh toán</button>
+                    }
+                    @if (item.status === 'PENDING' && !isBookingEquipment(item)) {
+                      <button class="btn-action btn-danger" (click)="onCancelRental(item.id)">Huỷ</button>
+                    }
+                    @if (isBookingEquipment(item)) {
+                      <span class="booking-managed-note">Theo đơn đặt sân</span>
+                    }
+                  </div>
                 </td>
               </tr>
             </tbody>

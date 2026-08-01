@@ -122,4 +122,11 @@ export class RentalHistoryComponent implements OnInit {
       default: return type;
     }
   }
+
+  isBookingEquipment(item: RentalHistoryItem): boolean {
+    return item.type?.toUpperCase() === 'ON_SITE'
+      && item.bookingId !== null
+      && item.bookingId !== undefined
+      && String(item.bookingId).trim().length > 0;
+  }
 }

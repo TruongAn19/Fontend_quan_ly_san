@@ -9,6 +9,16 @@
   <div class="glass-card form-card">
     <h1 class="section-title">Thuê dụng cụ</h1>
 
+    @if (rentalForm.get('type')?.value === 'ON_SITE' && rentalForm.get('bookingCode')?.value) {
+      <div class="on-site-context">
+        <span class="context-icon">⚽</span>
+        <div>
+          <strong>Thuê đồ theo sân</strong>
+          <p>Thiết bị sẽ được gắn với đơn {{ rentalForm.get('bookingCode')?.value }}.</p>
+        </div>
+      </div>
+    }
+
     @if (equipmentDetail(); as eq) {
       <div class="equipment-header">
         @if (eq.image) {
@@ -56,8 +66,11 @@
       <div class="form-group">
         <label for="type">Hình thức thuê</label>
         <select id="type" formControlName="type">
+          @if (!onSiteContext()) {
           <option value="DAILY">Thuê theo ngày (DAILY)</option>
+          } @else {
           <option value="ON_SITE">Thuê tại sân (ON_SITE)</option>
+          }
         </select>
       </div>
 
@@ -81,7 +94,7 @@
       @if (rentalForm.get('type')?.value === 'ON_SITE') {
         <div class="form-group animate-fade-in">
           <label for="bookingCode">Mã đặt sân (Booking Code)</label>
-          <input type="text" id="bookingCode" formControlName="bookingCode" placeholder="VD: BK123456" [class.invalid]="rentalForm.get('bookingCode')?.invalid && rentalForm.get('bookingCode')?.touched" />
+          <input type="text" id="bookingCode" formControlName="bookingCode" readonly />
         </div>
       }
 

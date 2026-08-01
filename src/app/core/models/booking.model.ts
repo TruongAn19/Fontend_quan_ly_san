@@ -1,5 +1,7 @@
 import { UserResponseDTO } from './user.model';
 import { ProductResponseDTO } from './product.model';
+import { Equipment } from './equipment.model';
+import { RentalToolDTO } from './rental.model';
 
 export interface AvailableTimeDTO {
   id: number;
@@ -33,6 +35,12 @@ export interface BookingInfoResponse {
   courts: BookingCourtResponse[];
   availableTimes: Array<{ id: number; time: string }>;
   totalPrice: number;
+  equipments: Equipment[];
+}
+
+export interface BookingEquipmentSelection {
+  equipmentId: number;
+  quantity: number;
 }
 
 export interface HoldBookingRequest {
@@ -66,6 +74,7 @@ export interface PlaceBookingRequest {
   recurringEndDate?: string | null;
   daysOfWeek?: number[];
   durationMonths?: number | null;
+  equipments?: BookingEquipmentSelection[];
 }
 
 export interface EstimatePriceRequest {
@@ -118,6 +127,8 @@ export interface BookingHistoryItem {
   pitchName?: string;
   time?: string;
   courtName?: string;
+  bookingDetails?: BookingDetailResponseDTO[];
+  rentalTools?: RentalToolDTO[];
   // CANCEL_BOOKING_FEATURE
   refundStatus?: RefundStatus;
   refundAmount?: number;
