@@ -8,12 +8,14 @@ import { Equipment, EquipmentListResponse } from '../models/equipment.model';
 import { UserResponseDTO } from '../models/user.model';
 import {
   AdminBookingDTO,
+  AdminBookingDetailResponse,
   AdminBookingListResponse,
   CancelBookingResponse,
   SubPitchDTO,
 } from '../models/booking.model';
 import {
   RentalRefundStatus,
+  AdminRentalDetailResponse,
   RentalToolDTO,
   RentalToolListResponse,
 } from '../models/rental.model';
@@ -146,6 +148,10 @@ export class AdminService {
     return this.http.put<ApiResponse<AdminBookingDTO>>(`${this.API_URL}/bookings/${bookingId}/status`, { status });
   }
 
+  getBookingDetail(bookingId: number): Observable<ApiResponse<AdminBookingDetailResponse>> {
+    return this.http.get<ApiResponse<AdminBookingDetailResponse>>(`${this.API_URL}/bookings/${bookingId}`);
+  }
+
   getRentals(page: number = 0, search: string = ''): Observable<ApiResponse<RentalToolListResponse>> {
     let params = new HttpParams().set('page', page.toString()).set('size', '5');
     if (search) params = params.set('search', search);
@@ -154,6 +160,10 @@ export class AdminService {
 
   updateRentalStatus(rentalId: number, status: string): Observable<ApiResponse<RentalToolDTO>> {
     return this.http.put<ApiResponse<RentalToolDTO>>(`${this.API_URL}/rentals/${rentalId}/status`, { status });
+  }
+
+  getRentalDetail(rentalId: number): Observable<ApiResponse<AdminRentalDetailResponse>> {
+    return this.http.get<ApiResponse<AdminRentalDetailResponse>>(`${this.API_URL}/rentals/${rentalId}`);
   }
 
   // ---- CANCEL_BOOKING_FEATURE — admin refund management ----

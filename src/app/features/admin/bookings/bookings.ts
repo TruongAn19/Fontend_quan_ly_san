@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
-import { AdminBookingDTO } from '../../../core/models/booking.model';
+import { AdminBookingDetailResponse, AdminBookingDTO } from '../../../core/models/booking.model';
 
 @Component({
   selector: 'app-admin-bookings',
@@ -20,6 +20,10 @@ export class AdminBookingsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  showDetailModal = signal(false);
+  isDetailLoading = signal(false);
+  detailError = signal<string | null>(null);
+  bookingDetail = signal<AdminBookingDetailResponse | null>(null);
 
   filterForm: FormGroup = this.fb.group({
     date: [''],
@@ -65,6 +69,30 @@ export class AdminBookingsComponent implements OnInit {
       next: () => this.loadBookings(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
     });
+  }
+
+  openDetail(bookingId: number): void {
+    this.showDetailModal.set(true);
+    this.isDetailLoading.set(true);
+    this.detailError.set(null);
+    this.bookingDetail.set(null);
+
+    this.adminService.getBookingDetail(bookingId).subscribe({
+      next: (res) => {
+        this.isDetailLoading.set(false);
+        this.bookingDetail.set(res.data);
+      },
+      error: (err) => {
+        this.isDetailLoading.set(false);
+        this.detailError.set(err?.error?.message || 'Không thể tải chi tiết đơn đặt sân.');
+      },
+    });
+  }
+
+  closeDetail(): void {
+    this.showDetailModal.set(false);
+    this.bookingDetail.set(null);
+    this.detailError.set(null);
   }
 
   getStatusLabel(status: string): string {

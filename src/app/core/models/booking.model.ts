@@ -189,6 +189,11 @@ export interface AdminBookingListResponse {
   totalElements: number;
 }
 
+export interface AdminBookingDetailResponse {
+  booking: AdminBookingDTO;
+  rentalTools: RentalToolDTO[];
+}
+
 export interface CancelBookingRequest {
   reason?: string;
 }

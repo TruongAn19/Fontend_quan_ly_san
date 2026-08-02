@@ -108,6 +108,11 @@ export interface RentalToolListResponse {
   totalElements: number;
 }
 
+export interface AdminRentalDetailResponse {
+  rentalTool: RentalToolDTO;
+  equipment: import('./equipment.model').Equipment | null;
+}
+
 /**
  * Loose shape for VNPay callback payloads — the same endpoint covers both
  * booking and rental flows, so most fields are optional.

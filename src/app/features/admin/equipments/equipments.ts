@@ -39,6 +39,7 @@ export class AdminEquipmentsComponent implements OnInit {
     this.equipmentForm = this.fb.group({
       name: ['', [Validators.required]],
       factory: ['', [Validators.required]],
+      image: [''],
       price: [0, [Validators.required, Validators.min(0)]],
       status: ['ACTIVE', [Validators.required]],
       available: [true, [Validators.required]],
@@ -77,17 +78,12 @@ export class AdminEquipmentsComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-    }
-  }
-
   openCreateModal(): void {
     this.isEdit.set(false);
     this.selectedEquipmentId.set(null);
     this.selectedFile = null;
     this.equipmentForm.reset({
+      image: '',
       price: 0,
       status: 'ACTIVE',
       available: true,
@@ -107,6 +103,7 @@ export class AdminEquipmentsComponent implements OnInit {
     this.equipmentForm.patchValue({
       name: equipment.name,
       factory: equipment.factory,
+      image: equipment.image ?? '',
       price: equipment.price,
       status: equipment.status,
       available: equipment.available,
@@ -121,6 +118,11 @@ export class AdminEquipmentsComponent implements OnInit {
 
   closeModal(): void {
     this.showModal.set(false);
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files?.[0] ?? null;
   }
 
   onSubmit(): void {

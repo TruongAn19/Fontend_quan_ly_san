@@ -151,8 +151,17 @@
           </label>
 
           <div class="form-group">
-            <label for="equipmentImg">Hình ảnh thiết bị</label>
-            <input type="file" id="equipmentImg" (change)="onFileSelected($event)" accept="image/*" />
+            <label for="equipmentImage">Đường dẫn hình ảnh thiết bị</label>
+            <input
+              type="url"
+              id="equipmentImage"
+              formControlName="image"
+              placeholder="Dán link ảnh, ví dụ: https://example.com/thiet-bi.jpg"
+            />
+            <div class="file-upload">
+              <span>Hoặc tải ảnh lên:</span>
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+            </div>
           </div>
 
           <div class="modal-actions">

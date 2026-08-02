@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
-import { RentalStatus, RentalToolDTO } from '../../../core/models/rental.model';
+import { AdminRentalDetailResponse, RentalStatus, RentalToolDTO } from '../../../core/models/rental.model';
 
 @Component({
   selector: 'app-admin-rentals',
@@ -20,6 +20,10 @@ export class AdminRentalsComponent implements OnInit {
   totalPages = signal<number>(1);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  showDetailModal = signal(false);
+  isDetailLoading = signal(false);
+  detailError = signal<string | null>(null);
+  rentalDetail = signal<AdminRentalDetailResponse | null>(null);
 
   searchForm: FormGroup = this.fb.group({
     search: ['']
@@ -86,6 +90,30 @@ export class AdminRentalsComponent implements OnInit {
       next: () => this.loadRentals(),
       error: (err) => this.errorMessage.set(err.error?.message || 'Cập nhật trạng thái thất bại.')
     });
+  }
+
+  openDetail(rentalId: number): void {
+    this.showDetailModal.set(true);
+    this.isDetailLoading.set(true);
+    this.detailError.set(null);
+    this.rentalDetail.set(null);
+
+    this.adminService.getRentalDetail(rentalId).subscribe({
+      next: (res) => {
+        this.isDetailLoading.set(false);
+        this.rentalDetail.set(res.data);
+      },
+      error: (err) => {
+        this.isDetailLoading.set(false);
+        this.detailError.set(err?.error?.message || 'Không thể tải chi tiết đơn thuê đồ.');
+      },
+    });
+  }
+
+  closeDetail(): void {
+    this.showDetailModal.set(false);
+    this.rentalDetail.set(null);
+    this.detailError.set(null);
   }
 
   changePage(page: number): void {

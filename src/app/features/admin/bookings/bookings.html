@@ -33,7 +33,7 @@
               <th>Giờ</th>
               <th>Tổng tiền</th>
               <th>Trạng thái</th>
-              <th class="text-right">Cập nhật trạng thái</th>
+              <th class="text-right">Hành động</th>
             </tr>
           </thead>
           <tbody>
@@ -54,13 +54,16 @@
                 </span>
               </td>
               <td class="text-right">
-                <div class="action-dropdown">
-                  <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)" [disabled]="isStatusChangeDisabled(item.status)">
-                    <option value="">-- Đổi trạng thái --</option>
-                    <option *ngFor="let st of statusList" [value]="st" [selected]="getStatusLabel(item.status) === st">
-                      {{ st }}
-                    </option>
-                  </select>
+                <div class="row-actions">
+                  <button type="button" class="btn-view" (click)="openDetail(item.id)">Xem chi tiết</button>
+                  <div class="action-dropdown">
+                    <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)" [disabled]="isStatusChangeDisabled(item.status)">
+                      <option value="">-- Đổi trạng thái --</option>
+                      <option *ngFor="let st of statusList" [value]="st" [selected]="getStatusLabel(item.status) === st">
+                        {{ st }}
+                      </option>
+                    </select>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -75,5 +78,73 @@
       <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">Trang sau</button>
     </div>
 
+  }
+
+  @if (showDetailModal()) {
+    <div class="modal-overlay animate-fade-in" (click)="closeDetail()">
+      <section class="modal-container detail-modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <p class="modal-eyebrow">Đơn đặt sân</p>
+            <h2>Chi tiết đơn</h2>
+          </div>
+          <button type="button" class="btn-close" (click)="closeDetail()" aria-label="Đóng">×</button>
+        </header>
+
+        <div class="modal-body">
+          @if (isDetailLoading()) {
+            <div class="detail-state"><span class="spinner"></span> Đang tải chi tiết...</div>
+          } @else if (detailError()) {
+            <div class="detail-error">{{ detailError() }}</div>
+          } @else if (bookingDetail(); as detail) {
+            <div class="detail-summary">
+              <div><span>Mã đơn</span><strong>{{ detail.booking.bookingCode || ('#' + detail.booking.id) }}</strong></div>
+              <div><span>Trạng thái</span><strong>{{ getStatusLabel(detail.booking.status) }}</strong></div>
+              <div><span>Tổng tiền</span><strong>{{ detail.booking.totalPrice | number }}đ</strong></div>
+              <div><span>Tiền cọc</span><strong>{{ detail.booking.depositPrice | number }}đ</strong></div>
+            </div>
+
+            <h3 class="detail-title">Thông tin khách hàng</h3>
+            <div class="detail-grid">
+              <div><span>Họ tên</span><strong>{{ detail.booking.user?.fullName || detail.booking.receiverName || '—' }}</strong></div>
+              <div><span>Số điện thoại</span><strong>{{ detail.booking.user?.phone || detail.booking.receiverPhone || '—' }}</strong></div>
+              <div class="full-row"><span>Địa chỉ</span><strong>{{ detail.booking.receiverAddress || '—' }}</strong></div>
+            </div>
+
+            <h3 class="detail-title">Thông tin sân</h3>
+            <div class="detail-grid">
+              <div><span>Sân</span><strong>{{ detail.booking.courtName || '—' }}</strong></div>
+              <div><span>Ngày đặt</span><strong>{{ detail.booking.bookingDate || '—' }}</strong></div>
+              <div><span>Khung giờ</span><strong>{{ detail.booking.time || '—' }}</strong></div>
+              <div><span>Hình thức</span><strong>{{ detail.booking.bookingType || '—' }}</strong></div>
+            </div>
+
+            @if (detail.booking.bookingDetails.length > 0) {
+              <h3 class="detail-title">Các suất đã đặt</h3>
+              <div class="detail-list">
+                @for (slot of detail.booking.bookingDetails; track slot.id) {
+                  <div class="detail-list-item">
+                    <div><strong>{{ slot.subPitchName || slot.productName || 'Sân bóng' }}</strong><span>{{ slot.date }} · {{ slot.availableTime || '—' }}</span></div>
+                    <strong>{{ slot.price | number }}đ</strong>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (detail.rentalTools.length > 0) {
+              <h3 class="detail-title">Thiết bị thuê kèm</h3>
+              <div class="detail-list">
+                @for (rental of detail.rentalTools; track rental.id) {
+                  <div class="detail-list-item">
+                    <div><strong>{{ rental.equipmentName || 'Thiết bị' }}</strong><span>Số lượng: {{ rental.quantity }}</span></div>
+                    <strong>{{ rental.rentalPrice | number }}đ</strong>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </section>
+    </div>
   }
 </div>

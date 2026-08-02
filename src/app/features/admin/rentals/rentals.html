@@ -33,7 +33,7 @@
             <th>Tổng chi phí</th>
             <th>Trạng thái</th>
             <th>Thanh toán</th>
-            <th class="text-right">Cập nhật trạng thái</th>
+            <th class="text-right">Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -50,18 +50,21 @@
             </td>
             <td>{{ getPaymentStatusLabel(item.paymentStatus) }}</td>
             <td class="text-right">
-              @if (getAllowedStatusTransitions(item.status).length > 0) {
-              <div class="action-dropdown">
-                <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
-                  <option value="">-- Đổi trạng thái --</option>
-                  <option *ngFor="let st of getAllowedStatusTransitions(item.status)" [value]="st.value">
-                    {{ st.label }}
-                  </option>
-                </select>
+              <div class="row-actions">
+                <button type="button" class="btn-view" (click)="openDetail(item.id)">Xem chi tiết</button>
+                @if (getAllowedStatusTransitions(item.status).length > 0) {
+                <div class="action-dropdown">
+                  <select #statusSelect (change)="updateStatus(item.id, statusSelect.value)">
+                    <option value="">-- Đổi trạng thái --</option>
+                    <option *ngFor="let st of getAllowedStatusTransitions(item.status)" [value]="st.value">
+                      {{ st.label }}
+                    </option>
+                  </select>
+                </div>
+                } @else {
+                <span class="finished-label">Đã kết thúc</span>
+                }
               </div>
-              } @else {
-              <span>Đã kết thúc</span>
-              }
             </td>
           </tr>
         </tbody>
@@ -77,5 +80,64 @@
       (click)="changePage(currentPage() + 1)">Trang sau</button>
   </div>
 
+  }
+
+  @if (showDetailModal()) {
+    <div class="modal-overlay animate-fade-in" (click)="closeDetail()">
+      <section class="modal-container detail-modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <p class="modal-eyebrow">Đơn thuê dụng cụ</p>
+            <h2>Chi tiết đơn</h2>
+          </div>
+          <button type="button" class="btn-close" (click)="closeDetail()" aria-label="Đóng">×</button>
+        </header>
+
+        <div class="modal-body">
+          @if (isDetailLoading()) {
+            <div class="detail-state"><span class="spinner"></span> Đang tải chi tiết...</div>
+          } @else if (detailError()) {
+            <div class="detail-error">{{ detailError() }}</div>
+          } @else if (rentalDetail(); as detail) {
+            <div class="detail-summary">
+              <div><span>Mã đơn</span><strong>{{ detail.rentalTool.rentalToolCode || ('#' + detail.rentalTool.id) }}</strong></div>
+              <div><span>Trạng thái</span><strong>{{ getStatusLabel(detail.rentalTool.status) }}</strong></div>
+              <div><span>Thanh toán</span><strong>{{ getPaymentStatusLabel(detail.rentalTool.paymentStatus) }}</strong></div>
+              <div><span>Chi phí</span><strong>{{ detail.rentalTool.rentalPrice | number }}đ</strong></div>
+            </div>
+
+            <h3 class="detail-title">Thông tin người thuê</h3>
+            <div class="detail-grid">
+              <div><span>Họ tên</span><strong>{{ detail.rentalTool.fullName || '—' }}</strong></div>
+              <div><span>Số điện thoại</span><strong>{{ detail.rentalTool.phone || '—' }}</strong></div>
+              <div class="full-row"><span>Email</span><strong>{{ detail.rentalTool.email || '—' }}</strong></div>
+            </div>
+
+            <h3 class="detail-title">Thông tin thuê</h3>
+            <div class="detail-grid">
+              <div><span>Dụng cụ</span><strong>{{ detail.rentalTool.equipmentName || detail.equipment?.name || '—' }}</strong></div>
+              <div><span>Hình thức</span><strong>{{ detail.rentalTool.type || '—' }}</strong></div>
+              <div><span>Số lượng</span><strong>{{ detail.rentalTool.quantity }}</strong></div>
+              <div><span>Số ngày</span><strong>{{ detail.rentalTool.quantityDay || '—' }}</strong></div>
+              <div><span>Ngày thuê</span><strong>{{ detail.rentalTool.rentalDate || detail.rentalTool.bookingDate || '—' }}</strong></div>
+              <div><span>Giờ đặt sân</span><strong>{{ detail.rentalTool.bookingTime || '—' }}</strong></div>
+              @if (detail.rentalTool.bookingCode) {
+                <div class="full-row"><span>Mã đơn sân liên quan</span><strong>{{ detail.rentalTool.bookingCode }}</strong></div>
+              }
+            </div>
+
+            @if (detail.equipment) {
+              <h3 class="detail-title">Thông tin dụng cụ</h3>
+              <div class="detail-grid">
+                <div><span>Hãng sản xuất</span><strong>{{ detail.equipment.factory || '—' }}</strong></div>
+                <div><span>Trạng thái</span><strong>{{ detail.equipment.status || '—' }}</strong></div>
+                <div><span>Giá thuê theo ngày</span><strong>{{ detail.equipment.rentalPricePerDay | number }}đ</strong></div>
+                <div><span>Giá thuê tại sân</span><strong>{{ detail.equipment.rentalPricePerPlay | number }}đ</strong></div>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    </div>
   }
 </div>
