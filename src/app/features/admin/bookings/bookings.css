@@ -186,7 +186,10 @@
   background: white;
 }
 
-.text-right { text-align: right; }
+.premium-table th.text-right,
+.premium-table td.text-right {
+  text-align: right;
+}
 
 .pagination-wrapper {
   display: flex;

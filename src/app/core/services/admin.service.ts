@@ -58,6 +58,10 @@ export class AdminService {
     return this.http.get<ApiResponse<UserResponseDTO[]>>(`${this.API_URL}/users`);
   }
 
+  getUserDetail(userId: number): Observable<ApiResponse<UserResponseDTO>> {
+    return this.http.get<ApiResponse<UserResponseDTO>>(`${this.API_URL}/users/${userId}`);
+  }
+
   createUser(payload: FormData): Observable<ApiResponse<UserResponseDTO>> {
     return this.http.post<ApiResponse<UserResponseDTO>>(`${this.API_URL}/users`, payload);
   }

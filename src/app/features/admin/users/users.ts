@@ -20,6 +20,9 @@ export class AdminUsersComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   selectedUser = signal<UserResponseDTO | null>(null);
+  detailUser = signal<UserResponseDTO | null>(null);
+  isDetailOpen = signal<boolean>(false);
+  isDetailLoading = signal<boolean>(false);
   roleForm: FormGroup = this.fb.group({
     role: ['', [Validators.required]]
   });
@@ -49,6 +52,30 @@ export class AdminUsersComponent implements OnInit {
 
   closeRoleModal(): void {
     this.selectedUser.set(null);
+  }
+
+  openDetailModal(userId: number): void {
+    this.isDetailOpen.set(true);
+    this.isDetailLoading.set(true);
+    this.detailUser.set(null);
+    this.errorMessage.set(null);
+
+    this.adminService.getUserDetail(userId).subscribe({
+      next: (res) => {
+        this.detailUser.set(res.data);
+        this.isDetailLoading.set(false);
+      },
+      error: (err) => {
+        this.isDetailLoading.set(false);
+        this.isDetailOpen.set(false);
+        this.errorMessage.set(err.error?.message || 'Không thể tải chi tiết người dùng.');
+      }
+    });
+  }
+
+  closeDetailModal(): void {
+    this.isDetailOpen.set(false);
+    this.detailUser.set(null);
   }
 
   onUpdateRole(): void {

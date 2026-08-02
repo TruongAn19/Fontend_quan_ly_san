@@ -48,6 +48,11 @@
         <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar-item">
           <span class="icon">📊</span> Dashboard
         </a>
+        @if (isFullAdmin()) {
+          <a routerLink="/admin/users" routerLinkActive="active" class="sidebar-item">
+            <span class="icon">👥</span> Quản lý Người dùng
+          </a>
+        }
         <a routerLink="/admin/products" routerLinkActive="active" class="sidebar-item">
           <span class="icon">🏟️</span> Quản lý Sân
         </a>

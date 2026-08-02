@@ -12,13 +12,12 @@
       <span class="spinner"></span> Đang tải danh sách...
     </div>
   } @else {
-
     <div class="table-responsive glass-card">
       <table class="premium-table">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Họ Tên</th>
+            <th>Họ tên</th>
             <th>Email</th>
             <th>Số điện thoại</th>
             <th>Vai trò</th>
@@ -30,29 +29,67 @@
             <td>{{ user.id }}</td>
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
-            <td>{{ user.phone }}</td>
+            <td>{{ user.phone || '—' }}</td>
             <td>
               <span class="role-badge" [class]="user.roleName?.toLowerCase()">
-                {{ user.roleName }}
+                {{ user.roleName || '—' }}
               </span>
             </td>
             <td class="actions-cell">
-              <button class="btn-edit" (click)="openRoleModal(user)">Đổi Quyền</button>
-              <button class="btn-delete" (click)="deleteUser(user.id)">Xóa</button>
+              <button type="button" class="btn-detail" (click)="openDetailModal(user.id)">Xem chi tiết</button>
+              <button type="button" class="btn-edit" (click)="openRoleModal(user)">Đổi quyền</button>
+              <button type="button" class="btn-delete" (click)="deleteUser(user.id)">Xóa</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+  }
 
+  @if (isDetailOpen()) {
+    <div class="modal-overlay animate-fade-in" (click)="closeDetailModal()">
+      <section class="modal-content detail-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="user-detail-title" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="user-detail-title">Chi tiết người dùng</h3>
+          <button type="button" class="btn-close" aria-label="Đóng" (click)="closeDetailModal()">×</button>
+        </div>
+
+        @if (isDetailLoading()) {
+          <div class="loading-state detail-loading"><span class="spinner"></span> Đang tải chi tiết...</div>
+        } @else if (detailUser(); as detail) {
+          <div class="user-summary">
+            @if (detail.avatar) {
+              <img class="user-avatar" [src]="detail.avatar" [alt]="'Ảnh đại diện của ' + detail.fullName">
+            } @else {
+              <div class="avatar-placeholder" aria-hidden="true">{{ detail.fullName.charAt(0) || '?' }}</div>
+            }
+            <div>
+              <strong>{{ detail.fullName }}</strong>
+              <span>{{ detail.roleName || '—' }}</span>
+            </div>
+          </div>
+
+          <dl class="detail-grid">
+            <div><dt>ID</dt><dd>{{ detail.id }}</dd></div>
+            <div><dt>Email</dt><dd>{{ detail.email }}</dd></div>
+            <div><dt>Số điện thoại</dt><dd>{{ detail.phone || '—' }}</dd></div>
+            <div><dt>Địa chỉ</dt><dd>{{ detail.address || '—' }}</dd></div>
+          </dl>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-primary" (click)="closeDetailModal()">Đóng</button>
+          </div>
+        }
+      </section>
+    </div>
   }
 
   @if (selectedUser(); as selected) {
-    <div class="modal-overlay animate-fade-in">
-      <div class="modal-content glass-card">
-        <h3>Thay đổi quyền người dùng</h3>
+    <div class="modal-overlay animate-fade-in" (click)="closeRoleModal()">
+      <div class="modal-content glass-card" role="dialog" aria-modal="true" aria-labelledby="role-modal-title" (click)="$event.stopPropagation()">
+        <h3 id="role-modal-title">Thay đổi quyền người dùng</h3>
         <p>Người dùng: <strong>{{ selected.fullName }}</strong></p>
-        
+
         <form [formGroup]="roleForm" (ngSubmit)="onUpdateRole()">
           <div class="form-group">
             <label for="role">Chọn vai trò</label>
@@ -71,5 +108,4 @@
       </div>
     </div>
   }
-
 </div>

@@ -30,6 +30,11 @@ export class App {
     return role === 'ADMIN' || role === 'STAFF' || role === 'ROLE_ADMIN' || role === 'ROLE_STAFF';
   });
 
+  isFullAdmin = computed(() => {
+    const role = this.authService.role();
+    return role === 'ADMIN' || role === 'ROLE_ADMIN';
+  });
+
   onLogout(): void {
     this.notifService.disconnect();
     this.authService.logout();
