@@ -94,8 +94,7 @@
 }
 
 .btn-detail,
-.btn-edit,
-.btn-delete {
+.btn-edit {
   padding: 7px 12px;
   border-radius: 8px;
   background: #fff;
@@ -125,16 +124,6 @@
 .btn-edit:hover {
   border-color: #93c5fd;
   background: #eff6ff;
-}
-
-.btn-delete {
-  border: 1px solid #fecaca;
-  color: #b91c1c;
-}
-
-.btn-delete:hover {
-  border-color: #fca5a5;
-  background: #fff1f2;
 }
 
 .error-alert {

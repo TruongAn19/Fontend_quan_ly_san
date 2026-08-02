@@ -66,7 +66,6 @@
                   {{ expandedProductId() === item.id ? '▾' : '▸' }}
                 </button>
                 <button class="btn-icon-action edit" (click)="openEditModal(item)" title="Chỉnh sửa">✏️</button>
-                <button class="btn-icon-action delete" (click)="deleteProduct(item.id)" title="Xóa sân">🗑️</button>
               </div>
             </td>
           </tr>
@@ -98,7 +97,6 @@
                       </td>
                       <td class="text-right">
                         <button class="btn-icon-action edit" (click)="openEditSubPitchModal(sp)" title="Sửa">✏️</button>
-                        <button class="btn-icon-action delete" (click)="deleteSubPitch(sp.id)" title="Xóa">🗑️</button>
                       </td>
                     </tr>
                   </tbody>

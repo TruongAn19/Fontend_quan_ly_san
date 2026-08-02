@@ -105,21 +105,6 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  deleteSubPitch(id: number): void {
-    if (!confirm('Xóa sân con này?')) return;
-    const productId = this.expandedProductId();
-    this.adminService.deleteSubPitch(id).subscribe({
-      next: () => {
-        if (productId != null) {
-          this.adminService.getSubPitches(productId).subscribe({
-            next: (res) => this.subPitches.set(res.data || [])
-          });
-        }
-      },
-      error: (err) => this.errorMessage.set(err?.error?.message || 'Xóa sân con thất bại.')
-    });
-  }
-
   initForm(): void {
     this.productForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -236,15 +221,6 @@ export class AdminProductsComponent implements OnInit {
         this.errorMessage.set(err.error?.message || 'Thao tác sản phẩm thất bại.');
       }
     });
-  }
-
-  deleteProduct(id: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      this.adminService.deleteProduct(id).subscribe({
-        next: () => this.loadProducts(),
-        error: (err) => this.errorMessage.set(err.error?.message || 'Xóa sản phẩm thất bại.')
-      });
-    }
   }
 
   changePage(page: number): void {

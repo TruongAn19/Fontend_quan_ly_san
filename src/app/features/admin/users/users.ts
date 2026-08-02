@@ -95,12 +95,4 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  deleteUser(userId: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-      this.adminService.deleteUser(userId).subscribe({
-        next: () => this.loadUsers(),
-        error: (err) => this.errorMessage.set(err.error?.message || 'Xóa người dùng thất bại.')
-      });
-    }
-  }
 }

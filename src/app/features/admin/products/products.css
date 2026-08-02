@@ -160,11 +160,6 @@
   background: #F3F4F6;
 }
 
-.btn-icon-action.delete:hover {
-  background: #FFF1F2;
-  border-color: #FEE2E2;
-}
-
 /* Modal */
 .modal-overlay {
   position: fixed;
