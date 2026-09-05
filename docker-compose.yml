@@ -1,0 +1,9 @@
+services:
+  fontend-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fontend-do-an
+    ports:
+      - "4200:4200"
+    restart: always
